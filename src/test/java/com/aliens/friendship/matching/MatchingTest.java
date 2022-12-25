@@ -18,6 +18,7 @@ public class MatchingTest {
     static List<List<ApplicantInfo>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
     static List<MatchedApplicants> matchedTeams; // 팀 반환
     List<ApplicantInfo> remainApplicants1, remainApplicants2;
+
     @BeforeAll
     static void init() {
         mockApplicants = new ArrayList<>();
@@ -33,3 +34,16 @@ public class MatchingTest {
         }
     }
 
+
+    void loadApplicants() {
+        Random random = new Random();
+
+        // 신청자 수: 4~52명, 질문 값: 1 또는 2, 언어: 10가지 중 하나
+        for (int i = 0; i < 2; i++) {
+            mockApplicants.add(new ApplicantInfo(i, 1, random.nextInt(10)));
+            mockApplicants.add(new ApplicantInfo(i + 2, 2, random.nextInt(10)));
+        }
+        for (int i = 4; i < random.nextInt(50) + 3; i++) {
+            mockApplicants.add(new ApplicantInfo(i, random.nextInt(2) + 1, random.nextInt(10)));
+        }
+    }
