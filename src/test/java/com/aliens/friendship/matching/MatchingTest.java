@@ -37,6 +37,26 @@ public class MatchingTest {
         }
     }
 
+    @Test
+    void matchApplicants() {
+        // given
+        loadApplicants();
+
+        // when
+        Collections.shuffle(mockApplicants);
+        filterQuestion();
+        filterLanguage(ans1, 1);
+        filterLanguage(ans2, 2);
+        remainApplicants1 = makeTeam(ans1_lg);
+        remainApplicants2 = makeTeam(ans2_lg);
+
+        // then
+        // 남은 신청자가 0명인지 확인
+        Assertions.assertThat(remainApplicants1.size()).isEqualTo(0);
+        Assertions.assertThat(remainApplicants2.size()).isEqualTo(0);
+        // 생성되어야 하는 팀 수 확인
+        Assertions.assertThat(matchedTeams.size()).isEqualTo(calculateTeamCnt());
+    }
 
     void loadApplicants() {
         Random random = new Random();
