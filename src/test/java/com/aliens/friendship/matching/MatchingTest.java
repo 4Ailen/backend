@@ -8,8 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
 @SpringBootTest
 public class MatchingTest {
 
@@ -46,4 +49,14 @@ public class MatchingTest {
         for (int i = 4; i < random.nextInt(50) + 3; i++) {
             mockApplicants.add(new ApplicantInfo(i, random.nextInt(2) + 1, random.nextInt(10)));
         }
+    }
+
+    void filterQuestion() {
+        ans1 = mockApplicants.stream()
+                .filter(ans -> ans.getQuestion() == 1)
+                .collect(Collectors.toList());
+
+        ans2 = mockApplicants.stream()
+                .filter(ans -> ans.getQuestion() == 2)
+                .collect(Collectors.toList());
     }
