@@ -131,3 +131,20 @@ public class MatchingTest {
 
         return remainApplicants;
     }
+
+    // 신청자 수 기반으로 생성되어야 할 팀 수 계산
+    int calculateTeamCnt() {
+        int teamCnt = 0;
+        teamCnt += ans1.size() / 3;
+        if (ans1.size() % 3 != 0) {
+            teamCnt++;
+        }
+        teamCnt += ans2.size() / 3;
+        if (ans2.size() % 3 != 0) {
+            teamCnt++;
+        }
+
+        return teamCnt;
+    }
+
+}
