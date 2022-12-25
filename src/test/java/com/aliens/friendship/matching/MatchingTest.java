@@ -60,3 +60,18 @@ public class MatchingTest {
                 .filter(ans -> ans.getQuestion() == 2)
                 .collect(Collectors.toList());
     }
+
+    // ans에 대해 10가지 언어로 나누기
+    void filterLanguage(List<ApplicantInfo> ans, int ansNum) {
+        for (int i = 0; i < 10; i++) {
+            int lgIdx = i;
+            List<ApplicantInfo> tmp = ans.stream()
+                    .filter(lg -> lg.getLanguage() == lgIdx)
+                    .collect(Collectors.toList());
+            if (ansNum == 1) {
+                ans1_lg.get(i).addAll(tmp);
+            } else if (ansNum == 2) {
+                ans2_lg.get(i).addAll(tmp);
+            }
+        }
+    }
