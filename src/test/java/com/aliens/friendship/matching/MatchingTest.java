@@ -75,3 +75,59 @@ public class MatchingTest {
             }
         }
     }
+
+    List<ApplicantInfo> makeTeam(List<List<ApplicantInfo>> filteredList) {
+        List<ApplicantInfo> remainApplicants = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            // 세명씩 팀 구성
+            while (filteredList.get(i).size() >= 3) {
+                MatchedApplicants team = new MatchedApplicants(filteredList.get(i).get(0).getMemberId(),
+                        filteredList.get(i).get(1).getMemberId(),
+                        filteredList.get(i).get(2).getMemberId());
+                for (int j = 0; j < 3; j++) {
+                    filteredList.get(i).remove(0);
+                }
+                matchedTeams.add(team);
+            }
+            // 남은 신청자들
+            for (int j = 0; j < filteredList.get(i).size(); j++) {
+                remainApplicants.add(filteredList.get(i).get(j));
+            }
+        }
+
+        // 남은 신청자들 1차: 3명씩 팀
+        while (remainApplicants.size() >= 3) {
+            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMemberId(),
+                    remainApplicants.get(1).getMemberId(),
+                    remainApplicants.get(2).getMemberId());
+            for (int j = 0; j < 3; j++) {
+                remainApplicants.remove(0);
+            }
+            matchedTeams.add(team);
+        }
+
+        // 남은 신청자들 2차: 2명씩 팀
+        if (remainApplicants.size() == 2) { // 2명 팀
+            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMemberId(),
+                    remainApplicants.get(1).getMemberId(),
+                    null);
+            for (int j = 0; j < 2; j++) {
+                remainApplicants.remove(0);
+            }
+            // 만들어진 팀 추가
+            matchedTeams.add(team);
+        } else if (remainApplicants.size() == 1) { // 이전에 만들어진 팀의 3명 + 남은 1명으로 2명, 2명 팀
+            int id1, id2, id3, id4, lastIdx = matchedTeams.size() - 1;
+            id1 = matchedTeams.get(lastIdx).getMemberId1();
+            id2 = matchedTeams.get(lastIdx).getMemberId2();
+            id3 = matchedTeams.get(lastIdx).getMemberId3();
+            id4 = remainApplicants.get(0).getMemberId();
+            matchedTeams.remove(matchedTeams.size() - 1);
+            matchedTeams.add(new MatchedApplicants(id1, id2, null));
+            matchedTeams.add(new MatchedApplicants(id3, id4, null));
+            remainApplicants.remove(0);
+        }
+
+        return remainApplicants;
+    }
