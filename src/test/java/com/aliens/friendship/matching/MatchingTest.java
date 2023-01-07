@@ -22,7 +22,7 @@ public class MatchingTest {
     static List<ApplicantInfo> ans1, ans2; // 1차 필터링(질문 기반)
     static List<List<ApplicantInfo>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
     static List<MatchedApplicants> matchedTeams; // 팀 반환
-    List<ApplicantInfo> remainApplicants1, remainApplicants2;
+    static List<ApplicantInfo> remainApplicants1, remainApplicants2;
 
     @BeforeAll
     static void init() {
@@ -33,6 +33,8 @@ public class MatchingTest {
         ans1_lg = new ArrayList<>();
         ans2_lg = new ArrayList<>();
         matchedTeams = new ArrayList<>();
+        remainApplicants1 = new ArrayList<>();
+        remainApplicants2 = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             ans1_lg.add(new ArrayList<>());
@@ -203,6 +205,20 @@ public class MatchingTest {
         }
         return true;
     }
+
+    // 리스트 내 모든 요소 삭제
+    void clearLists() {
+        matchedTeams.clear();
+        remainApplicants1.clear();
+        remainApplicants2.clear();
+        ans1.clear();
+        ans2.clear();
+        for (int i = 0; i < 10; i++) {
+            ans1_lg.get(i).clear();
+            ans2_lg.get(i).clear();
+        }
+    }
+
     // 신청자 수 기반으로 생성되어야 할 팀 수 계산
     int calculateTeamCnt() {
         int teamCnt = 0;
