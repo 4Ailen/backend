@@ -179,6 +179,30 @@ public class MatchingTest {
         return remainApplicants;
     }
 
+    // 매칭된 팀에서 차단한 신청자가 같이 매칭된 경우 발견 시 false 반환
+    boolean checkBlockingInfo() {
+        for (int i = 0; i < matchedTeams.size(); i++) {
+            for (int j = 0; j < blockingInfos.size(); j++) {
+                int blockedMemberId = blockingInfos.get(j).getBlockedMemberId();
+                int blockingMemberId = blockingInfos.get(j).getBlockingMemberId();
+                int memberId1 = matchedTeams.get(i).getMemberId1(), memberId2 = matchedTeams.get(i).getMemberId2(), memberId3 = -1;
+                if (matchedTeams.get(i).getMemberId3() != null) {
+                    memberId3 = matchedTeams.get(i).getMemberId3();
+                }
+                boolean isBlockedMember = false, isBlockingMember = false;
+                if (memberId1 == blockingMemberId || memberId2 == blockingMemberId || memberId3 == blockingMemberId) {
+                    isBlockingMember = true;
+                }
+                if (memberId1 == blockedMemberId || memberId2 == blockedMemberId || memberId3 == blockedMemberId) {
+                    isBlockedMember = true;
+                }
+                if (isBlockingMember && isBlockedMember) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     // 신청자 수 기반으로 생성되어야 할 팀 수 계산
     int calculateTeamCnt() {
         int teamCnt = 0;
