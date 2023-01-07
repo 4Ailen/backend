@@ -23,6 +23,7 @@ public class MatchingTest {
     static List<List<ApplicantInfo>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
     static List<MatchedApplicants> matchedTeams; // 팀 반환
     static List<ApplicantInfo> remainApplicants1, remainApplicants2;
+    int ttl = 100;
 
     @BeforeAll
     static void init() {
@@ -48,12 +49,20 @@ public class MatchingTest {
         loadApplicants();
 
         // when
-        Collections.shuffle(mockApplicants);
-        filterQuestion();
-        filterLanguage(ans1, 1);
-        filterLanguage(ans2, 2);
-        remainApplicants1 = makeTeam(ans1_lg);
-        remainApplicants2 = makeTeam(ans2_lg);
+        while (ttl > 0) {
+            clearLists();
+            Collections.shuffle(mockApplicants);
+            filterQuestion();
+            filterLanguage(ans1, 1);
+            filterLanguage(ans2, 2);
+            remainApplicants1 = makeTeam(ans1_lg);
+            remainApplicants2 = makeTeam(ans2_lg);
+            if (checkBlockingInfo()) {
+                break;
+            } else {
+                ttl--;
+            }
+        }
 
         // then
         // 남은 신청자가 0명인지 확인
