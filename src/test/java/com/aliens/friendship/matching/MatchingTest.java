@@ -1,6 +1,7 @@
 package com.aliens.friendship.matching;
 
 import com.aliens.friendship.dto.ApplicantInfo;
+import com.aliens.friendship.dto.BlockingInfo;
 import com.aliens.friendship.dto.MatchedApplicants;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class MatchingTest {
 
     static List<ApplicantInfo> mockApplicants; // 신청자
+    static List<BlockingInfo> blockingInfos; // 사용자들의 차단 정보
     static List<ApplicantInfo> ans1, ans2; // 1차 필터링(질문 기반)
     static List<List<ApplicantInfo>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
     static List<MatchedApplicants> matchedTeams; // 팀 반환
@@ -25,6 +27,7 @@ public class MatchingTest {
     @BeforeAll
     static void init() {
         mockApplicants = new ArrayList<>();
+        blockingInfos = new ArrayList<>();
         ans1 = new ArrayList<>();
         ans2 = new ArrayList<>();
         ans1_lg = new ArrayList<>();
@@ -68,6 +71,30 @@ public class MatchingTest {
         }
         for (int i = 4; i < random.nextInt(50) + 3; i++) {
             mockApplicants.add(new ApplicantInfo(i, random.nextInt(2) + 1, random.nextInt(10)));
+        }
+
+        // 차단 정보 인스턴스 랜덤 생성
+        for (int i = 0; i < mockApplicants.size(); i++) {
+            // memberId가 i인 신청자 한명 당 차단하는 사용자가 중복되지 않도록 체크하는 checkBlocked
+            List<Integer> checkBlocked = new ArrayList<>(mockApplicants.size());
+            for (int j = 0; j < mockApplicants.size(); j++) {
+                if (j == i) { // 자기 자신은 차단할 수 없음.
+                    checkBlocked.add(j, 1);
+                } else {
+                    checkBlocked.add(j, 0);
+                }
+            }
+            // memberId가 i인 신청자가 차단하는 사용자 랜덤 생성
+            for (int j = 0; j < random.nextInt(mockApplicants.size()); j++) {
+                int blocked = random.nextInt(mockApplicants.size());
+                // 차단 중복 체크
+                if (checkBlocked.get(blocked) == 0) { // 차단되지 않은 번호인 경우
+                    blockingInfos.add(new BlockingInfo(blockingInfoIdx++, blocked, i));
+                    checkBlocked.set(blocked, 1);
+                } else { // 이미 차단되었던 번호가 나온 경우
+                    j--;
+                }
+            }
         }
     }
 
