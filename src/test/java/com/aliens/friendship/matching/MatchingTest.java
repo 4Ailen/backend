@@ -65,6 +65,7 @@ public class MatchingTest {
 
     void loadApplicants() {
         Random random = new Random();
+        int blockingInfoIdx = 0;
 
         // 신청자 수: 4~52명, 질문 값: 1 또는 2, 언어: 10가지 중 하나
         for (int i = 0; i < 2; i++) {
