@@ -76,12 +76,12 @@ public class MatchingTest {
         Random random = new Random();
         int blockingInfoIdx = 0;
 
-        // 신청자 수: 4~52명, 질문 값: 1 또는 2, 언어: 10가지 중 하나
+        // 신청자 수: 4~752명, 질문 값: 1 또는 2, 언어: 10가지 중 하나
         for (int i = 0; i < 2; i++) {
             mockApplicants.add(new ApplicantInfo(i, 1, random.nextInt(10)));
             mockApplicants.add(new ApplicantInfo(i + 2, 2, random.nextInt(10)));
         }
-        for (int i = 4; i < random.nextInt(50) + 3; i++) {
+        for (int i = 4; i < random.nextInt(750) + 3; i++) {
             mockApplicants.add(new ApplicantInfo(i, random.nextInt(2) + 1, random.nextInt(10)));
         }
 
