@@ -1,6 +1,7 @@
 package com.aliens.friendship.matching;
 
 import com.aliens.friendship.dto.ApplicantInfo;
+import com.aliens.friendship.dto.BlockingInfo;
 import com.aliens.friendship.dto.MatchedApplicants;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,19 +18,24 @@ import java.util.stream.Collectors;
 public class MatchingTest {
 
     static List<ApplicantInfo> mockApplicants; // 신청자
+    static List<BlockingInfo> blockingInfos; // 사용자들의 차단 정보
     static List<ApplicantInfo> ans1, ans2; // 1차 필터링(질문 기반)
     static List<List<ApplicantInfo>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
     static List<MatchedApplicants> matchedTeams; // 팀 반환
-    List<ApplicantInfo> remainApplicants1, remainApplicants2;
+    static List<ApplicantInfo> remainApplicants1, remainApplicants2;
+    int ttl = 100;
 
     @BeforeAll
     static void init() {
         mockApplicants = new ArrayList<>();
+        blockingInfos = new ArrayList<>();
         ans1 = new ArrayList<>();
         ans2 = new ArrayList<>();
         ans1_lg = new ArrayList<>();
         ans2_lg = new ArrayList<>();
         matchedTeams = new ArrayList<>();
+        remainApplicants1 = new ArrayList<>();
+        remainApplicants2 = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             ans1_lg.add(new ArrayList<>());
@@ -43,12 +49,20 @@ public class MatchingTest {
         loadApplicants();
 
         // when
-        Collections.shuffle(mockApplicants);
-        filterQuestion();
-        filterLanguage(ans1, 1);
-        filterLanguage(ans2, 2);
-        remainApplicants1 = makeTeam(ans1_lg);
-        remainApplicants2 = makeTeam(ans2_lg);
+        while (ttl > 0) {
+            clearLists();
+            Collections.shuffle(mockApplicants);
+            filterQuestion();
+            filterLanguage(ans1, 1);
+            filterLanguage(ans2, 2);
+            remainApplicants1 = makeTeam(ans1_lg);
+            remainApplicants2 = makeTeam(ans2_lg);
+            if (checkBlockingInfo()) {
+                break;
+            } else {
+                ttl--;
+            }
+        }
 
         // then
         // 남은 신청자가 0명인지 확인
@@ -60,14 +74,39 @@ public class MatchingTest {
 
     void loadApplicants() {
         Random random = new Random();
+        int blockingInfoIdx = 0;
 
-        // 신청자 수: 4~52명, 질문 값: 1 또는 2, 언어: 10가지 중 하나
+        // 신청자 수: 4~752명, 질문 값: 1 또는 2, 언어: 10가지 중 하나
         for (int i = 0; i < 2; i++) {
             mockApplicants.add(new ApplicantInfo(i, 1, random.nextInt(10)));
             mockApplicants.add(new ApplicantInfo(i + 2, 2, random.nextInt(10)));
         }
-        for (int i = 4; i < random.nextInt(50) + 3; i++) {
+        for (int i = 4; i < random.nextInt(750) + 3; i++) {
             mockApplicants.add(new ApplicantInfo(i, random.nextInt(2) + 1, random.nextInt(10)));
+        }
+
+        // 차단 정보 인스턴스 랜덤 생성
+        for (int i = 0; i < mockApplicants.size(); i++) {
+            // memberId가 i인 신청자 한명 당 차단하는 사용자가 중복되지 않도록 체크하는 checkBlocked
+            List<Integer> checkBlocked = new ArrayList<>(mockApplicants.size());
+            for (int j = 0; j < mockApplicants.size(); j++) {
+                if (j == i) { // 자기 자신은 차단할 수 없음.
+                    checkBlocked.add(j, 1);
+                } else {
+                    checkBlocked.add(j, 0);
+                }
+            }
+            // memberId가 i인 신청자가 차단하는 사용자 랜덤 생성
+            for (int j = 0; j < random.nextInt(mockApplicants.size()); j++) {
+                int blocked = random.nextInt(mockApplicants.size());
+                // 차단 중복 체크
+                if (checkBlocked.get(blocked) == 0) { // 차단되지 않은 번호인 경우
+                    blockingInfos.add(new BlockingInfo(blockingInfoIdx++, blocked, i));
+                    checkBlocked.set(blocked, 1);
+                } else { // 이미 차단되었던 번호가 나온 경우
+                    j--;
+                }
+            }
         }
     }
 
@@ -150,6 +189,44 @@ public class MatchingTest {
         }
 
         return remainApplicants;
+    }
+
+    // 매칭된 팀에서 차단한 신청자가 같이 매칭된 경우 발견 시 false 반환
+    boolean checkBlockingInfo() {
+        for (int i = 0; i < matchedTeams.size(); i++) {
+            for (int j = 0; j < blockingInfos.size(); j++) {
+                int blockedMemberId = blockingInfos.get(j).getBlockedMemberId();
+                int blockingMemberId = blockingInfos.get(j).getBlockingMemberId();
+                int memberId1 = matchedTeams.get(i).getMemberId1(), memberId2 = matchedTeams.get(i).getMemberId2(), memberId3 = -1;
+                if (matchedTeams.get(i).getMemberId3() != null) {
+                    memberId3 = matchedTeams.get(i).getMemberId3();
+                }
+                boolean isBlockedMember = false, isBlockingMember = false;
+                if (memberId1 == blockingMemberId || memberId2 == blockingMemberId || memberId3 == blockingMemberId) {
+                    isBlockingMember = true;
+                }
+                if (memberId1 == blockedMemberId || memberId2 == blockedMemberId || memberId3 == blockedMemberId) {
+                    isBlockedMember = true;
+                }
+                if (isBlockingMember && isBlockedMember) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // 리스트 내 모든 요소 삭제
+    void clearLists() {
+        matchedTeams.clear();
+        remainApplicants1.clear();
+        remainApplicants2.clear();
+        ans1.clear();
+        ans2.clear();
+        for (int i = 0; i < 10; i++) {
+            ans1_lg.get(i).clear();
+            ans2_lg.get(i).clear();
+        }
     }
 
     // 신청자 수 기반으로 생성되어야 할 팀 수 계산
