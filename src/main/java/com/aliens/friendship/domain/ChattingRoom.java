@@ -1,9 +1,6 @@
 package com.aliens.friendship.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,14 +11,21 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
+@ToString
 @Entity
-@Table(name = "chatting_room", schema = "aliendb")
+@Table(name = ChattingRoom.TABLE_NAME, schema = "aliendb")
 public class ChattingRoom {
+    public static final String TABLE_NAME = "chatting_room";
+    public static final String COLUMN_ID_NAME = "chatting_room_id";
+    public static final String COLUMN_STATUS_NAME = "status";
+
+    @Setter(AccessLevel.NONE)
     @Id
-    @Column(name = "chatting_room_id", nullable = false)
+    @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @Column(name = "status", nullable = false, length = 45)
+    @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
     private String status;
 
 }

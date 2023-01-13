@@ -9,46 +9,62 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
+@ToString
 @Entity
-@Table(name = "member", schema = "aliendb")
+@Table(name = Member.TABLE_NAME, schema = "aliendb")
 public class Member {
+    @Setter(AccessLevel.NONE)
+    public static final String TABLE_NAME = "member";
+    public static final String COLUMN_ID_NAME = "member_id";
+    public static final String COLUMN_EMAIL_NAME = "email";
+    public static final String COLUMN_PASSWORD_NAME = "password";
+    public static final String COLUMN_MBTI_NAME = "mbti";
+    public static final String COLUMN_GENDER_NAME = "gender";
+    public static final String COLUMN_AGE_NAME = "age";
+    public static final String COLUMN_NAME_NAME = "name";
+    public static final String COLUMN_JOINDATE_NAME = "join_date";
+    public static final String COLUMN_IMAGEURL_NAME = "image_url";
+    public static final String COLUMN_NOTIFICATIONSTATUS_NAME = "notification_status";
+    public static final String COLUMN_ISAPPLIED_NAME = "is_applied";
+
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id", nullable = false)
+    @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @Column(name = "email", nullable = false, length = 45)
+    @Column(name = COLUMN_EMAIL_NAME, nullable = false, length = 45)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = COLUMN_PASSWORD_NAME, nullable = false)
     private String password;
 
-    @Column(name = "mbti", nullable = false, length = 45)
+    @Column(name = COLUMN_MBTI_NAME, nullable = false, length = 45)
     private String mbti;
 
-    @Column(name = "gender", nullable = false, length = 45)
+    @Column(name = COLUMN_GENDER_NAME, nullable = false, length = 45)
     private String gender;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "nationality", nullable = false)
     private Nationality nationality;
 
-    @Column(name = "age", nullable = false)
+    @Column(name = COLUMN_AGE_NAME, nullable = false)
     private Integer age;
 
-    @Column(name = "name", nullable = false, length = 45)
+    @Column(name = COLUMN_NAME_NAME, nullable = false, length = 45)
     private String name;
 
-    @Column(name = "join_date", nullable = false)
+    @Column(name = COLUMN_JOINDATE_NAME, nullable = false)
     private Instant joinDate;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = COLUMN_IMAGEURL_NAME, nullable = false)
     private String imageUrl;
 
-    @Column(name = "notification_status", nullable = false)
+    @Column(name = COLUMN_NOTIFICATIONSTATUS_NAME, nullable = false)
     private Byte notificationStatus;
 
-    @Column(name = "matching_status", nullable = false, length = 45)
-    private String matchingStatus;
+    @Column(name = COLUMN_ISAPPLIED_NAME, nullable = false, length = 45)
+    private String isApplied;
 
 }

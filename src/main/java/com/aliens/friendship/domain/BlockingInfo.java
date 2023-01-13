@@ -2,26 +2,29 @@ package com.aliens.friendship.domain;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString
 @Entity
-@Table(name = "blocking_info", schema = "aliendb")
+@Table(name = BlockingInfo.TABLE_NAME, schema = "aliendb")
 public class BlockingInfo {
+    public static final String TABLE_NAME = "blocking_info";
+    public static final String COLUMN_ID_NAME = "blocking_info_id";
+
     @Id
-    @Column(name = "blocking_info_id", nullable = false)
+    @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @Column(name = "blocked_member_id", nullable = false)
-    private Integer blockedMemberId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "blocked_member_id", nullable = false)
+    private Member blockedMember;
 
-    @Column(name = "blocking_member_id", nullable = false)
-    private Integer blockingMemberId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "blocking_member_id", nullable = false)
+    private Member blockingMember;
 
 }
