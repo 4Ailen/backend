@@ -1,9 +1,6 @@
 package com.aliens.friendship.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,17 +11,24 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString
 @Entity
-@Table(name = "question", schema = "aliendb")
+@Table(name = Question.TABLE_NAME, schema = "aliendb")
 public class Question {
+    public static final String TABLE_NAME = "question";
+    public static final String COLUMN_ID_NAME = "question_id";
+    public static final String COLUMN_QUESTIONTEXT_NAME = "question_text";
+    public static final String COLUMN_ISSELECTED_NAME = "is_selected";
+
+
     @Id
-    @Column(name = "question_id", nullable = false)
+    @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @Column(name = "sentence", nullable = false, length = 45)
-    private String sentence;
+    @Column(name = COLUMN_QUESTIONTEXT_NAME, nullable = false, length = 45)
+    private String questionText;
 
-    @Column(name = "is_selected", nullable = false)
+    @Column(name = COLUMN_ISSELECTED_NAME, nullable = false)
     private Byte isSelected;
 
 }

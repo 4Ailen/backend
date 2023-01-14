@@ -1,9 +1,6 @@
 package com.aliens.friendship.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,23 +12,27 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString
 @Entity
-@Table(name = "authentication", schema = "aliendb")
+@Table(name = Authentication.TABLE_NAME, schema = "aliendb")
 public class Authentication {
+    public static final String TABLE_NAME = "authentication";
+    public static final String COLUMN_ID_NAME = "authentication_id";
+    public static final String COLUMN_CODE_NAME = "code";
+    public static final String COLUMN_EMAIL_NAME = "email";
+    public static final String COLUMN_CREATEDTIME_NAME = "created_time";
+
     @Id
-    @Column(name = "authentication_id", nullable = false)
+    @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @Column(name = "code", nullable = false, length = 45)
+    @Column(name = COLUMN_CODE_NAME, nullable = false, length = 45)
     private String code;
 
-    @Column(name = "email", nullable = false)
-    private Integer email;
+    @Column(name = COLUMN_EMAIL_NAME, nullable = false, length = 45)
+    private String email;
 
-    @Column(name = "status", nullable = false, length = 45)
-    private String status;
-
-    @Column(name = "created_time")
+    @Column(name = COLUMN_CREATEDTIME_NAME, nullable = false)
     private Instant createdTime;
 
 }
