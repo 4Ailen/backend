@@ -77,4 +77,20 @@ public class MatchingService {
         matchingParticipantRepository.save(matchingParticipant);
     }
 
+    // member 테이블로부터 매칭 상태 반환
+    public String checkStatus() {
+        // 해당 유저의 정보를 반환하는 코드 아직 구현 안되어 임시로 member 설정
+        Member member = memberRepository.findById(10).get();
+        System.out.println("member.getIsApplied() = " + member.getIsApplied());
+        if (member.getIsApplied().equals("apply")) {
+            if (matchingParticipantRepository.findById(10).get().getIsMatched() == 1) {
+                return "matched";
+            } else {
+                return "waiting";
+            }
+        } else {
+            return "none";
+        }
+    }
+
 }
