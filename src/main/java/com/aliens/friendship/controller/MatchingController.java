@@ -2,6 +2,7 @@ package com.aliens.friendship.controller;
 
 import com.aliens.friendship.domain.Language;
 import com.aliens.friendship.domain.Question;
+import com.aliens.friendship.dto.ApplicantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,5 +29,10 @@ public class MatchingController {
     @GetMapping("/matching/question")
     public Question getQuestion() {
         return matchingService.chooseQuestion();
+    }
+
+    @PostMapping("/matching/applicant")
+    public void applyMatching(@RequestBody ApplicantInfo applicantInfo) {
+        matchingService.applyMatching(applicantInfo);
     }
 }

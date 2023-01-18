@@ -1,7 +1,10 @@
 package com.aliens.friendship.service;
 
 import com.aliens.friendship.domain.Language;
+import com.aliens.friendship.domain.MatchingParticipant;
+import com.aliens.friendship.domain.Member;
 import com.aliens.friendship.domain.Question;
+import com.aliens.friendship.dto.ApplicantInfo;
 import com.aliens.friendship.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,6 +57,24 @@ public class MatchingService {
         questionRepository.save(nextQuestion);
 
         return currentQuestion;
+    }
+
+    public void applyMatching(ApplicantInfo applicantInfo) {
+        // 신청한 member의 is_applied를 waiting으로 변경
+        Member member = memberRepository.findById(applicantInfo.getMemberId()).get();
+        member.setIsApplied("apply");
+        System.out.println("applicantInfo = " + applicantInfo.getAnswer());
+
+        // matching_applicant에 신청자 정보 저장
+        MatchingParticipant matchingParticipant = MatchingParticipant.builder()
+                .member(member)
+                .questionAnswer(applicantInfo.getAnswer())
+                .preferredLanguage(languageRepository.findById(applicantInfo.getLanguage()).get())
+                .isMatched((byte) 0)
+                .groupId(-1)
+                .build();
+
+        matchingParticipantRepository.save(matchingParticipant);
     }
 
 }
