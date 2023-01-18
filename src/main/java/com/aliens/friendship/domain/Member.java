@@ -1,20 +1,24 @@
 package com.aliens.friendship.domain;
 
+import com.aliens.friendship.domain.dto.JoinDto;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@ToString
-@Entity
+import static java.util.stream.Collectors.toList;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.GenerationType.IDENTITY;
+
+@Entity @Getter @ToString @Builder
+@AllArgsConstructor(access = AccessLevel.PROTECTED) @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = Member.TABLE_NAME, schema = "aliendb")
 public class Member {
-    @Setter(AccessLevel.NONE)
+
     public static final String TABLE_NAME = "member";
     public static final String COLUMN_ID_NAME = "member_id";
     public static final String COLUMN_EMAIL_NAME = "email";
@@ -28,8 +32,7 @@ public class Member {
     public static final String COLUMN_NOTIFICATIONSTATUS_NAME = "notification_status";
     public static final String COLUMN_ISAPPLIED_NAME = "is_applied";
 
-
-    @Id
+    @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
@@ -59,65 +62,31 @@ public class Member {
     private Instant joinDate;
 
     @Column(name = COLUMN_IMAGEURL_NAME, nullable = false)
-    private String imageUrl;
+    @Builder.Default
+    private String imageUrl = "/default_image.jpg";
 
     @Column(name = COLUMN_NOTIFICATIONSTATUS_NAME, nullable = false)
-    private Byte notificationStatus;
+    @Builder.Default
+    private Byte notificationStatus = 0;
 
     @Column(name = COLUMN_ISAPPLIED_NAME, nullable = false, length = 45)
-    private String isApplied;
-    
-    
-    // feature #13 jwt 관련 코드
-    
-    /**
-    import com.aliens.friendship.domain.dto.JoinDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
-
-@Entity
-@Getter
-@NoArgsConstructor(access = PROTECTED)
-@AllArgsConstructor(access = PROTECTED)
-@Builder
-public class Member {
-    @Id @GeneratedValue(strategy = IDENTITY) @Column(name = "MEMBER_ID")
-    private Long id;
-
-    @Column(unique = true)
-    private String username;
-
-    @Column(unique = true)
-    private String email;
-
-    private String password;
-
-    @Column(unique = true)
-    private String nickname;
+    @Builder.Default
+    private String isApplied = "none";
 
     @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
     @Builder.Default
-    private Set<com.aliens.friendship.domain.Authority> authorities = new HashSet<>();
+    private Set<Authority> authorities = new HashSet<>();
 
     public static Member ofUser(JoinDto joinDto) {
         Member member = Member.builder()
-                .username(UUID.randomUUID().toString())
                 .email(joinDto.getEmail())
                 .password(joinDto.getPassword())
-                .nickname(joinDto.getNickname())
+                .mbti(joinDto.getMbti())
+                .gender(joinDto.getGender())
+                .age(joinDto.getAge())
+                .name(joinDto.getName())
+                .nationality(joinDto.getNationality())
+                .joinDate(Instant.now())
                 .build();
         member.addAuthority(com.aliens.friendship.domain.Authority.ofUser(member));
         return member;
@@ -125,10 +94,14 @@ public class Member {
 
     public static Member ofAdmin(JoinDto joinDto) {
         Member member = Member.builder()
-                .username(UUID.randomUUID().toString())
                 .email(joinDto.getEmail())
                 .password(joinDto.getPassword())
-                .nickname(joinDto.getNickname())
+                .mbti(joinDto.getMbti())
+                .gender(joinDto.getGender())
+                .age(joinDto.getAge())
+                .name(joinDto.getName())
+                .nationality(joinDto.getNationality())
+                .joinDate(Instant.now())
                 .build();
         member.addAuthority(com.aliens.friendship.domain.Authority.ofAdmin(member));
         return member;
@@ -143,6 +116,6 @@ public class Member {
                 .map(com.aliens.friendship.domain.Authority::getRole)
                 .collect(toList());
     }
-    **/
+
 
 }
