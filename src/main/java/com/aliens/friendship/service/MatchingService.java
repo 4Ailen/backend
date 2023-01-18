@@ -4,16 +4,29 @@ import com.aliens.friendship.domain.Language;
 import com.aliens.friendship.domain.MatchingParticipant;
 import com.aliens.friendship.domain.Member;
 import com.aliens.friendship.domain.Question;
+import com.aliens.friendship.domain.BlockingInfo;
 import com.aliens.friendship.dto.ApplicantInfo;
+import com.aliens.friendship.dto.MatchedApplicants;
 import com.aliens.friendship.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class MatchingService {
+
+    static List<MatchingParticipant> matchingParticipants; // 신청자
+    static List<BlockingInfo> blockingInfos; // 사용자들의 차단 정보
+    static List<Language> languages; // 언어 리스트
+    static List<Integer> language_ids; // 언어 id 리스트
+    static List<MatchingParticipant> ans1, ans2; // 1차 필터링(질문 기반)
+    static List<List<MatchingParticipant>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
+    static List<MatchedApplicants> matchedTeams; // 팀 반환
+    static List<MatchingParticipant> remainApplicants1, remainApplicants2;
+    int ttl = 100;
 
     private final LanguageRepository languageRepository;
     private final QuestionRepository questionRepository;
@@ -93,4 +106,179 @@ public class MatchingService {
         }
     }
 
+    public List<MatchedApplicants> teamBuilding() {
+        init();
+        loadDatas();
+
+        while (ttl > 0) {
+            clearLists();
+            Collections.shuffle(matchingParticipants);
+            filterQuestion();
+            filterLanguage(ans1, 1);
+            filterLanguage(ans2, 2);
+            remainApplicants1 = makeTeam(ans1_lg);
+            remainApplicants2 = makeTeam(ans2_lg);
+            if (checkBlockingInfo()) {
+                break;
+            } else {
+                ttl--;
+            }
+        }
+        convertStatus();
+
+        return matchedTeams;
+    }
+
+    static void init() {
+        matchingParticipants = new ArrayList<>();
+        blockingInfos = new ArrayList<>();
+        ans1 = new ArrayList<>();
+        ans2 = new ArrayList<>();
+        ans1_lg = new ArrayList<>();
+        ans2_lg = new ArrayList<>();
+        matchedTeams = new ArrayList<>();
+        remainApplicants1 = new ArrayList<>();
+        remainApplicants2 = new ArrayList<>();
+        languages = new ArrayList<>();
+        language_ids = new ArrayList<>();
+    }
+
+    private void loadDatas() {
+        matchingParticipants = matchingParticipantRepository.findAll();
+        blockingInfos = blockingInfoRepository.findAll();
+        languages = languageRepository.findAll();
+        for (int i = 0; i < languages.size(); i++) {
+            ans1_lg.add(new ArrayList<>());
+            ans2_lg.add(new ArrayList<>());
+            language_ids.add(languages.get(i).getId());
+        }
+    }
+
+    public void filterQuestion() {
+        ans1 = matchingParticipants.stream()
+                .filter(ans -> ans.getQuestionAnswer() == 1)
+                .collect(Collectors.toList());
+
+        ans2 = matchingParticipants.stream()
+                .filter(ans -> ans.getQuestionAnswer() == 2)
+                .collect(Collectors.toList());
+    }
+
+    // ans에 대해 각 언어로 나누기
+    public void filterLanguage(List<MatchingParticipant> ans, int ansNum) {
+        for (int i = 0; i < languages.size(); i++) {
+            int lgIdx = i;
+            List<MatchingParticipant> tmp = ans.stream()
+                    .filter(lg -> lg.getPreferredLanguage().getId() == language_ids.get(lgIdx))
+                    .collect(Collectors.toList());
+            if (ansNum == 1) {
+                ans1_lg.get(i).addAll(tmp);
+            } else if (ansNum == 2) {
+                ans2_lg.get(i).addAll(tmp);
+            }
+        }
+    }
+
+    public List<MatchingParticipant> makeTeam(List<List<MatchingParticipant>> filteredList) {
+        List<MatchingParticipant> remainApplicants = new ArrayList<>();
+
+        for (int i = 0; i < languages.size(); i++) {
+            // 세명씩 팀 구성
+            while (filteredList.get(i).size() >= 3) {
+                MatchedApplicants team = new MatchedApplicants(filteredList.get(i).get(0).getMember().getId(),
+                        filteredList.get(i).get(1).getMember().getId(),
+                        filteredList.get(i).get(2).getMember().getId());
+                for (int j = 0; j < 3; j++) {
+                    filteredList.get(i).remove(0);
+                }
+                matchedTeams.add(team);
+            }
+            // 남은 신청자들
+            for (int j = 0; j < filteredList.get(i).size(); j++) {
+                remainApplicants.add(filteredList.get(i).get(j));
+            }
+        }
+
+        // 남은 신청자들 1차: 3명씩 팀
+        while (remainApplicants.size() >= 3) {
+            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMember().getId(),
+                    remainApplicants.get(1).getMember().getId(),
+                    remainApplicants.get(2).getMember().getId());
+            for (int j = 0; j < 3; j++) {
+                remainApplicants.remove(0);
+            }
+            matchedTeams.add(team);
+        }
+
+        // 남은 신청자들 2차: 2명씩 팀
+        if (remainApplicants.size() == 2) { // 2명 팀
+            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMember().getId(),
+                    remainApplicants.get(1).getMember().getId(),
+                    null);
+            for (int j = 0; j < 2; j++) {
+                remainApplicants.remove(0);
+            }
+            // 만들어진 팀 추가
+            matchedTeams.add(team);
+        } else if (remainApplicants.size() == 1) { // 이전에 만들어진 팀의 3명 + 남은 1명으로 2명, 2명 팀
+            int id1, id2, id3, id4, lastIdx = matchedTeams.size() - 1;
+            id1 = matchedTeams.get(lastIdx).getMemberId1();
+            id2 = matchedTeams.get(lastIdx).getMemberId2();
+            id3 = matchedTeams.get(lastIdx).getMemberId3();
+            id4 = remainApplicants.get(0).getMember().getId();
+            matchedTeams.remove(matchedTeams.size() - 1);
+            matchedTeams.add(new MatchedApplicants(id1, id2, null));
+            matchedTeams.add(new MatchedApplicants(id3, id4, null));
+            remainApplicants.remove(0);
+        }
+
+        return remainApplicants;
+    }
+
+    // 매칭된 팀에서 차단한 신청자가 같이 매칭된 경우 발견 시 false 반환
+    public boolean checkBlockingInfo() {
+        for (int i = 0; i < matchedTeams.size(); i++) {
+            for (int j = 0; j < blockingInfos.size(); j++) {
+                int blockedMemberId = blockingInfos.get(j).getBlockedMember().getId();
+                int blockingMemberId = blockingInfos.get(j).getBlockingMember().getId();
+                int memberId1 = matchedTeams.get(i).getMemberId1(), memberId2 = matchedTeams.get(i).getMemberId2(), memberId3 = -1;
+                if (matchedTeams.get(i).getMemberId3() != null) {
+                    memberId3 = matchedTeams.get(i).getMemberId3();
+                }
+                boolean isBlockedMember = false, isBlockingMember = false;
+                if (memberId1 == blockingMemberId || memberId2 == blockingMemberId || memberId3 == blockingMemberId) {
+                    isBlockingMember = true;
+                }
+                if (memberId1 == blockedMemberId || memberId2 == blockedMemberId || memberId3 == blockedMemberId) {
+                    isBlockedMember = true;
+                }
+                if (isBlockingMember && isBlockedMember) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // 리스트 내 모든 요소 삭제
+    void clearLists() {
+        matchedTeams.clear();
+        remainApplicants1.clear();
+        remainApplicants2.clear();
+        ans1.clear();
+        ans2.clear();
+        for (int i = 0; i < languages.size(); i++) {
+            ans1_lg.get(i).clear();
+            ans2_lg.get(i).clear();
+        }
+    }
+
+    // 매칭 완료 후 member와 matching_participant status 변경
+    void convertStatus() {
+        for (int i = 0; i < matchingParticipants.size(); i++) {
+            MatchingParticipant matchingParticipant = matchingParticipants.get(i);
+            matchingParticipant.setIsMatched((byte) 1);
+            matchingParticipantRepository.save(matchingParticipant);
+        }
+    }
 }

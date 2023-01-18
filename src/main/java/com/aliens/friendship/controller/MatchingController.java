@@ -3,6 +3,7 @@ package com.aliens.friendship.controller;
 import com.aliens.friendship.domain.Language;
 import com.aliens.friendship.domain.Question;
 import com.aliens.friendship.dto.ApplicantInfo;
+import com.aliens.friendship.dto.MatchedApplicants;
 import com.aliens.friendship.service.MatchingService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -48,4 +49,9 @@ public class MatchingController {
 
         return status;
     }
+    @GetMapping("/matching/result")
+    public List<MatchedApplicants> matchingTeams() {
+        return matchingService.teamBuilding();
+    }
+
 }
