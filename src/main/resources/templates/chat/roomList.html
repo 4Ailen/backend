@@ -8,7 +8,7 @@
 <body>
     <a th:href="@{/roomForm}">방만들기</a><br>
     <tr th:each="room : ${roomList}">
-        <td><a th:href="@{/{roomId}(roomId=${room.getId()})}" th:text="${room.getName()}"></a></td>
+        <td><a th:href="@{/{roomId}(roomId=${room.getId()})}" th:text="${room.getId()}"></a></td>
     </tr>
 </body>
 </html>

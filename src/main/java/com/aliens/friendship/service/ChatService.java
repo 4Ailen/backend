@@ -1,42 +1,41 @@
 package com.aliens.friendship.service;
 
 import com.aliens.friendship.domain.Chat;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.aliens.friendship.domain.ChattingRoom;
+import com.aliens.friendship.repository.ChattingRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.aliens.friendship.domain.Room;
 import com.aliens.friendship.repository.ChatRepository;
-import com.aliens.friendship.repository.RoomRepository;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ChatService {
-    private final RoomRepository roomRepository;
+    private final ChattingRoomRepository chattingRoomRepository;
     private final ChatRepository chatRepository;
 
     /**
      * 모든 채팅방 찾기
      */
-    public List<Room> findAllRoom() {
-        return roomRepository.findAll();
+    public List<ChattingRoom> findAllRoom() {
+        return chattingRoomRepository.findAll();
     }
 
     /**
      * 특정 채팅방 찾기
      * @param id room_id
      */
-    public Room findRoomById(Long id) {
-        return roomRepository.findById(id).orElseThrow();
+    public ChattingRoom findRoomById(Integer id) {
+        return chattingRoomRepository.findById(id).orElseThrow();
     }
 
     /**
      * 채팅방 만들기
      * @param name 방 이름
      */
-    public Room createRoom(String name) {
-        return roomRepository.save(Room.createRoom(name));
+    public ChattingRoom createRoom() {
+        return chattingRoomRepository.save(new ChattingRoom());
     }
 
     /////////////////
@@ -47,8 +46,8 @@ public class ChatService {
      * @param sender 보낸이
      * @param message 내용
      */
-    public Chat createChat(Long roomId, String sender, String message) {
-        Room room = roomRepository.findById(roomId).orElseThrow();  //방 찾기 -> 없는 방일 경우 여기서 예외처리
+    public Chat createChat(Integer roomId, String sender, String message) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow();  //방 찾기 -> 없는 방일 경우 여기서 예외처리
         return chatRepository.save(Chat.createChat(room.getId(), sender, message));
     }
 

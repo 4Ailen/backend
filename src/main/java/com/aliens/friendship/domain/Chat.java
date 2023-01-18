@@ -18,7 +18,7 @@ public class Chat {
     private Long id;
 
     @Indexed
-    private Long room;
+    private Integer room;
 
     private String sender;
 
@@ -30,7 +30,7 @@ public class Chat {
     private LocalDateTime sendDate;
 
     @Builder
-    public Chat(Long room, String sender, String message) {
+    public Chat(Integer room, String sender, String message) {
         this.room = room;
         this.sender = sender;
         this.message = message;
@@ -44,7 +44,7 @@ public class Chat {
      * @param message 내용
      * @return Chat Entity
      */
-    public static Chat createChat(Long room, String sender, String message) {
+    public static Chat createChat(Integer room, String sender, String message) {
         return Chat.builder()
                 .room(room)
                 .sender(sender)
