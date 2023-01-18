@@ -37,12 +37,12 @@ public class MemberService {
 
     public void join(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        memberRepository.save(Member.ofUser(joinDto));
+//        memberRepository.save(Member.ofUser(joinDto));
     }
 
     public void joinAdmin(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        memberRepository.save(Member.ofAdmin(joinDto));
+//        memberRepository.save(Member.ofAdmin(joinDto));
     }
 
     // 1
