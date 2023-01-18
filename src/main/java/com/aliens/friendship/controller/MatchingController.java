@@ -49,9 +49,12 @@ public class MatchingController {
 
         return status;
     }
+
+    // TODO: 특정 시간이 되면 매칭 로직을 돌린다...
     @GetMapping("/matching/result")
     public List<MatchedApplicants> matchingTeams() {
         return matchingService.teamBuilding();
     }
 
+    // TODO: 새로 매칭 시작 전 member의 is_applied를 none으로 변경 후 matchingParticipants 데이터 모두 삭제
 }
