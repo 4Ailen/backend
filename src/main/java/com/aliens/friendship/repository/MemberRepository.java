@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     Optional<Member> findByEmail(String email);
 
-    Optional<Member> findByUsername(String username);
+    Optional<Member> findByName(String name);
 
-    @Query("select m from Member m join fetch m.authorities a where m.username = :username")
-    Optional<Member> findByUsernameWithAuthority(String username);
-    
+    @Query("select m from Member m join fetch m.authorities a where m.name = :name")
+    Optional<Member> findByNameWithAuthority(String name);
+
 }
