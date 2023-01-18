@@ -1,6 +1,7 @@
 package com.aliens.friendship.controller;
 
 import com.aliens.friendship.domain.Language;
+import com.aliens.friendship.domain.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,5 +23,10 @@ public class MatchingController {
     @GetMapping("/matching/languages")
     public List<Language> getLanguages() {
         return matchingService.getLanguages();
+    }
+
+    @GetMapping("/matching/question")
+    public Question getQuestion() {
+        return matchingService.chooseQuestion();
     }
 }
