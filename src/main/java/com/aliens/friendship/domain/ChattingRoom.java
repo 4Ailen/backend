@@ -20,6 +20,8 @@ public class ChattingRoom {
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
+    @Enumerated(EnumType.STRING)
+
     @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
     private RoomStatus status = RoomStatus.CLOSE;
 

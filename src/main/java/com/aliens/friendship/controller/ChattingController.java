@@ -1,6 +1,7 @@
 package com.aliens.friendship.controller;
 
 import com.aliens.friendship.domain.ChattingRoom;
+import com.aliens.friendship.domain.dto.RoomInfoDto;
 import com.aliens.friendship.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +19,12 @@ public class ChattingController {
         this.chatService = chatService;
     }
 
-    //Todo: 해당 멤버를 기준으로 채팅방 목록을 가져와야함
+
     @GetMapping("/chat/rooms")
     public ApiRes<Map<String, Object>> getRooms(){
-        List<ChattingRoom> rooms = chatService.findAllRoom();
+        //Todo: jwt를 통해 접속된 멤버 아이디를 가져와야함
+        Integer memberId = 10;
+        List<RoomInfoDto> rooms = chatService.getRoomInfoDtoListByMatchingParticipantId(memberId);
         Map<String, Object> result = new HashMap<>();
         result.put("chattingRooms",rooms);
         return ApiRes.SUCCESS(result);

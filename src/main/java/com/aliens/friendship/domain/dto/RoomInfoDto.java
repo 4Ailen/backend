@@ -1,9 +1,10 @@
 package com.aliens.friendship.domain.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoomInfoDto {
     private int roomId;
     private String status;

@@ -1,18 +1,26 @@
 package com.aliens.friendship.service;
 
 import com.aliens.friendship.domain.Chat;
+import com.aliens.friendship.domain.Chatting;
 import com.aliens.friendship.domain.ChattingRoom;
+import com.aliens.friendship.domain.MatchingParticipant;
+import com.aliens.friendship.domain.dto.RoomInfoDto;
+import com.aliens.friendship.repository.ChattingRepository;
 import com.aliens.friendship.repository.ChattingRoomRepository;
+import com.aliens.friendship.repository.MatchingParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.aliens.friendship.repository.ChatRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ChatService {
     private final ChattingRoomRepository chattingRoomRepository;
+    private final MatchingParticipantRepository matchingParticipantRepository;
+    private final ChattingRepository chattingRepository;
     private final ChatRepository chatRepository;
 
     /**
@@ -59,8 +67,6 @@ public class ChatService {
         return chatRepository.findAllByRoom(roomId);
     }
 
-
-    //Todo status 유효성 검사해보고 오류 어떻게 처리되는지 확인해보기
     public void updateRoomStatus(int roomId, String status) {
         ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow();
         ChattingRoom.RoomStatus roomStatus = ChattingRoom.RoomStatus.valueOf(status.toUpperCase());
@@ -68,7 +74,25 @@ public class ChatService {
         chattingRoomRepository.save(room);
     }
 
+    public List<RoomInfoDto> getRoomInfoDtoListByMatchingParticipantId(Integer matchingParticipantId) {
+        List<RoomInfoDto> roomInfoDtoList = new ArrayList<>();
+        MatchingParticipant matchingParticipant = matchingParticipantRepository.findById(matchingParticipantId).orElseThrow();
+        for(Chatting chatting : chattingRepository.findByMatchingParticipant(matchingParticipant)){
+            RoomInfoDto roomInfoDto = new RoomInfoDto();
+            roomInfoDto.setRoomId(chatting.getChattingRoom().getId());
+            roomInfoDto.setStatus(chatting.getChattingRoom().getStatus().toString());
+            roomInfoDto.setPartnerId(findPartnerId(matchingParticipant, chatting.getChattingRoom()));
+            roomInfoDtoList.add(roomInfoDto);
+        }
+        return roomInfoDtoList;
+    }
 
-
-
+    private Integer findPartnerId(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom) {
+        for(Chatting chatting : chattingRepository.findByChattingRoom(chattingRoom)){
+            if(chatting.getMatchingParticipant().getId() != matchingParticipant.getId()){
+                return chatting.getMatchingParticipant().getId();
+            }
+        }
+        return null;
+    }
 }
