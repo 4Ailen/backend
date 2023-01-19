@@ -60,4 +60,15 @@ public class ChatService {
     }
 
 
+    //Todo status 유효성 검사해보고 오류 어떻게 처리되는지 확인해보기
+    public void updateRoomStatus(int roomId, String status) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow();
+        ChattingRoom.RoomStatus roomStatus = ChattingRoom.RoomStatus.valueOf(status.toUpperCase());
+        room.updateStatus(roomStatus);
+        chattingRoomRepository.save(room);
+    }
+
+
+
+
 }

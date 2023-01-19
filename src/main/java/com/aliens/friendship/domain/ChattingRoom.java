@@ -21,6 +21,14 @@ public class ChattingRoom {
     private Integer id;
 
     @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
-    private String status = "none";
+    private RoomStatus status = RoomStatus.CLOSE;
+
+    public void updateStatus(RoomStatus status) {
+        this.status = status;
+    }
+
+    public enum RoomStatus {
+        PENDING, OPEN, CLOSE;
+    }
 
 }
