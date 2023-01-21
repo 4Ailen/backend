@@ -140,7 +140,7 @@ public class MatchingService {
         return matchedTeams;
     }
 
-    static void init() {
+    private void init() {
         matchingParticipants = new ArrayList<>();
         blockingInfos = new ArrayList<>();
         ans1 = new ArrayList<>();
@@ -165,7 +165,7 @@ public class MatchingService {
         }
     }
 
-    public void filterQuestion() {
+    private void filterQuestion() {
         ans1 = matchingParticipants.stream()
                 .filter(ans -> ans.getQuestionAnswer() == 1)
                 .collect(Collectors.toList());
@@ -190,7 +190,7 @@ public class MatchingService {
         }
     }
 
-    public List<MatchingParticipant> makeTeam(List<List<MatchingParticipant>> filteredList) {
+    private List<MatchingParticipant> makeTeam(List<List<MatchingParticipant>> filteredList) {
         List<MatchingParticipant> remainApplicants = new ArrayList<>();
 
         for (int i = 0; i < languages.size(); i++) {
@@ -247,7 +247,7 @@ public class MatchingService {
     }
 
     // 매칭된 팀에서 차단한 신청자가 같이 매칭된 경우 발견 시 false 반환
-    public boolean checkBlockingInfo() {
+    private boolean checkBlockingInfo() {
         for (int i = 0; i < matchedTeams.size(); i++) {
             for (int j = 0; j < blockingInfos.size(); j++) {
                 int blockedMemberId = blockingInfos.get(j).getBlockedMember().getId();
@@ -272,7 +272,7 @@ public class MatchingService {
     }
 
     // 리스트 내 모든 요소 삭제
-    void clearLists() {
+    private void clearLists() {
         matchedTeams.clear();
         remainApplicants1.clear();
         remainApplicants2.clear();
@@ -285,7 +285,7 @@ public class MatchingService {
     }
 
     // 매칭 완료 후 member와 matching_participant status 변경
-    void convertStatus() {
+    private void updateStatus() {
         for (int i = 0; i < matchingParticipants.size(); i++) {
             MatchingParticipant matchingParticipant = matchingParticipants.get(i);
             matchingParticipant.setIsMatched((byte) 1);
