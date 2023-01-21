@@ -135,7 +135,7 @@ public class MatchingService {
                 ttl--;
             }
         }
-        convertStatus();
+        updateStatus();
 
         return matchedTeams;
     }
