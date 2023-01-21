@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MatchingService {
 
-    static List<MatchingParticipant> matchingParticipants; // 신청자
-    static List<BlockingInfo> blockingInfos; // 사용자들의 차단 정보
-    static List<Language> languages; // 언어 리스트
-    static List<Integer> language_ids; // 언어 id 리스트
-    static List<MatchingParticipant> ans1, ans2; // 1차 필터링(질문 기반)
-    static List<List<MatchingParticipant>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
-    static List<MatchedApplicants> matchedTeams; // 팀 반환
-    static List<MatchingParticipant> remainApplicants1, remainApplicants2;
+    private List<MatchingParticipant> matchingParticipants; // 신청자
+    private List<BlockingInfo> blockingInfos; // 사용자들의 차단 정보
+    private List<Language> languages; // 언어 리스트
+    private List<Integer> languageIds; // 언어 id 리스트
+    private List<MatchingParticipant> ans1, ans2; // 1차 필터링(질문 기반)
+    private List<List<MatchingParticipant>> ans1Lg, ans2Lg; // 2차 필터링(언어 기반)
+    private List<MatchedApplicants> matchedTeams; // 팀 반환
+    private List<MatchingParticipant> remainApplicants1, remainApplicants2;
     int ttl = 100;
 
     private final LanguageRepository languageRepository;
@@ -127,8 +127,8 @@ public class MatchingService {
             filterQuestion();
             filterLanguage(ans1, 1);
             filterLanguage(ans2, 2);
-            remainApplicants1 = makeTeam(ans1_lg);
-            remainApplicants2 = makeTeam(ans2_lg);
+            remainApplicants1 = makeTeam(ans1Lg);
+            remainApplicants2 = makeTeam(ans2Lg);
             if (checkBlockingInfo()) {
                 break;
             } else {
@@ -145,13 +145,13 @@ public class MatchingService {
         blockingInfos = new ArrayList<>();
         ans1 = new ArrayList<>();
         ans2 = new ArrayList<>();
-        ans1_lg = new ArrayList<>();
-        ans2_lg = new ArrayList<>();
+        ans1Lg = new ArrayList<>();
+        ans2Lg = new ArrayList<>();
         matchedTeams = new ArrayList<>();
         remainApplicants1 = new ArrayList<>();
         remainApplicants2 = new ArrayList<>();
         languages = new ArrayList<>();
-        language_ids = new ArrayList<>();
+        languageIds = new ArrayList<>();
     }
 
     private void loadDatas() {
@@ -159,9 +159,9 @@ public class MatchingService {
         blockingInfos = blockingInfoRepository.findAll();
         languages = languageRepository.findAll();
         for (int i = 0; i < languages.size(); i++) {
-            ans1_lg.add(new ArrayList<>());
-            ans2_lg.add(new ArrayList<>());
-            language_ids.add(languages.get(i).getId());
+            ans1Lg.add(new ArrayList<>());
+            ans2Lg.add(new ArrayList<>());
+            languageIds.add(languages.get(i).getId());
         }
     }
 
@@ -176,16 +176,16 @@ public class MatchingService {
     }
 
     // ans에 대해 각 언어로 나누기
-    public void filterLanguage(List<MatchingParticipant> ans, int ansNum) {
+    private void filterLanguage(List<MatchingParticipant> ans, int ansNum) {
         for (int i = 0; i < languages.size(); i++) {
             int lgIdx = i;
             List<MatchingParticipant> tmp = ans.stream()
-                    .filter(lg -> lg.getPreferredLanguage().getId() == language_ids.get(lgIdx))
+                    .filter(lg -> lg.getPreferredLanguage().getId() == languageIds.get(lgIdx))
                     .collect(Collectors.toList());
             if (ansNum == 1) {
-                ans1_lg.get(i).addAll(tmp);
+                ans1Lg.get(i).addAll(tmp);
             } else if (ansNum == 2) {
-                ans2_lg.get(i).addAll(tmp);
+                ans2Lg.get(i).addAll(tmp);
             }
         }
     }
@@ -279,8 +279,8 @@ public class MatchingService {
         ans1.clear();
         ans2.clear();
         for (int i = 0; i < languages.size(); i++) {
-            ans1_lg.get(i).clear();
-            ans2_lg.get(i).clear();
+            ans1Lg.get(i).clear();
+            ans2Lg.get(i).clear();
         }
     }
 
