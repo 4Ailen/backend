@@ -34,19 +34,19 @@ public class MatchingService {
     private final MatchingParticipantRepository matchingParticipantRepository;
     private final BlockingInfoRepository blockingInfoRepository;
 
-    public Map<String, List<List<String>>> getLanguages() {
+    public Map<String, Object> getLanguages() {
         List<Language> languages = languageRepository.findAll();
-        Map<String, List<List<String>>> map = new HashMap<>();
-        List<List<String>> language_list = new ArrayList<>();
+        Map<String, Object> result = new HashMap<>();
+        List<List<String>> languageList = new ArrayList<>();
         for (Language language : languages) {
-            List<String> lg = new ArrayList<>();
-            lg.add(language.getLanguageText());
-            lg.add(language.getId().toString());
-            language_list.add(lg);
+            List<String> languageContent = new ArrayList<>();
+            languageContent.add(language.getLanguageText());
+            languageContent.add(language.getId().toString());
+            languageList.add(languageContent);
         }
-        map.put("languages", language_list);
+        result.put("languages", languageList);
 
-        return map;
+        return result;
     }
 
     public Question chooseQuestion() {

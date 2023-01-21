@@ -26,7 +26,7 @@ public class MatchingController {
     }
 
     @GetMapping("/matching/languages")
-    public ApiRes<Map<String, List<List<String>>>> getLanguages() {
+    public ApiRes<Map<String, Object>> getLanguages() {
         return ApiRes.SUCCESS(matchingService.getLanguages());
     }
 
