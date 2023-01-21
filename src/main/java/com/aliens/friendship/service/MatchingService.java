@@ -284,7 +284,7 @@ public class MatchingService {
         }
     }
 
-    // 매칭 완료 후 member와 matching_participant status 변경
+    // 매칭 완료 후 matching_participant status 변경
     private void updateStatus() {
         for (int i = 0; i < matchingParticipants.size(); i++) {
             MatchingParticipant matchingParticipant = matchingParticipants.get(i);
