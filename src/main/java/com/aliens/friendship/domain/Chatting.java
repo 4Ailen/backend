@@ -8,7 +8,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @ToString
 @Entity
 @Table(name = Chatting.TABLE_NAME, schema = "aliendb")

@@ -1,5 +1,6 @@
 package com.aliens.friendship.controller;
 
+import com.aliens.friendship.domain.ChattingRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,8 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import com.aliens.friendship.domain.Chat;
-import com.aliens.friendship.domain.Room;
-import com.aliens.friendship.dto.ChatMessage;
 import com.aliens.friendship.service.ChatService;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class RoomController {
      */
     @PostMapping("/room")
     public String createRoom(RoomForm form) {
-        chatService.createRoom(form.getName());
+        chatService.createRoom();
         return "redirect:/roomList";
     }
 
@@ -47,7 +46,7 @@ public class RoomController {
      */
     @GetMapping("/roomList")
     public String roomList(Model model) {
-        List<Room> roomList = chatService.findAllRoom();
+        List<ChattingRoom> roomList = chatService.findAllRoom();
         model.addAttribute("roomList", roomList);
         return "chat/roomList";
     }
