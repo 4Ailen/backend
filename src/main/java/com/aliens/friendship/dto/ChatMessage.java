@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatMessage {
 
-    private Long roomId;
+    private Integer roomId;
     private String sender;
     private String message;
     private LocalDateTime sendDate;

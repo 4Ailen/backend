@@ -49,8 +49,7 @@ public class MemberService {
     public TokenDto login(LoginDto loginDto) {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         checkPassword(loginDto.getPassword(), member.getPassword());
-
-        String username = member.getName();
+        String username = member.getEmail();
         String accessToken = jwtTokenUtil.generateAccessToken(username);
         RefreshToken refreshToken = saveRefreshToken(username);
         return TokenDto.of(accessToken, refreshToken.getRefreshToken());
@@ -70,11 +69,11 @@ public class MemberService {
     // 2
     public MemberInfo getMemberInfo(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
-        if (!member.getName().equals(getCurrentUsername())) {
+        if (!member.getEmail().equals(getCurrentUsername())) {
             throw new IllegalArgumentException("회원 정보가 일치하지 않습니다.");
         }
         return MemberInfo.builder()
-                .username(member.getName())
+                .username(member.getEmail())
                 .email(member.getEmail())
                 .build();
     }

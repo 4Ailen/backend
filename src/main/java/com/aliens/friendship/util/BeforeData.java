@@ -1,5 +1,6 @@
 package com.aliens.friendship.util;
 
+import com.aliens.friendship.domain.Nationality;
 import com.aliens.friendship.domain.dto.JoinDto;
 import com.aliens.friendship.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -16,20 +17,27 @@ public class BeforeData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 테스트 용 ID
-        JoinDto testJoin = JoinDto.builder()
-                .email("test@test.com")
-                .password("1234")
-                .nickname("test")
-                .build();
-        memberService.join(testJoin);
-
-        // admin 아이디 미리 기입
-        JoinDto adminJoin = JoinDto.builder()
-                .email("admin@admin.com")
-                .password("1234")
-                .nickname("admin")
-                .build();
-        memberService.joinAdmin(adminJoin);
+//        JoinDto testJoin = JoinDto.builder()
+//                .email("test@test.com")
+//                .password("1234")
+//                .name("test")
+//                .age(20)
+//                .gender("MALE")
+//                .mbti("ENFJ")
+//                .nationality(Nationality.builder().id(1).build())
+//                .build();
+//        memberService.join(testJoin);
+//
+//        // admin 아이디 미리 기입
+//        JoinDto adminJoin = JoinDto.builder()
+//                .email("testAdmin@test.com")
+//                .password("1234")
+//                .name("test")
+//                .age(20)
+//                .gender("MALE")
+//                .mbti("ENFJ")
+//                .nationality(Nationality.builder().id(1).build())
+//                .build();
+//        memberService.joinAdmin(adminJoin);
     }
 }

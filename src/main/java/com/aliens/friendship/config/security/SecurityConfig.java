@@ -37,28 +37,37 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors()
+//        http.cors()
+//
+//
+//
+//                .and()
+//                .csrf().disable()
+//                .authorizeRequests()
+//                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login").permitAll()
+//                .antMatchers("/logout").authenticated()
+//                .anyRequest().hasRole("USER")
+//
+//                .and()
+//                .exceptionHandling().
+//                authenticationEntryPoint(jwtEntryPoint).
+//
+//                and()
+//                .logout()
+//                .disable()
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+//
+//                and()// Add a filter to validate the tokens with every request
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-                .and()
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login").permitAll()
-                .antMatchers("/matching/**").permitAll()
-                .antMatchers("/logout").authenticated()
-                .anyRequest().hasRole("USER")
+        // 필터 해제
+        http.authorizeRequests()
+                .antMatchers("/**").permitAll()
+                .and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-                .and()
-                .exceptionHandling().
-                authenticationEntryPoint(jwtEntryPoint).
 
-                and()
-                .logout()
-                .disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-
-                and()// Add a filter to validate the tokens with every request
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
