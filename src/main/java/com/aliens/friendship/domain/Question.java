@@ -11,6 +11,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Entity
 @Table(name = Question.TABLE_NAME, schema = "aliendb")

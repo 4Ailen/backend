@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
+
 @Entity @Getter @ToString @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED) @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = Member.TABLE_NAME, schema = "aliendb")
@@ -72,6 +73,7 @@ public class Member {
     @Column(name = COLUMN_ISAPPLIED_NAME, nullable = false, length = 45)
     @Builder.Default
     private String isApplied = "none";
+
 
     @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
     @Builder.Default

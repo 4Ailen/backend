@@ -37,19 +37,18 @@ public class MemberService {
 
     public void join(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        memberRepository.save(Member.ofUser(joinDto));
+//        memberRepository.save(Member.ofUser(joinDto));
     }
 
     public void joinAdmin(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        memberRepository.save(Member.ofAdmin(joinDto));
+//        memberRepository.save(Member.ofAdmin(joinDto));
     }
 
     // 1
     public TokenDto login(LoginDto loginDto) {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         checkPassword(loginDto.getPassword(), member.getPassword());
-
         String username = member.getEmail();
         String accessToken = jwtTokenUtil.generateAccessToken(username);
         RefreshToken refreshToken = saveRefreshToken(username);

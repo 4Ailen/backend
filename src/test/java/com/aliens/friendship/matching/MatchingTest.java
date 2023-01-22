@@ -112,11 +112,11 @@ public class MatchingTest {
 
     void filterQuestion() {
         ans1 = mockApplicants.stream()
-                .filter(ans -> ans.getQuestion() == 1)
+                .filter(ans -> ans.getAnswer() == 1)
                 .collect(Collectors.toList());
 
         ans2 = mockApplicants.stream()
-                .filter(ans -> ans.getQuestion() == 2)
+                .filter(ans -> ans.getAnswer() == 2)
                 .collect(Collectors.toList());
     }
 

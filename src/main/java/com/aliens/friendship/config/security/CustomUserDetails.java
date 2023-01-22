@@ -31,7 +31,6 @@ public class CustomUserDetails implements UserDetails {
         return CustomUserDetails.builder()
                 .username(member.getEmail())
                 .password(member.getPassword())
-                .roles(member.getRoles())
                 .build();
     }
 
