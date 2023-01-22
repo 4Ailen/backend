@@ -37,12 +37,12 @@ public class MemberService {
 
     public void join(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        memberRepository.save(Member.ofUser(joinDto));
+//        memberRepository.save(Member.ofUser(joinDto));
     }
 
     public void joinAdmin(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        memberRepository.save(Member.ofAdmin(joinDto));
+//        memberRepository.save(Member.ofAdmin(joinDto));
     }
 
     // 1
@@ -50,7 +50,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         checkPassword(loginDto.getPassword(), member.getPassword());
 
-        String username = member.getUsername();
+        String username = member.getName();
         String accessToken = jwtTokenUtil.generateAccessToken(username);
         RefreshToken refreshToken = saveRefreshToken(username);
         return TokenDto.of(accessToken, refreshToken.getRefreshToken());
@@ -70,11 +70,11 @@ public class MemberService {
     // 2
     public MemberInfo getMemberInfo(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
-        if (!member.getUsername().equals(getCurrentUsername())) {
+        if (!member.getName().equals(getCurrentUsername())) {
             throw new IllegalArgumentException("회원 정보가 일치하지 않습니다.");
         }
         return MemberInfo.builder()
-                .username(member.getUsername())
+                .username(member.getName())
                 .email(member.getEmail())
                 .build();
     }

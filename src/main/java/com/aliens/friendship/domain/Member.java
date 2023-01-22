@@ -1,9 +1,17 @@
 package com.aliens.friendship.domain;
 
+import com.aliens.friendship.domain.dto.JoinDto;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static javax.persistence.CascadeType.ALL;
 
 @Builder
 @AllArgsConstructor
@@ -66,8 +74,42 @@ public class Member {
 
     @Column(name = COLUMN_ISAPPLIED_NAME, nullable = false, length = 45)
     private String isApplied;
-    
-    
+
+    @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<Authority> authorities = new HashSet<>();
+
+    public static Member ofUser(JoinDto joinDto) {
+        Member member = Member.builder()
+                .name(UUID.randomUUID().toString())
+                .email(joinDto.getEmail())
+                .password(joinDto.getPassword())
+                .build();
+        member.addAuthority(com.aliens.friendship.domain.Authority.ofUser(member));
+        return member;
+    }
+
+    public static Member ofAdmin(JoinDto joinDto) {
+        Member member = Member.builder()
+                .name(UUID.randomUUID().toString())
+                .email(joinDto.getEmail())
+                .password(joinDto.getPassword())
+                .build();
+        member.addAuthority(com.aliens.friendship.domain.Authority.ofAdmin(member));
+        return member;
+    }
+
+    private void addAuthority(com.aliens.friendship.domain.Authority authority) {
+        authorities.add(authority);
+    }
+
+    public List<String> getRoles() {
+        return authorities.stream()
+                .map(com.aliens.friendship.domain.Authority::getRole)
+                .collect(Collectors.toList());
+    }
+
+
     // feature #13 jwt 관련 코드
     
     /**
