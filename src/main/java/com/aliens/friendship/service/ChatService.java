@@ -14,6 +14,7 @@ import com.aliens.friendship.repository.ChatRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +56,7 @@ public class ChatService {
      * @param message 내용
      */
     public Chat createChat(Integer roomId, String sender, String message) {
-        ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow();  //방 찾기 -> 없는 방일 경우 여기서 예외처리
+        ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(() -> new NoSuchElementException("Can't find room "+roomId));
         return chatRepository.save(Chat.createChat(room.getId(), sender, message));
     }
 
@@ -68,7 +69,7 @@ public class ChatService {
     }
 
     public void updateRoomStatus(int roomId, String status) {
-        ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow();
+        ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(()-> new NoSuchElementException("Can't find room "+roomId));
         ChattingRoom.RoomStatus roomStatus = ChattingRoom.RoomStatus.valueOf(status.toUpperCase());
         room.updateStatus(roomStatus);
         chattingRoomRepository.save(room);
@@ -76,7 +77,7 @@ public class ChatService {
 
     public List<RoomInfoDto> getRoomInfoDtoListByMatchingParticipantId(Integer matchingParticipantId) {
         List<RoomInfoDto> roomInfoDtoList = new ArrayList<>();
-        MatchingParticipant matchingParticipant = matchingParticipantRepository.findById(matchingParticipantId).orElseThrow();
+        MatchingParticipant matchingParticipant = matchingParticipantRepository.findById(matchingParticipantId).orElseThrow(() -> new NoSuchElementException("Can't find matchingParticipant " + matchingParticipantId));
         for(Chatting chatting : chattingRepository.findByMatchingParticipant(matchingParticipant)){
             RoomInfoDto roomInfoDto = new RoomInfoDto();
             roomInfoDto.setRoomId(chatting.getChattingRoom().getId());
