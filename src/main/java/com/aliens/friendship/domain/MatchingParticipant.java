@@ -41,4 +41,8 @@ public class MatchingParticipant {
     @Column(name = COLUMN_GROUPID_NAME, nullable = false)
     private Integer groupId;
 
+    public void setIsMatched(Byte isMatched) {
+        this.isMatched = isMatched;
+    }
+
 }

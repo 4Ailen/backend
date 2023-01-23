@@ -135,7 +135,7 @@ public class MatchingService {
                 ttl--;
             }
         }
-        updateStatus();
+        updateMatchingParticipantStatus();
 
         return matchedTeams;
     }
@@ -285,7 +285,7 @@ public class MatchingService {
     }
 
     // 매칭 완료 후 matching_participant status 변경
-    private void updateStatus() {
+    private void updateMatchingParticipantStatus() {
         for (int i = 0; i < matchingParticipants.size(); i++) {
             MatchingParticipant matchingParticipant = matchingParticipants.get(i);
             matchingParticipant.setIsMatched((byte) 1);
