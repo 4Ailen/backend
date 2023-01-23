@@ -79,6 +79,10 @@ public class Member {
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
+    public void setIsApplied(String status) {
+        this.isApplied = status;
+    }
+
     public static Member ofUser(JoinDto joinDto) {
         Member member = Member.builder()
                 .email(joinDto.getEmail())
