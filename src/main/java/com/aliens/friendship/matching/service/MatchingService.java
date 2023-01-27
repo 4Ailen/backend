@@ -224,18 +224,17 @@ public class MatchingService {
             ansLgMatchedTeams.add(team);
         }
 
+        // 남은 신청자들 2차: 만들어진 각 팀에 한 명씩 추가
+        if (remainApplicants.size() > 0) {
+            int ansLgMatchedTeamsIdx = 0;
+            while (ansLgMatchedTeamsIdx < ansLgMatchedTeams.size()) {
+                ansLgMatchedTeams.get(ansLgMatchedTeamsIdx).setMemberId5(remainApplicants.get(0).getMember().getId());
                 remainApplicants.remove(0);
+                ansLgMatchedTeamsIdx++;
+                if (remainApplicants.size() <= 0) break;
             }
-            matchedTeams.add(team);
         }
 
-        // 남은 신청자들 2차: 2명씩 팀
-        if (remainApplicants.size() == 2) { // 2명 팀
-            MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMember().getId(),
-                    remainApplicants.get(1).getMember().getId(),
-                    null);
-            for (int j = 0; j < 2; j++) {
-                remainApplicants.remove(0);
             }
             // 만들어진 팀 추가
             matchedTeams.add(team);
