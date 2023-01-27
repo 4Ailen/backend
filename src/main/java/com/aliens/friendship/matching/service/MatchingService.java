@@ -133,6 +133,7 @@ public class MatchingService {
             filterLanguage(ans2, 2);
             remainApplicants1 = makeTeam(ans1Lg);
             remainApplicants2 = makeTeam(ans2Lg);
+            makeRemainApplicantsTeam(remainApplicants1, remainApplicants2);
             if (checkBlockingInfo()) {
                 break;
             } else {
@@ -259,6 +260,35 @@ public class MatchingService {
         matchedTeams.addAll(ansLgMatchedTeams);
 
         return remainApplicants;
+    }
+
+    private void makeRemainApplicantsTeam(List<MatchingParticipant> remainApplicants1, List<MatchingParticipant> remainApplicants2) {
+        List<MatchingParticipant> remainApplicants = new ArrayList<>();
+        remainApplicants.addAll(remainApplicants1);
+        remainApplicants.addAll(remainApplicants2);
+        // remainApplicants1과 remainApplicants2의 인원의 범위는 각각 0~2명
+        if (remainApplicants.size() == 4) { // 남은 신청자가 4명인 경우: 한 팀 생성
+            MatchedGroup matchedTeam = new MatchedGroup(remainApplicants.get(0).getId(),
+                    remainApplicants.get(1).getId(),
+                    remainApplicants.get(2).getId(),
+                    remainApplicants.get(3).getId(),
+                    null);
+            matchedTeams.add(matchedTeam);
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 3) { // 남은 신청자가 3명인 경우: 한 팀 생성
+            matchedTeams.add(new MatchedGroup(remainApplicants.get(0).getId(),
+                    remainApplicants.get(1).getId(),
+                    remainApplicants.get(2).getId(),
+                    null,
+                    null));
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 2) { // 남은 신청자가 2명인 경우: 마지막 팀이 4명이면 2명 더해서 (3명, 3명)으로, 5명이면 2명 더해서 (4명, 3명)으로 팀 재구성
+            matchedTeams = makeOneTeamToTwoTeam(matchedTeams, remainApplicants);
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 1) { // 마지막 팀이 4명이면 +1 해서 5명, 마지막 팀이 5명이면 +1해서 3, 3으로
+            matchedTeams = makeOneTeamToTwoTeam(matchedTeams, remainApplicants);
+            remainApplicants.clear();
+        }
     }
 
     // 매칭된 팀에서 차단한 신청자가 같이 매칭된 경우 발견 시 false 반환
