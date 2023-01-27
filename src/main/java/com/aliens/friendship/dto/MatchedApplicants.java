@@ -10,8 +10,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MatchedApplicants {
-    int memberId1;
-    int memberId2;
-    Integer memberId3;
+    private int memberId1;
+    private int memberId2;
+    private int memberId3;
+    private Integer memberId4;
+    private Integer memberId5;
 
+    public void setMemberId5(Integer memberId5) {
+        this.memberId5 = memberId5;
+    }
 }
