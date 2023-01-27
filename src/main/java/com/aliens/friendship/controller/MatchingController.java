@@ -19,6 +19,7 @@ import java.util.Map;
 public class MatchingController {
 
     private final MatchingService matchingService;
+    private List<MatchedApplicants> matchedTeams;
 
     @Autowired
     public MatchingController(MatchingService matchingService) {
@@ -48,11 +49,12 @@ public class MatchingController {
         return ApiRes.SUCCESS(status);
     }
 
-    // TODO: 특정 시간이 되면 매칭 로직을 돌린다...
     @GetMapping("/matching/result")
     public List<MatchedApplicants> matchingTeams() {
+        // TODO: 본인 제외하고 반환
         return matchingService.teamBuilding();
     }
 
     // TODO: 새로 매칭 시작 전 member의 is_applied를 none으로 변경 후 matchingParticipants 데이터 모두 삭제
+    // TODO: 특정 시간이 되면 매칭 로직을 돌린다...
 }
