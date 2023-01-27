@@ -30,7 +30,7 @@ public class MatchingService {
     private List<List<MatchingParticipant>> ans1Lg, ans2Lg; // 2차 필터링(언어 기반)
     private List<MatchedGroup> matchedTeams; // 매칭된 팀 리스트
     private List<MatchingParticipant> remainApplicants1, remainApplicants2;
-    int ttl = 100;
+    int ttl;
 
     private final LanguageRepository languageRepository;
     private final QuestionRepository questionRepository;
@@ -157,6 +157,7 @@ public class MatchingService {
         remainApplicants2 = new ArrayList<>();
         languages = new ArrayList<>();
         languageIds = new ArrayList<>();
+        ttl=100;
     }
 
     private void loadDatas() {
