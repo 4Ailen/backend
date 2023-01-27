@@ -87,17 +87,17 @@ public class MatchingService {
         return currentQuestion;
     }
 
-    public void applyMatching(MatchingParticipantInfo applicantInfo) {
+    public void applyMatching(MatchingParticipantInfo matchingParticipantInfo) {
         // 신청한 member의 is_applied를 waiting으로 변경
-        Member member = memberRepository.findById(applicantInfo.getMemberId()).get();
+        Member member = memberRepository.findById(matchingParticipantInfo.getMemberId()).get();
         member.setIsApplied("apply");
-        System.out.println("applicantInfo = " + applicantInfo.getAnswer());
+        System.out.println("applicantInfo = " + matchingParticipantInfo.getAnswer());
 
         // matching_applicant에 신청자 정보 저장
         MatchingParticipant matchingParticipant = MatchingParticipant.builder()
                 .member(member)
-                .questionAnswer(applicantInfo.getAnswer())
-                .preferredLanguage(languageRepository.findById(applicantInfo.getLanguage()).get())
+                .questionAnswer(matchingParticipantInfo.getAnswer())
+                .preferredLanguage(languageRepository.findById(matchingParticipantInfo.getLanguage()).get())
                 .isMatched((byte) 0)
                 .groupId(-1)
                 .build();
