@@ -235,19 +235,24 @@ public class MatchingService {
             }
         }
 
+        // 남은 신청자들 3차
+        if (remainApplicants.size() == 3) { // 3명이 남은 경우: 3명 팀
+            ansLgMatchedTeams.add(new MatchedGroup(remainApplicants.get(0).getId(),
+                    remainApplicants.get(1).getId(),
+                    remainApplicants.get(2).getId(),
+                    null,
+                    null));
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 2) { // 2명이 남은 경우: 마지막 팀(5명)에 2명을 더하여 (3명, 4명) 팀으로 재구성
+            if (ansLgMatchedTeams.size() > 0) {
+                ansLgMatchedTeams = makeOneTeamToTwoTeam(ansLgMatchedTeams, remainApplicants);
+                remainApplicants.clear();
             }
-            // 만들어진 팀 추가
-            matchedTeams.add(team);
-        } else if (remainApplicants.size() == 1) { // 이전에 만들어진 팀의 3명 + 남은 1명으로 2명, 2명 팀
-            int id1, id2, id3, id4, lastIdx = matchedTeams.size() - 1;
-            id1 = matchedTeams.get(lastIdx).getMemberId1();
-            id2 = matchedTeams.get(lastIdx).getMemberId2();
-            id3 = matchedTeams.get(lastIdx).getMemberId3();
-            id4 = remainApplicants.get(0).getMember().getId();
-            matchedTeams.remove(matchedTeams.size() - 1);
-            matchedTeams.add(new MatchedGroup(id1, id2, null));
-            matchedTeams.add(new MatchedGroup(id3, id4, null));
-            remainApplicants.remove(0);
+        } else if (remainApplicants.size() == 1) { // 1명이 남은 경우: 마지막 팀(5명)에 1명을 더하여 (3명, 3명) 팀으로 재구성
+            if (ansLgMatchedTeams.size() > 0) {
+                ansLgMatchedTeams = makeOneTeamToTwoTeam(ansLgMatchedTeams, remainApplicants);
+                remainApplicants.clear();
+            }
         }
 
         // 만들어진 팀들을 matchedTeams에 추가
