@@ -28,7 +28,7 @@ public class MatchingService {
     private List<Integer> languageIds; // 언어 id 리스트
     private List<MatchingParticipant> ans1, ans2; // 1차 필터링(질문 기반)
     private List<List<MatchingParticipant>> ans1Lg, ans2Lg; // 2차 필터링(언어 기반)
-    private List<MatchedGroup> matchedTeams; // 팀 반환
+    private List<MatchedGroup> matchedTeams; // 매칭된 팀 리스트
     private List<MatchingParticipant> remainApplicants1, remainApplicants2;
     int ttl = 100;
 
