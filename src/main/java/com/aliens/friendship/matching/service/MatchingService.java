@@ -1,13 +1,17 @@
-package com.aliens.friendship.service;
+package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.domain.Language;
-import com.aliens.friendship.domain.MatchingParticipant;
-import com.aliens.friendship.domain.Member;
-import com.aliens.friendship.domain.Question;
-import com.aliens.friendship.domain.BlockingInfo;
-import com.aliens.friendship.dto.ApplicantInfo;
-import com.aliens.friendship.dto.MatchedApplicants;
-import com.aliens.friendship.repository.*;
+import com.aliens.friendship.matching.repository.BlockingInfoRepository;
+import com.aliens.friendship.matching.domain.Language;
+import com.aliens.friendship.matching.repository.LanguageRepository;
+import com.aliens.friendship.matching.domain.MatchingParticipant;
+import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
+import com.aliens.friendship.matching.service.model.MatchingParticipantInfo;
+import com.aliens.friendship.matching.service.model.MatchedGroup;
+import com.aliens.friendship.member.domain.Member;
+import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.matching.domain.Question;
+import com.aliens.friendship.matching.domain.BlockingInfo;
+import com.aliens.friendship.matching.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +28,7 @@ public class MatchingService {
     private List<Integer> languageIds; // 언어 id 리스트
     private List<MatchingParticipant> ans1, ans2; // 1차 필터링(질문 기반)
     private List<List<MatchingParticipant>> ans1Lg, ans2Lg; // 2차 필터링(언어 기반)
-    private List<MatchedApplicants> matchedTeams; // 팀 반환
+    private List<MatchedGroup> matchedTeams; // 팀 반환
     private List<MatchingParticipant> remainApplicants1, remainApplicants2;
     int ttl = 100;
 
@@ -83,7 +87,7 @@ public class MatchingService {
         return currentQuestion;
     }
 
-    public void applyMatching(ApplicantInfo applicantInfo) {
+    public void applyMatching(MatchingParticipantInfo applicantInfo) {
         // 신청한 member의 is_applied를 waiting으로 변경
         Member member = memberRepository.findById(applicantInfo.getMemberId()).get();
         member.setIsApplied("apply");
@@ -117,7 +121,7 @@ public class MatchingService {
         }
     }
 
-    public List<MatchedApplicants> teamBuilding() {
+    public List<MatchedGroup> teamBuilding() {
         init();
         loadDatas();
 
@@ -196,7 +200,7 @@ public class MatchingService {
         for (int i = 0; i < languages.size(); i++) {
             // 세명씩 팀 구성
             while (filteredList.get(i).size() >= 3) {
-                MatchedApplicants team = new MatchedApplicants(filteredList.get(i).get(0).getMember().getId(),
+                MatchedGroup team = new MatchedGroup(filteredList.get(i).get(0).getMember().getId(),
                         filteredList.get(i).get(1).getMember().getId(),
                         filteredList.get(i).get(2).getMember().getId());
                 for (int j = 0; j < 3; j++) {
@@ -212,7 +216,7 @@ public class MatchingService {
 
         // 남은 신청자들 1차: 3명씩 팀
         while (remainApplicants.size() >= 3) {
-            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMember().getId(),
+            MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMember().getId(),
                     remainApplicants.get(1).getMember().getId(),
                     remainApplicants.get(2).getMember().getId());
             for (int j = 0; j < 3; j++) {
@@ -223,7 +227,7 @@ public class MatchingService {
 
         // 남은 신청자들 2차: 2명씩 팀
         if (remainApplicants.size() == 2) { // 2명 팀
-            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMember().getId(),
+            MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMember().getId(),
                     remainApplicants.get(1).getMember().getId(),
                     null);
             for (int j = 0; j < 2; j++) {
@@ -238,8 +242,8 @@ public class MatchingService {
             id3 = matchedTeams.get(lastIdx).getMemberId3();
             id4 = remainApplicants.get(0).getMember().getId();
             matchedTeams.remove(matchedTeams.size() - 1);
-            matchedTeams.add(new MatchedApplicants(id1, id2, null));
-            matchedTeams.add(new MatchedApplicants(id3, id4, null));
+            matchedTeams.add(new MatchedGroup(id1, id2, null));
+            matchedTeams.add(new MatchedGroup(id3, id4, null));
             remainApplicants.remove(0);
         }
 
