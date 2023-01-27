@@ -213,12 +213,17 @@ public class MatchingService {
             remainApplicants.addAll(filteredList.get(i));
         }
 
-        // 남은 신청자들 1차: 3명씩 팀
-        while (remainApplicants.size() >= 3) {
+        // 남은 신청자들 1차: 4명씩 팀
+        while (remainApplicants.size() >= 4) {
             MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMember().getId(),
                     remainApplicants.get(1).getMember().getId(),
-                    remainApplicants.get(2).getMember().getId());
-            for (int j = 0; j < 3; j++) {
+                    remainApplicants.get(2).getMember().getId(),
+                    remainApplicants.get(3).getMember().getId(),
+                    null);
+            remainApplicants.subList(0, 4).clear();
+            ansLgMatchedTeams.add(team);
+        }
+
                 remainApplicants.remove(0);
             }
             matchedTeams.add(team);
