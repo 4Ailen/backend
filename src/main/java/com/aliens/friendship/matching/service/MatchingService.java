@@ -293,19 +293,25 @@ public class MatchingService {
 
     // 매칭된 팀에서 차단한 신청자가 같이 매칭된 경우 발견 시 false 반환
     private boolean checkBlockingInfo() {
-        for (int i = 0; i < matchedTeams.size(); i++) {
-            for (int j = 0; j < blockingInfos.size(); j++) {
-                int blockedMemberId = blockingInfos.get(j).getBlockedMember().getId();
-                int blockingMemberId = blockingInfos.get(j).getBlockingMember().getId();
-                int memberId1 = matchedTeams.get(i).getMemberId1(), memberId2 = matchedTeams.get(i).getMemberId2(), memberId3 = -1;
-                if (matchedTeams.get(i).getMemberId3() != null) {
-                    memberId3 = matchedTeams.get(i).getMemberId3();
+        for (MatchedGroup matchedTeam : matchedTeams) {
+            for (BlockingInfo blockingInfo : blockingInfos) {
+                int blockedMemberId = blockingInfo.getBlockedMember().getId();
+                int blockingMemberId = blockingInfo.getBlockingMember().getId();
+                int memberId1 = matchedTeam.getMemberId1(),
+                        memberId2 = matchedTeam.getMemberId2(),
+                        memberId3 = matchedTeam.getMemberId3(),
+                        memberId4 = -1, memberId5 = -1;
+                if (matchedTeam.getMemberId4() != null) {
+                    memberId4 = matchedTeam.getMemberId4();
+                }
+                if (matchedTeam.getMemberId5() != null) {
+                    memberId5 = matchedTeam.getMemberId5();
                 }
                 boolean isBlockedMember = false, isBlockingMember = false;
-                if (memberId1 == blockingMemberId || memberId2 == blockingMemberId || memberId3 == blockingMemberId) {
+                if (memberId1 == blockingMemberId || memberId2 == blockingMemberId || memberId3 == blockingMemberId || memberId4 == blockingMemberId || memberId5 == blockingMemberId) {
                     isBlockingMember = true;
                 }
-                if (memberId1 == blockedMemberId || memberId2 == blockedMemberId || memberId3 == blockedMemberId) {
+                if (memberId1 == blockedMemberId || memberId2 == blockedMemberId || memberId3 == blockedMemberId || memberId4 == blockedMemberId || memberId5 == blockedMemberId) {
                     isBlockedMember = true;
                 }
                 if (isBlockingMember && isBlockedMember) {
