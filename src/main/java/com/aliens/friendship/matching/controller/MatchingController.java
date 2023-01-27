@@ -19,7 +19,6 @@ import java.util.Map;
 public class MatchingController {
 
     private final MatchingService matchingService;
-    private List<MatchedGroup> matchedTeams;
 
     @Autowired
     public MatchingController(MatchingService matchingService) {
