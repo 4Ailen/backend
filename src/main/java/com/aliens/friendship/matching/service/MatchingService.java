@@ -196,22 +196,21 @@ public class MatchingService {
 
     private List<MatchingParticipant> makeTeam(List<List<MatchingParticipant>> filteredList) {
         List<MatchingParticipant> remainApplicants = new ArrayList<>();
+        List<MatchedGroup> ansLgMatchedTeams = new ArrayList<>();
 
         for (int i = 0; i < languages.size(); i++) {
-            // 세명씩 팀 구성
-            while (filteredList.get(i).size() >= 3) {
+            // 본인 포함 4명씩 팀 구성
+            while (filteredList.get(i).size() >= 4) {
                 MatchedGroup team = new MatchedGroup(filteredList.get(i).get(0).getMember().getId(),
                         filteredList.get(i).get(1).getMember().getId(),
-                        filteredList.get(i).get(2).getMember().getId());
-                for (int j = 0; j < 3; j++) {
-                    filteredList.get(i).remove(0);
-                }
-                matchedTeams.add(team);
+                        filteredList.get(i).get(2).getMember().getId(),
+                        filteredList.get(i).get(3).getMember().getId(),
+                        null);
+                filteredList.get(i).subList(0, 4).clear();
+                ansLgMatchedTeams.add(team);
             }
             // 남은 신청자들
-            for (int j = 0; j < filteredList.get(i).size(); j++) {
-                remainApplicants.add(filteredList.get(i).get(j));
-            }
+            remainApplicants.addAll(filteredList.get(i));
         }
 
         // 남은 신청자들 1차: 3명씩 팀
@@ -246,6 +245,9 @@ public class MatchingService {
             matchedTeams.add(new MatchedGroup(id3, id4, null));
             remainApplicants.remove(0);
         }
+
+        // 만들어진 팀들을 matchedTeams에 추가
+        matchedTeams.addAll(ansLgMatchedTeams);
 
         return remainApplicants;
     }
