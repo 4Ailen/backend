@@ -1,7 +1,6 @@
 package com.aliens.friendship.member.domain;
 
 import com.aliens.friendship.jwt.domain.Authority;
-import com.aliens.friendship.nationality.domain.Nationality;
 import com.aliens.friendship.jwt.domain.dto.JoinDto;
 import lombok.*;
 

@@ -1,16 +1,16 @@
 package com.aliens.friendship.chatting.service;
 
-import com.aliens.friendship.chat.domain.Chat;
+import com.aliens.friendship.chatting.domain.ChatMessage;
 import com.aliens.friendship.chatting.domain.Chatting;
-import com.aliens.friendship.chattingRoom.domain.ChattingRoom;
-import com.aliens.friendship.matchingParticipant.domain.MatchingParticipant;
+import com.aliens.friendship.chatting.domain.ChattingRoom;
+import com.aliens.friendship.matching.domain.MatchingParticipant;
 import com.aliens.friendship.jwt.domain.dto.RoomInfoDto;
 import com.aliens.friendship.chatting.repository.ChattingRepository;
-import com.aliens.friendship.chattingRoom.repository.ChattingRoomRepository;
-import com.aliens.friendship.matchingParticipant.repository.MatchingParticipantRepository;
+import com.aliens.friendship.chatting.repository.ChattingRoomRepository;
+import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.aliens.friendship.chat.repository.ChatRepository;
+import com.aliens.friendship.chatting.repository.ChatMessageRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class ChattingService {
     private final ChattingRoomRepository chattingRoomRepository;
     private final MatchingParticipantRepository matchingParticipantRepository;
     private final ChattingRepository chattingRepository;
-    private final ChatRepository chatRepository;
+    private final ChatMessageRepository chatRepository;
 
     /**
      * 모든 채팅방 찾기
@@ -55,16 +55,16 @@ public class ChattingService {
      * @param sender 보낸이
      * @param message 내용
      */
-    public Chat createChat(Integer roomId, String sender, String message) {
+    public ChatMessage createChat(Integer roomId, String sender, String message) {
         ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(() -> new NoSuchElementException("Can't find room "+roomId));
-        return chatRepository.save(Chat.createChat(room.getId(), sender, message));
+        return chatRepository.save(ChatMessage.createChat(room.getId(), sender, message));
     }
 
     /**
      * 채팅방 채팅내용 불러오기
      * @param roomId 채팅방 id
      */
-    public List<Chat> findAllChatByRoomId(Long roomId) {
+    public List<ChatMessage> findAllChatByRoomId(Long roomId) {
         return chatRepository.findAllByRoom(roomId);
     }
 

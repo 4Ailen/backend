@@ -1,6 +1,6 @@
 package com.aliens.friendship.jwt.domain.dto;
 
-import com.aliens.friendship.nationality.domain.Nationality;
+import com.aliens.friendship.member.domain.Nationality;
 import lombok.*;
 
 @Getter @Setter

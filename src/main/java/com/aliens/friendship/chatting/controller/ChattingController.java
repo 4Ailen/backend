@@ -19,7 +19,6 @@ public class ChattingController {
         this.chatService = chatService;
     }
 
-
     @GetMapping("/chat/rooms")
     public Response<Map<String, Object>> getRooms(){
         //Todo: jwt를 통해 접속된 멤버 아이디를 가져와야함

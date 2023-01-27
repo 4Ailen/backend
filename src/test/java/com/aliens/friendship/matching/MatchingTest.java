@@ -1,8 +1,7 @@
 package com.aliens.friendship.matching;
 
-import com.aliens.friendship.matchingParticipant.MatchingParticipantInfo;
-import com.aliens.friendship.blockingInfo.controller.dto.BlockingInfo;
-import com.aliens.friendship.matchingParticipant.MatchedGroup;
+import com.aliens.friendship.matching.service.model.MatchingParticipantInfo;
+import com.aliens.friendship.matching.service.model.MatchedGroup;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

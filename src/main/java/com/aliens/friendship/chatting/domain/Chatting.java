@@ -1,7 +1,6 @@
 package com.aliens.friendship.chatting.domain;
 
-import com.aliens.friendship.chattingRoom.domain.ChattingRoom;
-import com.aliens.friendship.matchingParticipant.domain.MatchingParticipant;
+import com.aliens.friendship.matching.domain.MatchingParticipant;
 import lombok.*;
 
 import javax.persistence.*;
