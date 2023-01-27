@@ -1,8 +1,7 @@
 package com.aliens.friendship.matching;
 
-import com.aliens.friendship.dto.ApplicantInfo;
-import com.aliens.friendship.dto.BlockingInfo;
-import com.aliens.friendship.dto.MatchedApplicants;
+import com.aliens.friendship.matching.service.model.MatchingParticipantInfo;
+import com.aliens.friendship.matching.service.model.MatchedGroup;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,12 +16,12 @@ import java.util.stream.Collectors;
 @SpringBootTest
 public class MatchingTest {
 
-    static List<ApplicantInfo> mockApplicants; // 신청자
+    static List<MatchingParticipantInfo> mockApplicants; // 신청자
     static List<BlockingInfo> blockingInfos; // 사용자들의 차단 정보
-    static List<ApplicantInfo> ans1, ans2; // 1차 필터링(질문 기반)
-    static List<List<ApplicantInfo>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
-    static List<MatchedApplicants> matchedTeams; // 팀 반환
-    static List<ApplicantInfo> remainApplicants1, remainApplicants2;
+    static List<MatchingParticipantInfo> ans1, ans2; // 1차 필터링(질문 기반)
+    static List<List<MatchingParticipantInfo>> ans1_lg, ans2_lg; // 2차 필터링(언어 기반)
+    static List<MatchedGroup> matchedTeams; // 팀 반환
+    static List<MatchingParticipantInfo> remainApplicants1, remainApplicants2;
     int ttl = 100;
 
     @BeforeAll
@@ -78,11 +77,11 @@ public class MatchingTest {
 
         // 신청자 수: 4~752명, 질문 값: 1 또는 2, 언어: 10가지 중 하나
         for (int i = 0; i < 2; i++) {
-            mockApplicants.add(new ApplicantInfo(i, 1, random.nextInt(10)));
-            mockApplicants.add(new ApplicantInfo(i + 2, 2, random.nextInt(10)));
+            mockApplicants.add(new MatchingParticipantInfo(i, 1, random.nextInt(10)));
+            mockApplicants.add(new MatchingParticipantInfo(i + 2, 2, random.nextInt(10)));
         }
         for (int i = 4; i < random.nextInt(750) + 3; i++) {
-            mockApplicants.add(new ApplicantInfo(i, random.nextInt(2) + 1, random.nextInt(10)));
+            mockApplicants.add(new MatchingParticipantInfo(i, random.nextInt(2) + 1, random.nextInt(10)));
         }
 
         // 차단 정보 인스턴스 랜덤 생성
@@ -121,10 +120,10 @@ public class MatchingTest {
     }
 
     // ans에 대해 10가지 언어로 나누기
-    void filterLanguage(List<ApplicantInfo> ans, int ansNum) {
+    void filterLanguage(List<MatchingParticipantInfo> ans, int ansNum) {
         for (int i = 0; i < 10; i++) {
             int lgIdx = i;
-            List<ApplicantInfo> tmp = ans.stream()
+            List<MatchingParticipantInfo> tmp = ans.stream()
                     .filter(lg -> lg.getLanguage() == lgIdx)
                     .collect(Collectors.toList());
             if (ansNum == 1) {
@@ -135,13 +134,13 @@ public class MatchingTest {
         }
     }
 
-    List<ApplicantInfo> makeTeam(List<List<ApplicantInfo>> filteredList) {
-        List<ApplicantInfo> remainApplicants = new ArrayList<>();
+    List<MatchingParticipantInfo> makeTeam(List<List<MatchingParticipantInfo>> filteredList) {
+        List<MatchingParticipantInfo> remainApplicants = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             // 세명씩 팀 구성
             while (filteredList.get(i).size() >= 3) {
-                MatchedApplicants team = new MatchedApplicants(filteredList.get(i).get(0).getMemberId(),
+                MatchedGroup team = new MatchedGroup(filteredList.get(i).get(0).getMemberId(),
                         filteredList.get(i).get(1).getMemberId(),
                         filteredList.get(i).get(2).getMemberId());
                 for (int j = 0; j < 3; j++) {
@@ -157,7 +156,7 @@ public class MatchingTest {
 
         // 남은 신청자들 1차: 3명씩 팀
         while (remainApplicants.size() >= 3) {
-            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMemberId(),
+            MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMemberId(),
                     remainApplicants.get(1).getMemberId(),
                     remainApplicants.get(2).getMemberId());
             for (int j = 0; j < 3; j++) {
@@ -168,7 +167,7 @@ public class MatchingTest {
 
         // 남은 신청자들 2차: 2명씩 팀
         if (remainApplicants.size() == 2) { // 2명 팀
-            MatchedApplicants team = new MatchedApplicants(remainApplicants.get(0).getMemberId(),
+            MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMemberId(),
                     remainApplicants.get(1).getMemberId(),
                     null);
             for (int j = 0; j < 2; j++) {
@@ -183,8 +182,8 @@ public class MatchingTest {
             id3 = matchedTeams.get(lastIdx).getMemberId3();
             id4 = remainApplicants.get(0).getMemberId();
             matchedTeams.remove(matchedTeams.size() - 1);
-            matchedTeams.add(new MatchedApplicants(id1, id2, null));
-            matchedTeams.add(new MatchedApplicants(id3, id4, null));
+            matchedTeams.add(new MatchedGroup(id1, id2, null));
+            matchedTeams.add(new MatchedGroup(id3, id4, null));
             remainApplicants.remove(0);
         }
 
