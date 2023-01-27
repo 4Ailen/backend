@@ -343,4 +343,33 @@ public class MatchingService {
             matchingParticipantRepository.save(matchingParticipant);
         }
     }
+
+    private List<MatchedGroup> makeOneTeamToTwoTeam(List<MatchedGroup> teams, List<MatchingParticipant> remainApplicants) {
+        Integer id1, id2, id3, id4, id5, id6 = null, id7 = null, lastIdx = teams.size() - 1;
+        id1 = teams.get(lastIdx).getMemberId1();
+        id2 = teams.get(lastIdx).getMemberId2();
+        id3 = teams.get(lastIdx).getMemberId3();
+        id4 = teams.get(lastIdx).getMemberId4();
+        if (teams.get(lastIdx).getMemberId5() != null) {
+            id5 = teams.get(lastIdx).getMemberId4();
+            id6 = remainApplicants.get(0).getMember().getId();
+            if (remainApplicants.size() == 2) {
+                id7 = remainApplicants.get(1).getMember().getId();
+            }
+        } else {
+            id5 = remainApplicants.get(0).getMember().getId();
+            if (remainApplicants.size() == 2) {
+                id6 = remainApplicants.get(1).getMember().getId();
+            }
+        }
+        teams.remove(teams.size() - 1);
+        if (id6 == null && id7 == null) {
+            teams.add(new MatchedGroup(id1, id2, id3, id4, id5));
+        } else {
+            teams.add(new MatchedGroup(id1, id2, id3, null, null));
+            teams.add(new MatchedGroup(id4, id5, id6, id7, null));
+        }
+
+        return teams;
+    }
 }
