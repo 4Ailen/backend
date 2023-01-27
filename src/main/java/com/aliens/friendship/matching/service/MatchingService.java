@@ -163,10 +163,10 @@ public class MatchingService {
         matchingParticipants = matchingParticipantRepository.findAll();
         blockingInfos = blockingInfoRepository.findAll();
         languages = languageRepository.findAll();
-        for (int i = 0; i < languages.size(); i++) {
+        for (Language language : languages) {
             ans1Lg.add(new ArrayList<>());
             ans2Lg.add(new ArrayList<>());
-            languageIds.add(languages.get(i).getId());
+            languageIds.add(language.getId());
         }
     }
 
@@ -337,8 +337,7 @@ public class MatchingService {
 
     // 매칭 완료 후 matching_participant status 변경
     private void updateMatchingParticipantStatus() {
-        for (int i = 0; i < matchingParticipants.size(); i++) {
-            MatchingParticipant matchingParticipant = matchingParticipants.get(i);
+        for (MatchingParticipant matchingParticipant : matchingParticipants) {
             matchingParticipant.setIsMatched((byte) 1);
             matchingParticipantRepository.save(matchingParticipant);
         }
