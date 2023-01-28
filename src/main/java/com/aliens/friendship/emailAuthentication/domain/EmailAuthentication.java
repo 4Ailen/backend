@@ -22,6 +22,7 @@ public class EmailAuthentication {
     public static final String COLUMN_EMAIL_NAME = "email";
     public static final String COLUMN_CREATEDTIME_NAME = "created_time";
 
+    public static final String COLUMN_STATUS_NAME = "status";
     @Id
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
@@ -34,5 +35,8 @@ public class EmailAuthentication {
 
     @Column(name = COLUMN_CREATEDTIME_NAME, nullable = false)
     private Instant createdTime;
+
+    @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
+    private String status;
 
 }
