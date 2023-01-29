@@ -37,11 +37,13 @@ public class MatchingParticipant {
     private Language preferredLanguage;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(name = COLUMN_ISMATCHED_NAME, nullable = false)
     private Status isMatched = Status.NOT_MATCHED;
 
+    @Builder.Default
     @Column(name = COLUMN_GROUPID_NAME, nullable = false)
-    private Integer groupId;
+    private Integer groupId = -1;
 
     public void setIsMatched(Status isMatched) {
         this.isMatched = isMatched;

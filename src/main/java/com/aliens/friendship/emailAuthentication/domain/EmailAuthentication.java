@@ -34,6 +34,7 @@ public class EmailAuthentication {
     private Instant createdTime;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
     private Status status = Status.NOT_AUTHENTICATED;
 
