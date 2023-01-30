@@ -2,9 +2,9 @@ package com.aliens.friendship.matching.controller;
 
 import com.aliens.friendship.global.common.Response;
 import com.aliens.friendship.matching.domain.Question;
-import com.aliens.friendship.matching.service.model.MatchingParticipantInfo;
-import com.aliens.friendship.matching.service.model.MatchedGroup;
 import com.aliens.friendship.matching.service.MatchingService;
+import com.aliens.friendship.matching.service.model.MatchedGroup;
+import com.aliens.friendship.matching.service.model.MatchingParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,8 +36,8 @@ public class MatchingController {
     }
 
     @PostMapping("/matching/applicant")
-    public void applyMatching(@RequestBody MatchingParticipantInfo applicantInfo) {
-        matchingService.applyMatching(applicantInfo);
+    public void applyMatching(@RequestBody MatchingParticipantInfo matchingParticipant) {
+        matchingService.applyMatching(matchingParticipant);
     }
 
     @GetMapping("/matching/status")
@@ -48,11 +48,12 @@ public class MatchingController {
         return Response.SUCCESS(status);
     }
 
-    // TODO: 특정 시간이 되면 매칭 로직을 돌린다...
     @GetMapping("/matching/result")
     public List<MatchedGroup> matchingTeams() {
+        // TODO: 본인 제외하고 반환
         return matchingService.teamBuilding();
     }
 
     // TODO: 새로 매칭 시작 전 member의 is_applied를 none으로 변경 후 matchingParticipants 데이터 모두 삭제
+    // TODO: 특정 시간이 되면 매칭 로직을 돌린다...
 }
