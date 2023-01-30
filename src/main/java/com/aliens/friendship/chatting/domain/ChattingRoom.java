@@ -21,9 +21,9 @@ public class ChattingRoom {
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-
+    @Builder.Default
     @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
-    private RoomStatus status = RoomStatus.CLOSE;
+    private RoomStatus status = RoomStatus.PENDING;
 
     public void updateStatus(RoomStatus status) {
         this.status = status;

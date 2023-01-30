@@ -88,9 +88,9 @@ public class MatchingService {
     }
 
     public void applyMatching(MatchingParticipantInfo applicantInfo) {
-        // 신청한 member의 is_applied를 waiting으로 변경
+        // 신청한 member의 is_applied를 APPLIED으로 변경
         Member member = memberRepository.findById(applicantInfo.getMemberId()).get();
-        member.setIsApplied("apply");
+        member.setIsApplied(Member.Status.APPLIED);
         System.out.println("applicantInfo = " + applicantInfo.getAnswer());
 
         // matching_applicant에 신청자 정보 저장
@@ -98,7 +98,7 @@ public class MatchingService {
                 .member(member)
                 .questionAnswer(applicantInfo.getAnswer())
                 .preferredLanguage(languageRepository.findById(applicantInfo.getLanguage()).get())
-                .isMatched((byte) 0)
+                .isMatched(MatchingParticipant.Status.NOT_MATCHED)
                 .groupId(-1)
                 .build();
 
@@ -110,14 +110,14 @@ public class MatchingService {
         // 해당 유저의 정보를 반환하는 코드 아직 구현 안되어 임시로 member 설정
         Member member = memberRepository.findById(10).get();
         System.out.println("member.getIsApplied() = " + member.getIsApplied());
-        if (member.getIsApplied().equals("apply")) {
-            if (matchingParticipantRepository.findById(10).get().getIsMatched() == 1) {
-                return "matched";
+        if (member.getIsApplied().equals(Member.Status.APPLIED)) {
+            if (matchingParticipantRepository.findById(10).get().getIsMatched() == MatchingParticipant.Status.MATCHED) {
+                return "MATCHED";
             } else {
-                return "waiting";
+                return "PENDING";
             }
         } else {
-            return "none";
+            return "NONE";
         }
     }
 
@@ -292,7 +292,7 @@ public class MatchingService {
     private void updateMatchingParticipantStatus() {
         for (int i = 0; i < matchingParticipants.size(); i++) {
             MatchingParticipant matchingParticipant = matchingParticipants.get(i);
-            matchingParticipant.setIsMatched((byte) 1);
+            matchingParticipant.setIsMatched((MatchingParticipant.Status.MATCHED));
             matchingParticipantRepository.save(matchingParticipant);
         }
     }
