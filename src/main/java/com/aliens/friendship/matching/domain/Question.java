@@ -29,7 +29,8 @@ public class Question {
     @Column(name = COLUMN_QUESTIONTEXT_NAME, nullable = false, length = 45)
     private String questionText;
 
+    @Builder.Default
     @Column(name = COLUMN_ISSELECTED_NAME, nullable = false)
-    private Byte isSelected;
+    private Byte isSelected = 0;
 
 }
