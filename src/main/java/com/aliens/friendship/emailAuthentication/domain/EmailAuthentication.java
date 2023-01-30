@@ -2,10 +2,7 @@ package com.aliens.friendship.emailAuthentication.domain;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.Instant;
 
 @Builder
@@ -36,7 +33,13 @@ public class EmailAuthentication {
     @Column(name = COLUMN_CREATEDTIME_NAME, nullable = false)
     private Instant createdTime;
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
-    private String status;
+    private Status status = Status.NOT_AUTHENTICATED;
+
+    public enum Status {
+        AUTHENTICATED, NOT_AUTHENTICATED;
+    }
 
 }
