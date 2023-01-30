@@ -90,7 +90,7 @@ public class MatchingService {
     public void applyMatching(MatchingParticipantInfo matchingParticipantInfo) {
         // 신청한 member의 is_applied를 waiting으로 변경
         Member member = memberRepository.findById(matchingParticipantInfo.getMemberId()).get();
-        member.setIsApplied("apply");
+        member.setIsApplied(Member.Status.APPLIED);
         System.out.println("applicantInfo = " + matchingParticipantInfo.getAnswer());
 
         // matching_applicant에 신청자 정보 저장
@@ -98,7 +98,7 @@ public class MatchingService {
                 .member(member)
                 .questionAnswer(matchingParticipantInfo.getAnswer())
                 .preferredLanguage(languageRepository.findById(matchingParticipantInfo.getLanguage()).get())
-                .isMatched((byte) 0)
+                .isMatched(MatchingParticipant.Status.NOT_MATCHED)
                 .groupId(-1)
                 .build();
 
@@ -339,7 +339,7 @@ public class MatchingService {
     // 매칭 완료 후 matching_participant status 변경
     private void updateMatchingParticipantStatus() {
         for (MatchingParticipant matchingParticipant : matchingParticipants) {
-            matchingParticipant.setIsMatched((byte) 1);
+            matchingParticipant.setIsMatched(MatchingParticipant.Status.MATCHED);
             matchingParticipantRepository.save(matchingParticipant);
         }
     }
