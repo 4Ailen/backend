@@ -45,7 +45,7 @@ public class MatchingParticipant {
     @Column(name = COLUMN_GROUPID_NAME, nullable = false)
     private Integer groupId = -1;
 
-    public void setIsMatched(Status isMatched) {
+    public void updateIsMatched(Status isMatched) {
         this.isMatched = isMatched;
     }
 
