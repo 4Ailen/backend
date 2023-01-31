@@ -1,6 +1,6 @@
 package com.aliens.friendship.member.controller;
 
-import com.aliens.friendship.jwt.domain.dto.JoinDto;
+import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.MemberInfo;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
@@ -23,7 +23,7 @@ public class APIController {
     }
 
     @PostMapping("/join")
-    public String join(@RequestBody JoinDto joinDto) {
+    public String join(@RequestBody JoinDto joinDto) throws Exception {
         memberService.join(joinDto);
         return "회원가입 완료";
     }

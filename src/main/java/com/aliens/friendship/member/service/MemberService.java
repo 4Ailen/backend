@@ -5,7 +5,7 @@ import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import com.aliens.friendship.jwt.domain.LogoutAccessToken;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.jwt.domain.RefreshToken;
-import com.aliens.friendship.jwt.domain.dto.JoinDto;
+import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.MemberInfo;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
@@ -35,14 +35,20 @@ public class MemberService {
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final JwtTokenUtil jwtTokenUtil;
 
-    public void join(JoinDto joinDto) {
+    private final ProfileImageService profileImageService;
+
+    // todo : 이메일 중복확인
+    // todo : transactional
+    public String join(JoinDto joinDto) throws Exception {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-//        memberRepository.save(Member.ofUser(joinDto));
+        String ProfileImageUrl = profileImageService.uploadProfileImage(joinDto.getImage());
+        memberRepository.save(Member.ofUser(joinDto, ProfileImageUrl));
+        return ProfileImageUrl;
     }
 
     public void joinAdmin(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-//        memberRepository.save(Member.ofAdmin(joinDto));
+        memberRepository.save(Member.ofAdmin(joinDto));
     }
 
     // 1
