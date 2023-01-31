@@ -79,7 +79,7 @@ public class Member {
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
-    public void setIsApplied(Status status) {
+    public void updateIsApplied(Status status) {
         this.isApplied = status;
     }
 

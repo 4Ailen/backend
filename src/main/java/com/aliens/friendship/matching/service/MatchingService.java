@@ -339,7 +339,7 @@ public class MatchingService {
     // 매칭 완료 후 matching_participant status 변경
     private void updateMatchingParticipantStatus() {
         for (MatchingParticipant matchingParticipant : matchingParticipants) {
-            matchingParticipant.setIsMatched(MatchingParticipant.Status.MATCHED);
+            matchingParticipant.updateIsMatched(MatchingParticipant.Status.MATCHED);
             matchingParticipantRepository.save(matchingParticipant);
         }
     }
