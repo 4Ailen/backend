@@ -36,14 +36,21 @@ public class MatchingParticipant {
     @JoinColumn(name = "preferred_language", nullable = false)
     private Language preferredLanguage;
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(name = COLUMN_ISMATCHED_NAME, nullable = false)
-    private Byte isMatched;
+    private Status isMatched = Status.NOT_MATCHED;
 
+    @Builder.Default
     @Column(name = COLUMN_GROUPID_NAME, nullable = false)
-    private Integer groupId;
+    private Integer groupId = -1;
 
-    public void setIsMatched(Byte isMatched) {
+    public void updateIsMatched(Status isMatched) {
         this.isMatched = isMatched;
+    }
+
+    public enum Status {
+        MATCHED, NOT_MATCHED;
     }
 
 }

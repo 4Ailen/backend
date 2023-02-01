@@ -70,16 +70,16 @@ public class Member {
     @Builder.Default
     private Byte notificationStatus = 0;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = COLUMN_ISAPPLIED_NAME, nullable = false, length = 45)
     @Builder.Default
-    private String isApplied = "none";
-
+    private Status isApplied = Status.NOT_APPLIED;
 
     @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
-    public void setIsApplied(String status) {
+    public void updateIsApplied(Status status) {
         this.isApplied = status;
     }
 
@@ -121,6 +121,10 @@ public class Member {
         return authorities.stream()
                 .map(Authority::getRole)
                 .collect(toList());
+    }
+
+    public enum Status {
+        APPLIED, NOT_APPLIED;
     }
 
 

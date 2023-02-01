@@ -28,9 +28,9 @@ public class MatchingService {
     private List<Integer> languageIds; // 언어 id 리스트
     private List<MatchingParticipant> ans1, ans2; // 1차 필터링(질문 기반)
     private List<List<MatchingParticipant>> ans1Lg, ans2Lg; // 2차 필터링(언어 기반)
-    private List<MatchedGroup> matchedTeams; // 팀 반환
+    private List<MatchedGroup> matchedTeams; // 매칭된 팀 리스트
     private List<MatchingParticipant> remainApplicants1, remainApplicants2;
-    int ttl = 100;
+    int ttl;
 
     private final LanguageRepository languageRepository;
     private final QuestionRepository questionRepository;
@@ -87,18 +87,18 @@ public class MatchingService {
         return currentQuestion;
     }
 
-    public void applyMatching(MatchingParticipantInfo applicantInfo) {
+    public void applyMatching(MatchingParticipantInfo matchingParticipantInfo) {
         // 신청한 member의 is_applied를 waiting으로 변경
-        Member member = memberRepository.findById(applicantInfo.getMemberId()).get();
-        member.setIsApplied("apply");
-        System.out.println("applicantInfo = " + applicantInfo.getAnswer());
+        Member member = memberRepository.findById(matchingParticipantInfo.getMemberId()).get();
+        member.setIsApplied(Member.Status.APPLIED);
+        System.out.println("applicantInfo = " + matchingParticipantInfo.getAnswer());
 
         // matching_applicant에 신청자 정보 저장
         MatchingParticipant matchingParticipant = MatchingParticipant.builder()
                 .member(member)
-                .questionAnswer(applicantInfo.getAnswer())
-                .preferredLanguage(languageRepository.findById(applicantInfo.getLanguage()).get())
-                .isMatched((byte) 0)
+                .questionAnswer(matchingParticipantInfo.getAnswer())
+                .preferredLanguage(languageRepository.findById(matchingParticipantInfo.getLanguage()).get())
+                .isMatched(MatchingParticipant.Status.NOT_MATCHED)
                 .groupId(-1)
                 .build();
 
@@ -110,14 +110,14 @@ public class MatchingService {
         // 해당 유저의 정보를 반환하는 코드 아직 구현 안되어 임시로 member 설정
         Member member = memberRepository.findById(10).get();
         System.out.println("member.getIsApplied() = " + member.getIsApplied());
-        if (member.getIsApplied().equals("apply")) {
-            if (matchingParticipantRepository.findById(10).get().getIsMatched() == 1) {
-                return "matched";
+        if (member.getIsApplied().equals(Member.Status.APPLIED)) {
+            if (matchingParticipantRepository.findById(10).get().getIsMatched() == MatchingParticipant.Status.MATCHED) {
+                return "MATCHED";
             } else {
-                return "waiting";
+                return "PENDING";
             }
         } else {
-            return "none";
+            return "NONE";
         }
     }
 
@@ -133,6 +133,7 @@ public class MatchingService {
             filterLanguage(ans2, 2);
             remainApplicants1 = makeTeam(ans1Lg);
             remainApplicants2 = makeTeam(ans2Lg);
+            makeRemainApplicantsTeam(remainApplicants1, remainApplicants2);
             if (checkBlockingInfo()) {
                 break;
             } else {
@@ -156,16 +157,17 @@ public class MatchingService {
         remainApplicants2 = new ArrayList<>();
         languages = new ArrayList<>();
         languageIds = new ArrayList<>();
+        ttl=100;
     }
 
     private void loadDatas() {
         matchingParticipants = matchingParticipantRepository.findAll();
         blockingInfos = blockingInfoRepository.findAll();
         languages = languageRepository.findAll();
-        for (int i = 0; i < languages.size(); i++) {
+        for (Language language : languages) {
             ans1Lg.add(new ArrayList<>());
             ans2Lg.add(new ArrayList<>());
-            languageIds.add(languages.get(i).getId());
+            languageIds.add(language.getId());
         }
     }
 
@@ -196,75 +198,121 @@ public class MatchingService {
 
     private List<MatchingParticipant> makeTeam(List<List<MatchingParticipant>> filteredList) {
         List<MatchingParticipant> remainApplicants = new ArrayList<>();
+        List<MatchedGroup> ansLgMatchedTeams = new ArrayList<>();
 
         for (int i = 0; i < languages.size(); i++) {
-            // 세명씩 팀 구성
-            while (filteredList.get(i).size() >= 3) {
+            // 본인 포함 4명씩 팀 구성
+            while (filteredList.get(i).size() >= 4) {
                 MatchedGroup team = new MatchedGroup(filteredList.get(i).get(0).getMember().getId(),
                         filteredList.get(i).get(1).getMember().getId(),
-                        filteredList.get(i).get(2).getMember().getId());
-                for (int j = 0; j < 3; j++) {
-                    filteredList.get(i).remove(0);
-                }
-                matchedTeams.add(team);
+                        filteredList.get(i).get(2).getMember().getId(),
+                        filteredList.get(i).get(3).getMember().getId(),
+                        null);
+                filteredList.get(i).subList(0, 4).clear();
+                ansLgMatchedTeams.add(team);
             }
             // 남은 신청자들
-            for (int j = 0; j < filteredList.get(i).size(); j++) {
-                remainApplicants.add(filteredList.get(i).get(j));
-            }
+            remainApplicants.addAll(filteredList.get(i));
         }
 
-        // 남은 신청자들 1차: 3명씩 팀
-        while (remainApplicants.size() >= 3) {
+        // 남은 신청자들 1차: 4명씩 팀
+        while (remainApplicants.size() >= 4) {
             MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMember().getId(),
                     remainApplicants.get(1).getMember().getId(),
-                    remainApplicants.get(2).getMember().getId());
-            for (int j = 0; j < 3; j++) {
-                remainApplicants.remove(0);
-            }
-            matchedTeams.add(team);
-        }
-
-        // 남은 신청자들 2차: 2명씩 팀
-        if (remainApplicants.size() == 2) { // 2명 팀
-            MatchedGroup team = new MatchedGroup(remainApplicants.get(0).getMember().getId(),
-                    remainApplicants.get(1).getMember().getId(),
+                    remainApplicants.get(2).getMember().getId(),
+                    remainApplicants.get(3).getMember().getId(),
                     null);
-            for (int j = 0; j < 2; j++) {
-                remainApplicants.remove(0);
-            }
-            // 만들어진 팀 추가
-            matchedTeams.add(team);
-        } else if (remainApplicants.size() == 1) { // 이전에 만들어진 팀의 3명 + 남은 1명으로 2명, 2명 팀
-            int id1, id2, id3, id4, lastIdx = matchedTeams.size() - 1;
-            id1 = matchedTeams.get(lastIdx).getMemberId1();
-            id2 = matchedTeams.get(lastIdx).getMemberId2();
-            id3 = matchedTeams.get(lastIdx).getMemberId3();
-            id4 = remainApplicants.get(0).getMember().getId();
-            matchedTeams.remove(matchedTeams.size() - 1);
-            matchedTeams.add(new MatchedGroup(id1, id2, null));
-            matchedTeams.add(new MatchedGroup(id3, id4, null));
-            remainApplicants.remove(0);
+            remainApplicants.subList(0, 4).clear();
+            ansLgMatchedTeams.add(team);
         }
+
+        // 남은 신청자들 2차: 만들어진 각 팀에 한 명씩 추가
+        if (remainApplicants.size() > 0) {
+            int ansLgMatchedTeamsIdx = 0;
+            while (ansLgMatchedTeamsIdx < ansLgMatchedTeams.size()) {
+                ansLgMatchedTeams.get(ansLgMatchedTeamsIdx).setMemberId5(remainApplicants.get(0).getMember().getId());
+                remainApplicants.remove(0);
+                ansLgMatchedTeamsIdx++;
+                if (remainApplicants.size() <= 0) break;
+            }
+        }
+
+        // 남은 신청자들 3차
+        if (remainApplicants.size() == 3) { // 3명이 남은 경우: 3명 팀
+            ansLgMatchedTeams.add(new MatchedGroup(remainApplicants.get(0).getId(),
+                    remainApplicants.get(1).getId(),
+                    remainApplicants.get(2).getId(),
+                    null,
+                    null));
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 2) { // 2명이 남은 경우: 마지막 팀(5명)에 2명을 더하여 (3명, 4명) 팀으로 재구성
+            if (ansLgMatchedTeams.size() > 0) {
+                ansLgMatchedTeams = makeOneTeamToTwoTeam(ansLgMatchedTeams, remainApplicants);
+                remainApplicants.clear();
+            }
+        } else if (remainApplicants.size() == 1) { // 1명이 남은 경우: 마지막 팀(5명)에 1명을 더하여 (3명, 3명) 팀으로 재구성
+            if (ansLgMatchedTeams.size() > 0) {
+                ansLgMatchedTeams = makeOneTeamToTwoTeam(ansLgMatchedTeams, remainApplicants);
+                remainApplicants.clear();
+            }
+        }
+
+        // 만들어진 팀들을 matchedTeams에 추가
+        matchedTeams.addAll(ansLgMatchedTeams);
 
         return remainApplicants;
     }
 
+    private void makeRemainApplicantsTeam(List<MatchingParticipant> remainApplicants1, List<MatchingParticipant> remainApplicants2) {
+        List<MatchingParticipant> remainApplicants = new ArrayList<>();
+        remainApplicants.addAll(remainApplicants1);
+        remainApplicants.addAll(remainApplicants2);
+        // remainApplicants1과 remainApplicants2의 인원의 범위는 각각 0~2명
+        if (remainApplicants.size() == 4) { // 남은 신청자가 4명인 경우: 한 팀 생성
+            MatchedGroup matchedTeam = new MatchedGroup(remainApplicants.get(0).getId(),
+                    remainApplicants.get(1).getId(),
+                    remainApplicants.get(2).getId(),
+                    remainApplicants.get(3).getId(),
+                    null);
+            matchedTeams.add(matchedTeam);
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 3) { // 남은 신청자가 3명인 경우: 한 팀 생성
+            matchedTeams.add(new MatchedGroup(remainApplicants.get(0).getId(),
+                    remainApplicants.get(1).getId(),
+                    remainApplicants.get(2).getId(),
+                    null,
+                    null));
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 2) { // 남은 신청자가 2명인 경우: 마지막 팀이 4명이면 2명 더해서 (3명, 3명)으로, 5명이면 2명 더해서 (4명, 3명)으로 팀 재구성
+            matchedTeams = makeOneTeamToTwoTeam(matchedTeams, remainApplicants);
+            remainApplicants.clear();
+        } else if (remainApplicants.size() == 1) { // 마지막 팀이 4명이면 +1 해서 5명, 마지막 팀이 5명이면 +1해서 3, 3으로
+            matchedTeams = makeOneTeamToTwoTeam(matchedTeams, remainApplicants);
+            remainApplicants.clear();
+        }
+    }
+
     // 매칭된 팀에서 차단한 신청자가 같이 매칭된 경우 발견 시 false 반환
     private boolean checkBlockingInfo() {
-        for (int i = 0; i < matchedTeams.size(); i++) {
-            for (int j = 0; j < blockingInfos.size(); j++) {
-                int blockedMemberId = blockingInfos.get(j).getBlockedMember().getId();
-                int blockingMemberId = blockingInfos.get(j).getBlockingMember().getId();
-                int memberId1 = matchedTeams.get(i).getMemberId1(), memberId2 = matchedTeams.get(i).getMemberId2(), memberId3 = -1;
-                if (matchedTeams.get(i).getMemberId3() != null) {
-                    memberId3 = matchedTeams.get(i).getMemberId3();
+        for (MatchedGroup matchedTeam : matchedTeams) {
+            for (BlockingInfo blockingInfo : blockingInfos) {
+                int blockedMemberId = blockingInfo.getBlockedMember().getId();
+                int blockingMemberId = blockingInfo.getBlockingMember().getId();
+                int memberId1 = matchedTeam.getMemberId1(),
+                        memberId2 = matchedTeam.getMemberId2(),
+                        memberId3 = matchedTeam.getMemberId3(),
+                        memberId4 = -1, memberId5 = -1;
+                if (matchedTeam.getMemberId4() != null) {
+                    memberId4 = matchedTeam.getMemberId4();
+                }
+                if (matchedTeam.getMemberId5() != null) {
+                    memberId5 = matchedTeam.getMemberId5();
                 }
                 boolean isBlockedMember = false, isBlockingMember = false;
-                if (memberId1 == blockingMemberId || memberId2 == blockingMemberId || memberId3 == blockingMemberId) {
+                if (memberId1 == blockingMemberId || memberId2 == blockingMemberId || memberId3 == blockingMemberId || memberId4 == blockingMemberId || memberId5 == blockingMemberId) {
                     isBlockingMember = true;
                 }
-                if (memberId1 == blockedMemberId || memberId2 == blockedMemberId || memberId3 == blockedMemberId) {
+                if (memberId1 == blockedMemberId || memberId2 == blockedMemberId || memberId3 == blockedMemberId || memberId4 == blockedMemberId || memberId5 == blockedMemberId) {
                     isBlockedMember = true;
                 }
                 if (isBlockingMember && isBlockedMember) {
@@ -290,10 +338,38 @@ public class MatchingService {
 
     // 매칭 완료 후 matching_participant status 변경
     private void updateMatchingParticipantStatus() {
-        for (int i = 0; i < matchingParticipants.size(); i++) {
-            MatchingParticipant matchingParticipant = matchingParticipants.get(i);
-            matchingParticipant.setIsMatched((byte) 1);
+        for (MatchingParticipant matchingParticipant : matchingParticipants) {
+            matchingParticipant.updateIsMatched(MatchingParticipant.Status.MATCHED);
             matchingParticipantRepository.save(matchingParticipant);
         }
+    }
+
+    private List<MatchedGroup> makeOneTeamToTwoTeam(List<MatchedGroup> teams, List<MatchingParticipant> remainApplicants) {
+        Integer id1, id2, id3, id4, id5, id6 = null, id7 = null, lastIdx = teams.size() - 1;
+        id1 = teams.get(lastIdx).getMemberId1();
+        id2 = teams.get(lastIdx).getMemberId2();
+        id3 = teams.get(lastIdx).getMemberId3();
+        id4 = teams.get(lastIdx).getMemberId4();
+        if (teams.get(lastIdx).getMemberId5() != null) {
+            id5 = teams.get(lastIdx).getMemberId4();
+            id6 = remainApplicants.get(0).getMember().getId();
+            if (remainApplicants.size() == 2) {
+                id7 = remainApplicants.get(1).getMember().getId();
+            }
+        } else {
+            id5 = remainApplicants.get(0).getMember().getId();
+            if (remainApplicants.size() == 2) {
+                id6 = remainApplicants.get(1).getMember().getId();
+            }
+        }
+        teams.remove(teams.size() - 1);
+        if (id6 == null && id7 == null) {
+            teams.add(new MatchedGroup(id1, id2, id3, id4, id5));
+        } else {
+            teams.add(new MatchedGroup(id1, id2, id3, null, null));
+            teams.add(new MatchedGroup(id4, id5, id6, id7, null));
+        }
+
+        return teams;
     }
 }
