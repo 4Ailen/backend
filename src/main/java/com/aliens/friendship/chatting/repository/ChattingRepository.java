@@ -7,9 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ChattingRepository extends JpaRepository<Chatting, Integer> {
+public interface ChattingRepository extends JpaRepository<Chatting, Integer>, ChattingCustomRepository {
 
     List<Chatting> findByMatchingParticipant(MatchingParticipant matchingParticipant);
 
-    List<Chatting> findByChattingRoom(ChattingRoom chattingRoom);
 }
