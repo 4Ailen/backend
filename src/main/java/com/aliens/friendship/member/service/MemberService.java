@@ -37,13 +37,11 @@ public class MemberService {
 
     private final ProfileImageService profileImageService;
 
-    // todo : 이메일 중복확인
-    // todo : transactional
-    public String join(JoinDto joinDto) throws Exception {
+    public void join(JoinDto joinDto) throws Exception {
+        checkDuplicatedEmail(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
         String ProfileImageUrl = profileImageService.uploadProfileImage(joinDto.getImage());
         memberRepository.save(Member.ofUser(joinDto, ProfileImageUrl));
-        return ProfileImageUrl;
     }
 
     public void joinAdmin(JoinDto joinDto) {
@@ -51,7 +49,12 @@ public class MemberService {
         memberRepository.save(Member.ofAdmin(joinDto));
     }
 
-    // 1
+    private void checkDuplicatedEmail(String email) throws Exception{
+        if (memberRepository.findByEmail(email).isPresent()) {
+            throw new Exception("이미 사용중인 이메일입니다.");
+        }
+    }
+
     public TokenDto login(LoginDto loginDto) {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         checkPassword(loginDto.getPassword(), member.getPassword());
