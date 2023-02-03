@@ -13,7 +13,7 @@ public class ChattingRepositoryImpl implements ChattingCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Integer findChattingByMatchingParticipantAndChattingRoom(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom) {
+    public Integer findMatchingParticipantIdByMatchingParticipantAndChattingRoom(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom) {
         QChatting qChatting = QChatting.chatting;
         Chatting chatting = queryFactory
                 .selectFrom(qChatting)
