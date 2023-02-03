@@ -89,11 +89,7 @@ public class ChattingService {
     }
 
     private Integer findPartnerId(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom) {
-        for(Chatting chatting : chattingRepository.findByChattingRoom(chattingRoom)){
-            if(chatting.getMatchingParticipant().getId() != matchingParticipant.getId()){
-                return chatting.getMatchingParticipant().getId();
-            }
-        }
-        return null;
+
+        return chattingRepository.findChattingByMatchingParticipantAndChattingRoom(matchingParticipant, chattingRoom);
     }
 }
