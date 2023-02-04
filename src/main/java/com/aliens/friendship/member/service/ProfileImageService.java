@@ -24,21 +24,9 @@ public class ProfileImageService {
     }
 
     private void validateFile(MultipartFile uploadedFile) throws Exception {
-        if (uploadedFile == null || uploadedFile.isEmpty()) {
-            throw new Exception("업로드된 파일이 없습니다.");
-        }
-        if (uploadedFile.getSize() > MAX_FILE_SIZE) {
-            throw new Exception("파일 크기가 10MB을 초과하였습니다.");
-        }
-        String extension = getFileExtension(uploadedFile.getOriginalFilename());
-        if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new Exception("허용되지 않은 파일 확장자입니다. 허용되는 확장자: " + ALLOWED_EXTENSIONS);
-        }
-    }
-
-    private String getFileExtension(String originalFileName) {
-        int dotIndex = originalFileName.lastIndexOf('.');
-        return originalFileName.substring(dotIndex + 1).toLowerCase();
+        validateNotEmpty(uploadedFile);
+        validateFileSize(uploadedFile);
+        validateFileExtension(uploadedFile);
     }
 
     private String getRandomFileName() {
@@ -48,5 +36,29 @@ public class ProfileImageService {
 
     private String getUploadPath(String fileName) {
         return System.getProperty("user.dir") + DEFAULT_FILE_PATH + fileName;
+    }
+
+    private void validateFileSize(MultipartFile uploadedFile) throws Exception {
+        if (uploadedFile.getSize() > MAX_FILE_SIZE) {
+            throw new Exception("파일 크기가 10MB을 초과하였습니다.");
+        }
+    }
+
+    private void validateNotEmpty(MultipartFile uploadedFile) throws Exception {
+        if (uploadedFile == null || uploadedFile.isEmpty()) {
+            throw new Exception("업로드된 파일이 없습니다.");
+        }
+    }
+
+    private void validateFileExtension(MultipartFile uploadedFile) throws Exception {
+        String extension = getFileExtension(uploadedFile.getOriginalFilename());
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new Exception("허용되지 않은 파일 확장자입니다. 허용되는 확장자: " + ALLOWED_EXTENSIONS);
+        }
+    }
+
+    private String getFileExtension(String originalFileName) {
+        int dotIndex = originalFileName.lastIndexOf('.');
+        return originalFileName.substring(dotIndex + 1).toLowerCase();
     }
 }
