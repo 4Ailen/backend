@@ -28,7 +28,7 @@ class MemberServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("성공: 회원가입")
+    @DisplayName("회원가입 성공")
     void CreateMember_When_GivenValidJoinDto() throws Exception {
         //given: 회원가입 정보
         JoinDto mockJoinDto = createMockJoinDto("test@case.com","TestPassword");
@@ -43,7 +43,7 @@ class MemberServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("예외: 회원가입시 이미 존재하는 이메일일 경우")
+    @DisplayName("회원가입 예외: 이미 존재하는 이메일일 경우")
     void ThrowException_When_GivenExistEmail() throws Exception {
 
         //given: 이미 존재하는 회원
@@ -62,7 +62,7 @@ class MemberServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("성공: 회원가입시 비밀번호 암호화")
+    @DisplayName("비밀번호 암호화 성공")
     void EncryptPassword_When_Join() throws Exception {
         //given: 회원가입시 비밀번호 암호화
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
