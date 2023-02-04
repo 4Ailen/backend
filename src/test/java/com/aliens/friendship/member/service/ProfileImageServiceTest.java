@@ -19,8 +19,8 @@ class ProfileImageServiceTest {
     private ProfileImageService profileImageService;
 
     @Test
-    @DisplayName("성공: 프로필 이미지 저장")
-    public void UploadProfileImage_When_GivenValidImageFile() throws Exception {
+    @DisplayName("프로필 이미지 저장 성공")
+    public void UploadProfileImage_Success_When_GivenValidImageFile() throws Exception {
         // given: jpg 파일 생성
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
 
@@ -35,8 +35,8 @@ class ProfileImageServiceTest {
     }
 
     @Test
-    @DisplayName("예외: 파일확장자가 지원되지 않을 경우")
-    public void ThrowException_When_GivenInvalidFileExtension() throws Exception {
+    @DisplayName("프로필 이미지 저장 예외: 파일확장자가 지원되지 않을 경우")
+    public void UploadProfileImage_ThrowException_When_GivenInvalidFileExtension() throws Exception {
         // given: 텍스트 파일 생성
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.txt", "text/plain", "test data".getBytes());
 
@@ -50,8 +50,8 @@ class ProfileImageServiceTest {
     }
 
     @Test
-    @DisplayName("예외: 파일 크기가 10MB를 초과할 경우")
-    public void ThrowException_When_GivenFileSizeExceeds10MB() {
+    @DisplayName("프로필 이미지 저장 예외: 파일 크기가 10MB를 초과할 경우")
+    public void UploadProfileImage_ThrowException_When_GivenFileSizeExceeds10MB() {
         // given : 10MB를 초과하는 파일 생성
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", new byte[1024 * 1024 * 10 + 1]);
 
@@ -65,8 +65,8 @@ class ProfileImageServiceTest {
     }
 
     @Test
-    @DisplayName("예외: 업로드된 파일이 없을 경우")
-    public void ThrowException_When_GivenNullFile() {
+    @DisplayName("프로필 이미지 저장 예외: 업로드된 파일이 없을 경우")
+    public void UploadProfileImage_ThrowException_When_GivenNullFile() {
         // given : null 파일 생성
         MultipartFile mockMultipartFile = null;
 
