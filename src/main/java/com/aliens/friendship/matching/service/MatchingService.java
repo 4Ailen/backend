@@ -90,7 +90,7 @@ public class MatchingService {
     public void applyMatching(MatchingParticipantInfo matchingParticipantInfo) {
         // 신청한 member의 is_applied를 waiting으로 변경
         Member member = memberRepository.findById(matchingParticipantInfo.getMemberId()).get();
-        member.updateIsApplied(Member.Status.APPLIED);
+        member.setIsApplied(Member.Status.APPLIED);
         System.out.println("applicantInfo = " + matchingParticipantInfo.getAnswer());
 
         // matching_applicant에 신청자 정보 저장
