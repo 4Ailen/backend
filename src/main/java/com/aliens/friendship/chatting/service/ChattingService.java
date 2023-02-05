@@ -90,6 +90,6 @@ public class ChattingService {
 
     private Integer findPartnerId(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom) {
 
-        return chattingRepository.findMatchingParticipantIdByMatchingParticipantAndChattingRoom(matchingParticipant, chattingRoom);
+        return chattingRepository.findPartnerIdByMatchingParticipantAndChattingRoom(matchingParticipant, chattingRoom);
     }
 }

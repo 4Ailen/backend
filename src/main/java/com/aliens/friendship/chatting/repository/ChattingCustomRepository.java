@@ -5,5 +5,5 @@ import com.aliens.friendship.matching.domain.MatchingParticipant;
 
 public interface ChattingCustomRepository {
 
-    Integer findMatchingParticipantIdByMatchingParticipantAndChattingRoom(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom);
+    Integer findPartnerIdByMatchingParticipantAndChattingRoom(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom);
 }
