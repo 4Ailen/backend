@@ -11,6 +11,7 @@ import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.aliens.friendship.chatting.repository.ChatMessageRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class ChattingService {
     /**
      * 모든 채팅방 찾기
      */
+    @Transactional(readOnly = true)
     public List<ChattingRoom> findAllRoom() {
         return chattingRoomRepository.findAll();
     }
@@ -35,6 +37,7 @@ public class ChattingService {
      * 특정 채팅방 찾기
      * @param id room_id
      */
+    @Transactional(readOnly = true)
     public ChattingRoom findRoomById(Integer id) {
         return chattingRoomRepository.findById(id).orElseThrow();
     }
@@ -64,6 +67,7 @@ public class ChattingService {
      * 채팅방 채팅내용 불러오기
      * @param roomId 채팅방 id
      */
+    @Transactional(readOnly = true)
     public List<ChatMessage> findAllChatByRoomId(Long roomId) {
         return chatRepository.findAllByRoom(roomId);
     }
@@ -75,6 +79,7 @@ public class ChattingService {
         chattingRoomRepository.save(room);
     }
 
+    @Transactional(readOnly = true)
     public List<RoomInfoDto> getRoomInfoDtoListByMatchingParticipantId(Integer matchingParticipantId) {
         List<RoomInfoDto> roomInfoDtoList = new ArrayList<>();
         MatchingParticipant matchingParticipant = matchingParticipantRepository.findById(matchingParticipantId).orElseThrow(() -> new NoSuchElementException("Can't find matchingParticipant " + matchingParticipantId));
