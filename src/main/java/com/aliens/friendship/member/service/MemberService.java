@@ -13,6 +13,7 @@ import com.aliens.friendship.jwt.repository.LogoutAccessTokenRedisRepository;
 import com.aliens.friendship.member.repository.MemberRepository;
 import com.aliens.friendship.jwt.repository.RefreshTokenRedisRepository;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.member.repository.NationalityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
@@ -34,15 +35,18 @@ public class MemberService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final JwtTokenUtil jwtTokenUtil;
+    private final NationalityRepository nationalityRepository;
 
-    public void join(JoinDto joinDto) {
+    public JoinDto join(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-//        memberRepository.save(Member.ofUser(joinDto));
+        nationalityRepository.save(joinDto.getNationality());
+        memberRepository.save(Member.ofUser(joinDto));
+        return joinDto;
     }
 
     public void joinAdmin(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-//        memberRepository.save(Member.ofAdmin(joinDto));
+        memberRepository.save(Member.ofAdmin(joinDto));
     }
 
     // 1
@@ -87,7 +91,7 @@ public class MemberService {
         logoutAccessTokenRedisRepository.save(LogoutAccessToken.of(accessToken, username, remainMilliSeconds));
     }
 
-    private String resolveToken(String token) {
+    public String resolveToken(String token) {
         return token.substring(7);
     }
 
