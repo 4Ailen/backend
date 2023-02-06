@@ -93,7 +93,6 @@ public class MemberService {
     }
 
     // 3
-    @Transactional(readOnly = true)
     public TokenDto reissue(String refreshToken) {
         refreshToken = resolveToken(refreshToken);
         String username = getCurrentUsername();
