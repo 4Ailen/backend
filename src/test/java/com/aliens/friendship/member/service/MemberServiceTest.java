@@ -77,17 +77,114 @@ class MemberServiceTest {
         assertTrue(passwordEncoder.matches("TestPassword", retrievedMember.getPassword()));
     }
 
+    //TODO: 회원탈퇴 성공, 회원탈퇴 예외: 존재하지 않는 회원일 경우, 회원탈퇴 예외: JWT 토큰이 유효하지 않은 경우, 회원탈퇴 예외: 비밀번호 불일치
+    @Test
+    @DisplayName("회원탈퇴 성공")
+    void DeleteMember_Success_When_GivenValidMemberAndAuthority() throws Exception {
+        //given: 유효한 회원 탈퇴 정보
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        memberService.join(mockJoinDto);
+        WithdrawalDto mockWithdrawalDto = WithdrawalDto.builder().email("test@case.com").password("TestPassword").build();
+
+        //when: 회원탈퇴
+        memberService.withdrawal(mockWithdrawalDto);
+
+        //then: 회원탈퇴 성공
+        assertFalse(memberRepository.findByEmail("test@case.com").isPresent());
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 예외: 존재하지 않는 회원일 경우")
+    void DeleteMember_ThrowException_When_GivenNotExistMember() throws Exception {
+        //given: 회원가입 되어있지 않은 회원의 회원탈퇴 정보
+        WithdrawalDto mockWithdrawalDto = WithdrawalDto.builder().email("test@case.com").password("TestPassword").build();
+
+        //when: 회원탈퇴
+        Exception exception = assertThrows(Exception.class, () -> {
+            memberService.withdrawal(mockWithdrawalDto);
+        });
+
+        //then: 예외 발생
+        assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 예외: 비밀번호 불일치")
+    void DeleteMember_ThrowException_When_GivenNotMatchPassword() throws Exception {
+        //given: 비밀번호 불일치 회원탈퇴 정보
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        memberService.join(mockJoinDto);
+        WithdrawalDto mockWithdrawalDto = WithdrawalDto.builder().email("test@case.com").password("WrongPassword").build();
+
+        //when: 회원탈퇴
+        Exception exception = assertThrows(Exception.class, () -> {
+            memberService.withdrawal(mockWithdrawalDto);
+        });
+
+        //then: 예외 발생
+        assertEquals("비밀번호가 일치하지 않습니다.", exception.getMessage());
+    }
+
+//    @Test
+//    @Transactional
+//    @DisplayName("회원탈퇴 예외: JWT 토큰이 유효하지 않은 경우")
+//    void DeleteMember_Success_When_GivenValidMemberAndAuthority() throws Exception {
+//        //given: 유효한 회원 탈퇴 정보
+//        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+//        memberService.join(mockJoinDto);
+//        WithdrawalDto mockWithdrawalDto = WithdrawalDto.builder().email("test@case.com").password("TestPassword").build();
+//
+//        //when: 회원탈퇴
+//        Exception exception = assertThrows(Exception.class, () -> {
+//            memberService.withdrawal(mockWithdrawalDto);
+//        });
+//
+//        //then: 예외 발생
+//        assertEquals("JWT 토큰이 유효하지 않습니다.", exception.getMessage());
+//    }
+
+//    TODO: 회원 정보 요청 성공, 회원 정보 요청 예외: 존재하지 않는 회원일 경우, 회원 정보 요청 예외: JWT 토큰이 유효하지 않은 경우
+    @Test
+    @DisplayName("회원 정보 요청 성공")
+    void GetMemberInfo_Success_When_GivenValidMember() throws Exception {
+    //given: 회원가입된 회원
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        memberService.join(mockJoinDto);
+        //when: 회원 정보 요청
+        MemberInfoDto memberDto = memberService.getMemberInfo("test@case.com");
+
+        //then: 회원 정보 요청 성공
+        assertEquals("test@case.com", memberDto.getEmail());
+    }
+
+    @Test
+    @DisplayName("회원 정보 요청 예외: 존재하지 않는 회원일 경우")
+    void GetMemberInfo_ThrowException_When_GivenNotExistMember() throws Exception {
+        //when: 회원 정보 요청 (가입되어있지 않은 회원)
+        Exception exception = assertThrows(Exception.class, () -> {
+            memberService.getMemberInfo("test@case.com");
+        });
+
+        //then: 예외 발생
+        assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
+    }
+
+
+
+
+
+
     private JoinDto createMockJoinDto(String email, String password) {
-        JoinDto mockJoinDto = new JoinDto();
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        mockJoinDto.setEmail(email);
-        mockJoinDto.setPassword(password);
-        mockJoinDto.setName("Ryan");
-        mockJoinDto.setMbti("ENFJ");
-        mockJoinDto.setGender("MALE");
-        mockJoinDto.setNationality(new Nationality(1, "South Korea"));
-        mockJoinDto.setAge(20);
-        mockJoinDto.setImage(mockMultipartFile);
-        return mockJoinDto;
+        return JoinDto.builder()
+                .email(email)
+                .password(password)
+                .name("Ryan")
+                .mbti("ENFJ")
+                .gender("MALE")
+                .nationality(new Nationality(1, "South Korea"))
+                .age(20)
+                .image(mockMultipartFile)
+                .build();
     }
 }
