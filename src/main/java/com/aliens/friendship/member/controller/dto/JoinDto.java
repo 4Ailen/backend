@@ -1,7 +1,8 @@
-package com.aliens.friendship.jwt.domain.dto;
+package com.aliens.friendship.member.controller.dto;
 
 import com.aliens.friendship.member.domain.Nationality;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
@@ -13,4 +14,7 @@ public class JoinDto {
     private String gender;
     private Nationality nationality;
     private Integer age;
+    private MultipartFile image;
+    @Builder.Default
+    private String imageUrl = "default.png";
 }

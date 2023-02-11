@@ -1,7 +1,7 @@
 package com.aliens.friendship.member.domain;
 
 import com.aliens.friendship.jwt.domain.Authority;
-import com.aliens.friendship.jwt.domain.dto.JoinDto;
+import com.aliens.friendship.member.controller.dto.JoinDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,9 +15,12 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 
+/**
+ * email,password,mbti,gender,nationality,age,name
+ */
 @Entity @Getter @ToString @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED) @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = Member.TABLE_NAME, schema = "aliendb")
+@Table(name = Member.TABLE_NAME)
 public class Member {
 
     public static final String TABLE_NAME = "member";
@@ -93,6 +96,7 @@ public class Member {
                 .name(joinDto.getName())
                 .nationality(joinDto.getNationality())
                 .joinDate(Instant.now())
+                .imageUrl(joinDto.getImageUrl())
                 .build();
         member.addAuthority(Authority.ofUser(member));
         return member;
