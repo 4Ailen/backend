@@ -87,7 +87,9 @@ public class MemberService {
                 jwtTokenUtil.generateRefreshToken(username), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
+    // 2
     // TODO: 만나이 반환으로 수정
+    @Transactional(readOnly = true)
     public MemberInfoDto getMemberInfo(int memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         return MemberInfoDto.builder()
