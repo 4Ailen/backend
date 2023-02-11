@@ -24,8 +24,8 @@ public class MemberController {
     }
 
     @GetMapping("/{email}")
-    public Response<MemberInfoDto> getMember(@PathVariable String email) {
-        return Response.SUCCESS(memberService.getMemberInfo(email));
+    public Response<MemberInfoDto> getMember(@PathVariable int memberId) {
+        return Response.SUCCESS(memberService.getMemberInfo(memberId));
     }
 
 

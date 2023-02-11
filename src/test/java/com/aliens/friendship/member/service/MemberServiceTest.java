@@ -150,8 +150,8 @@ class MemberServiceTest {
     //given: 회원가입된 회원
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         memberService.join(mockJoinDto);
-        //when: 회원 정보 요청
-        MemberInfoDto memberDto = memberService.getMemberInfo("test@case.com");
+        int memberId = memberRepository.findByEmail("test@case.com").get().getId();
+        MemberInfoDto memberDto = memberService.getMemberInfo(memberId);
 
         //then: 회원 정보 요청 성공
         assertEquals("test@case.com", memberDto.getEmail());
@@ -162,7 +162,7 @@ class MemberServiceTest {
     void GetMemberInfo_ThrowException_When_GivenNotExistMember() throws Exception {
         //when: 회원 정보 요청 (가입되어있지 않은 회원)
         Exception exception = assertThrows(Exception.class, () -> {
-            memberService.getMemberInfo("test@case.com");
+            memberService.getMemberInfo(9999);
         });
 
         //then: 예외 발생

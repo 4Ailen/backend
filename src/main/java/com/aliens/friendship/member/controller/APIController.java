@@ -39,11 +39,6 @@ public class APIController {
         return ResponseEntity.ok(memberService.login(loginDto));
     }
 
-    @GetMapping("/members/{email}")
-    public MemberInfo getMemberInfo(@PathVariable String email) {
-        return memberService.getMemberInfo(email);
-    }
-
     @PostMapping("/reissue")
     public ResponseEntity<TokenDto> reissue(@RequestHeader("RefreshToken") String refreshToken) {
         return ResponseEntity.ok(memberService.reissue(refreshToken));

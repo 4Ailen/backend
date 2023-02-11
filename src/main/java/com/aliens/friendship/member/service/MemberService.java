@@ -86,11 +86,8 @@ public class MemberService {
     }
 
     // TODO: 만나이 반환으로 수정
-    public MemberInfoDto getMemberInfo(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-        if (!member.getEmail().equals(getCurrentUsername())) {
-            throw new IllegalArgumentException("회원 정보가 일치하지 않습니다.");
-        }
+    public MemberInfoDto getMemberInfo(int memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         return MemberInfoDto.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
