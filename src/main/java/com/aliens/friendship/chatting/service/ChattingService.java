@@ -82,18 +82,9 @@ public class ChattingService {
             RoomInfoDto roomInfoDto = new RoomInfoDto();
             roomInfoDto.setRoomId(chatting.getChattingRoom().getId());
             roomInfoDto.setStatus(chatting.getChattingRoom().getStatus().toString());
-            roomInfoDto.setPartnerId(findPartnerId(matchingParticipant, chatting.getChattingRoom()));
+            roomInfoDto.setPartnerId(chattingRepository.findPartnerIdByMatchingParticipantAndChattingRoom(matchingParticipant, chatting.getChattingRoom()));
             roomInfoDtoList.add(roomInfoDto);
         }
         return roomInfoDtoList;
-    }
-
-    private Integer findPartnerId(MatchingParticipant matchingParticipant, ChattingRoom chattingRoom) {
-        for(Chatting chatting : chattingRepository.findByChattingRoom(chattingRoom)){
-            if(chatting.getMatchingParticipant().getId() != matchingParticipant.getId()){
-                return chatting.getMatchingParticipant().getId();
-            }
-        }
-        return null;
     }
 }
