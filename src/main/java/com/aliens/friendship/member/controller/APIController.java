@@ -4,6 +4,7 @@ import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.MemberInfo;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
+import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.service.MemberService;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
@@ -46,9 +47,9 @@ public class APIController {
     }
 
 
-    @GetMapping("/members/{email}")
-    public MemberInfo getMemberInfo(@PathVariable String email) {
-        return memberService.getMemberInfo(email);
+    @GetMapping("/members/{memberId}")
+    public MemberInfoDto getMemberInfo(@PathVariable int memberId) {
+        return memberService.getMemberInfo(memberId);
     }
 
 }
