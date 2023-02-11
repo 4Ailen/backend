@@ -42,8 +42,8 @@ public class MemberService {
     public void join(JoinDto joinDto) throws Exception {
         checkDuplicatedEmail(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        String ProfileImageUrl = profileImageService.uploadProfileImage(joinDto.getImage());
-        memberRepository.save(Member.ofUser(joinDto, ProfileImageUrl));
+        joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getImage()));
+        memberRepository.save(Member.ofUser(joinDto));
     }
 
     public void joinAdmin(JoinDto joinDto) {
