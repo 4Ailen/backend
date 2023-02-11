@@ -3,6 +3,8 @@ package com.aliens.friendship.member.service;
 import com.aliens.friendship.global.config.cache.CacheKey;
 import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import com.aliens.friendship.jwt.domain.LogoutAccessToken;
+import com.aliens.friendship.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.member.controller.dto.WithdrawalDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.jwt.domain.RefreshToken;
 import com.aliens.friendship.member.controller.dto.JoinDto;
@@ -49,6 +51,14 @@ public class MemberService {
         memberRepository.save(Member.ofAdmin(joinDto));
     }
 
+    public void withdrawal(WithdrawalDto withdrawalDto) throws Exception {
+        Member member = memberRepository.findByEmail(withdrawalDto.getEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        if (!passwordEncoder.matches(withdrawalDto.getPassword(), member.getPassword())) {
+            throw new Exception("비밀번호가 일치하지 않습니다.");
+        }
+        memberRepository.delete(member);
+    }
+
     private void checkDuplicatedEmail(String email) throws Exception{
         if (memberRepository.findByEmail(email).isPresent()) {
             throw new Exception("이미 사용중인 이메일입니다.");
@@ -75,15 +85,20 @@ public class MemberService {
                 jwtTokenUtil.generateRefreshToken(username), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
-    // 2
-    public MemberInfo getMemberInfo(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
+    // TODO: 만나이 반환으로 수정
+    public MemberInfoDto getMemberInfo(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         if (!member.getEmail().equals(getCurrentUsername())) {
             throw new IllegalArgumentException("회원 정보가 일치하지 않습니다.");
         }
-        return MemberInfo.builder()
-                .username(member.getEmail())
+        return MemberInfoDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
+                .mbti(member.getMbti())
+                .gender(member.getGender())
+                .nationality(member.getNationality().getId())
+                .age(member.getAge())
+                .name(member.getName())
                 .build();
     }
 
