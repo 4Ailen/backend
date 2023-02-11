@@ -83,7 +83,7 @@ public class Member {
         this.isApplied = status;
     }
 
-    public static Member ofUser(JoinDto joinDto, String imageUrl) {
+    public static Member ofUser(JoinDto joinDto) {
         Member member = Member.builder()
                 .email(joinDto.getEmail())
                 .password(joinDto.getPassword())
@@ -93,7 +93,7 @@ public class Member {
                 .name(joinDto.getName())
                 .nationality(joinDto.getNationality())
                 .joinDate(Instant.now())
-                .imageUrl(imageUrl)
+                .imageUrl(joinDto.getImageUrl())
                 .build();
         member.addAuthority(Authority.ofUser(member));
         return member;
