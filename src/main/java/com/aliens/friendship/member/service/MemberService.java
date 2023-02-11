@@ -15,6 +15,7 @@ import com.aliens.friendship.jwt.repository.LogoutAccessTokenRedisRepository;
 import com.aliens.friendship.member.repository.MemberRepository;
 import com.aliens.friendship.jwt.repository.RefreshTokenRedisRepository;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.member.repository.NationalityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
@@ -36,6 +37,7 @@ public class MemberService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final JwtTokenUtil jwtTokenUtil;
+    private final NationalityRepository nationalityRepository;
 
     private final ProfileImageService profileImageService;
 
@@ -108,7 +110,7 @@ public class MemberService {
         logoutAccessTokenRedisRepository.save(LogoutAccessToken.of(accessToken, username, remainMilliSeconds));
     }
 
-    private String resolveToken(String token) {
+    public String resolveToken(String token) {
         return token.substring(7);
     }
 
