@@ -1,7 +1,7 @@
 package com.aliens.friendship.member.domain;
 
 import com.aliens.friendship.jwt.domain.Authority;
-import com.aliens.friendship.jwt.domain.dto.JoinDto;
+import com.aliens.friendship.member.controller.dto.JoinDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -96,6 +96,7 @@ public class Member {
                 .name(joinDto.getName())
                 .nationality(joinDto.getNationality())
                 .joinDate(Instant.now())
+                .imageUrl(joinDto.getImageUrl())
                 .build();
         member.addAuthority(Authority.ofUser(member));
         return member;
