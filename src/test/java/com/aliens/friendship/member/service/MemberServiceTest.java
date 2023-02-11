@@ -1,6 +1,8 @@
 package com.aliens.friendship.member.service;
 
+import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.JoinDto;
+import com.aliens.friendship.member.controller.dto.WithdrawalDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
@@ -17,21 +19,22 @@ import javax.transaction.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+@Transactional
 @SpringBootTest
 class MemberServiceTest {
 
     @Autowired
-    MemberService memberService;
-
-    @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    MemberService memberService;
+
     @Test
-    @Transactional
     @DisplayName("회원가입 성공")
-    void CreateMember_When_GivenValidJoinDto() throws Exception {
+    void CreateMember_Success_When_GivenValidJoinDto() throws Exception {
         //given: 회원가입 정보
-        JoinDto mockJoinDto = createMockJoinDto("test@case.com","TestPassword");
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
 
         //when: 회원가입
         memberService.join(mockJoinDto);
@@ -42,9 +45,8 @@ class MemberServiceTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("회원가입 예외: 이미 존재하는 이메일일 경우")
-    void ThrowException_When_GivenExistEmail() throws Exception {
+    void CreateMember_ThrowException_When_GivenExistEmail() throws Exception {
 
         //given: 이미 존재하는 회원
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
@@ -61,9 +63,8 @@ class MemberServiceTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("비밀번호 암호화 성공")
-    void EncryptPassword_When_Join() throws Exception {
+    void EncryptPassword_Success_When_Join() throws Exception {
         //given: 회원가입시 비밀번호 암호화
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         memberService.join(mockJoinDto);
