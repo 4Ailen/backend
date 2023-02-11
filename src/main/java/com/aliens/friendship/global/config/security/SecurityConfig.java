@@ -5,6 +5,7 @@ import com.aliens.friendship.global.config.jwt.JwtEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -35,38 +37,35 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http.cors()
-//
-//
-//
-//                .and()
-//                .csrf().disable()
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login").permitAll()
-//                .antMatchers("/logout").authenticated()
-//                .anyRequest().hasRole("USER")
-//
-//                .and()
-//                .exceptionHandling().
-//                authenticationEntryPoint(jwtEntryPoint).
-//
-//                and()
-//                .logout()
-//                .disable()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-//
-//                and()// Add a filter to validate the tokens with every request
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.cors()
+                .and()
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login").permitAll()
+                .antMatchers("/health","/logout").authenticated()
+                .anyRequest().hasRole("USER")
 
-        // 필터 해제
-        http.authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and()
+                .exceptionHandling().
+                authenticationEntryPoint(jwtEntryPoint).
 
+                and()
+                .logout()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).
 
+                and()// Add a filter to validate the tokens with every request
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+//        // 필터 해제
+//        http.authorizeRequests()
+//                .antMatchers("/**").permitAll()
+//                .and().csrf().disable()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//
+//
+//
         return http.build();
     }
 

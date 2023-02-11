@@ -15,9 +15,12 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 
+/**
+ * email,password,mbti,gender,nationality,age,name
+ */
 @Entity @Getter @ToString @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED) @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = Member.TABLE_NAME, schema = "aliendb")
+@Table(name = Member.TABLE_NAME)
 public class Member {
 
     public static final String TABLE_NAME = "member";
