@@ -3,9 +3,11 @@ package com.aliens.friendship.member.service;
 import com.aliens.friendship.global.config.cache.CacheKey;
 import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import com.aliens.friendship.jwt.domain.LogoutAccessToken;
+import com.aliens.friendship.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.member.controller.dto.WithdrawalDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.jwt.domain.RefreshToken;
-import com.aliens.friendship.jwt.domain.dto.JoinDto;
+import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.MemberInfo;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
@@ -35,17 +37,34 @@ public class MemberService {
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final JwtTokenUtil jwtTokenUtil;
 
-    public void join(JoinDto joinDto) {
+    private final ProfileImageService profileImageService;
+
+    public void join(JoinDto joinDto) throws Exception {
+        checkDuplicatedEmail(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-//        memberRepository.save(Member.ofUser(joinDto));
+        joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getImage()));
+        memberRepository.save(Member.ofUser(joinDto));
     }
 
     public void joinAdmin(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-//        memberRepository.save(Member.ofAdmin(joinDto));
+        memberRepository.save(Member.ofAdmin(joinDto));
     }
 
-    // 1
+    public void withdrawal(WithdrawalDto withdrawalDto) throws Exception {
+        Member member = memberRepository.findByEmail(withdrawalDto.getEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        if (!passwordEncoder.matches(withdrawalDto.getPassword(), member.getPassword())) {
+            throw new Exception("비밀번호가 일치하지 않습니다.");
+        }
+        memberRepository.delete(member);
+    }
+
+    private void checkDuplicatedEmail(String email) throws Exception{
+        if (memberRepository.findByEmail(email).isPresent()) {
+            throw new Exception("이미 사용중인 이메일입니다.");
+        }
+    }
+
     public TokenDto login(LoginDto loginDto) {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         checkPassword(loginDto.getPassword(), member.getPassword());
@@ -66,15 +85,17 @@ public class MemberService {
                 jwtTokenUtil.generateRefreshToken(username), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
-    // 2
-    public MemberInfo getMemberInfo(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
-        if (!member.getEmail().equals(getCurrentUsername())) {
-            throw new IllegalArgumentException("회원 정보가 일치하지 않습니다.");
-        }
-        return MemberInfo.builder()
-                .username(member.getEmail())
+    // TODO: 만나이 반환으로 수정
+    public MemberInfoDto getMemberInfo(int memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        return MemberInfoDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
+                .mbti(member.getMbti())
+                .gender(member.getGender())
+                .nationality(member.getNationality().getId())
+                .age(member.getAge())
+                .name(member.getName())
                 .build();
     }
 
