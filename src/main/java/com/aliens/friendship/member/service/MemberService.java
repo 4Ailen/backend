@@ -67,6 +67,7 @@ public class MemberService {
     }
 
     // 2
+    @Transactional(readOnly = true)
     public MemberInfo getMemberInfo(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         if (!member.getEmail().equals(getCurrentUsername())) {

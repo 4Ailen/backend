@@ -11,6 +11,7 @@ import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.aliens.friendship.chatting.repository.ChatMessageRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChattingService {
     private final ChattingRoomRepository chattingRoomRepository;
     private final MatchingParticipantRepository matchingParticipantRepository;
@@ -43,6 +45,7 @@ public class ChattingService {
      * 채팅방 만들기
      * @param name 방 이름
      */
+    @Transactional(readOnly = false)
     public ChattingRoom createRoom() {
         return chattingRoomRepository.save(new ChattingRoom());
     }
@@ -55,6 +58,7 @@ public class ChattingService {
      * @param sender 보낸이
      * @param message 내용
      */
+    @Transactional(readOnly = false)
     public ChatMessage createChat(Integer roomId, String sender, String message) {
         ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(() -> new NoSuchElementException("Can't find room "+roomId));
         return chatRepository.save(ChatMessage.createChat(room.getId(), sender, message));
@@ -68,6 +72,7 @@ public class ChattingService {
         return chatRepository.findAllByRoom(roomId);
     }
 
+    @Transactional(readOnly = false)
     public void updateRoomStatus(int roomId, String status) {
         ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(()-> new NoSuchElementException("Can't find room "+roomId));
         ChattingRoom.RoomStatus roomStatus = ChattingRoom.RoomStatus.valueOf(status.toUpperCase());
