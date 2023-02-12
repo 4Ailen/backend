@@ -90,10 +90,8 @@ public class MemberService {
                 jwtTokenUtil.generateRefreshToken(username), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
-    // 2
-    // TODO: 만나이 반환으로 수정
     @Transactional(readOnly = true)
-    public MemberInfoDto getMemberInfo(int memberId) {
+    public MemberInfoDto getMemberInfo(int memberId) throws Exception{
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         return MemberInfoDto.builder()
                 .memberId(member.getId())
@@ -101,7 +99,8 @@ public class MemberService {
                 .mbti(member.getMbti())
                 .gender(member.getGender())
                 .nationality(member.getNationality().getId())
-                .age(member.getAge())
+                .birthday(member.getBirthday())
+                .age(getAgeFromBirthday(member.getBirthday()))
                 .name(member.getName())
                 .build();
     }
