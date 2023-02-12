@@ -147,7 +147,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원 정보 요청 성공")
     void GetMemberInfo_Success_When_GivenValidMember() throws Exception {
-    //given: 회원가입된 회원
+        //given: 회원가입된 회원
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         memberService.join(mockJoinDto);
         int memberId = memberRepository.findByEmail("test@case.com").get().getId();
@@ -155,6 +155,8 @@ class MemberServiceTest {
 
         //then: 회원 정보 요청 성공
         assertEquals("test@case.com", memberDto.getEmail());
+        assertEquals("1998-12-31", memberDto.getBirthday());
+        assertEquals(24, memberDto.getAge());
     }
 
     @Test
@@ -183,7 +185,7 @@ class MemberServiceTest {
                 .mbti("ENFJ")
                 .gender("MALE")
                 .nationality(new Nationality(1, "South Korea"))
-                .age(20)
+                .birthday("1998-12-31")
                 .image(mockMultipartFile)
                 .build();
     }
