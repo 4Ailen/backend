@@ -48,7 +48,7 @@ public class APIController {
 
 
     @GetMapping("/members/{memberId}")
-    public MemberInfoDto getMemberInfo(@PathVariable int memberId) {
+    public MemberInfoDto getMemberInfo(@PathVariable int memberId) throws Exception {
         return memberService.getMemberInfo(memberId);
     }
 

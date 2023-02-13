@@ -29,7 +29,7 @@ public class Member {
     public static final String COLUMN_PASSWORD_NAME = "password";
     public static final String COLUMN_MBTI_NAME = "mbti";
     public static final String COLUMN_GENDER_NAME = "gender";
-    public static final String COLUMN_AGE_NAME = "age";
+    public static final String COLUMN_BIRTHDAY_NAME = "birthday";
     public static final String COLUMN_NAME_NAME = "name";
     public static final String COLUMN_JOINDATE_NAME = "join_date";
     public static final String COLUMN_IMAGEURL_NAME = "image_url";
@@ -56,8 +56,8 @@ public class Member {
     @JoinColumn(name = "nationality", nullable = false)
     private Nationality nationality;
 
-    @Column(name = COLUMN_AGE_NAME, nullable = false)
-    private Integer age;
+    @Column(name = COLUMN_BIRTHDAY_NAME, nullable = false)
+    private String birthday;
 
     @Column(name = COLUMN_NAME_NAME, nullable = false, length = 45)
     private String name;
@@ -92,7 +92,7 @@ public class Member {
                 .password(joinDto.getPassword())
                 .mbti(joinDto.getMbti())
                 .gender(joinDto.getGender())
-                .age(joinDto.getAge())
+                .birthday(joinDto.getBirthday())
                 .name(joinDto.getName())
                 .nationality(joinDto.getNationality())
                 .joinDate(Instant.now())
@@ -108,7 +108,7 @@ public class Member {
                 .password(joinDto.getPassword())
                 .mbti(joinDto.getMbti())
                 .gender(joinDto.getGender())
-                .age(joinDto.getAge())
+                .birthday(joinDto.getBirthday())
                 .name(joinDto.getName())
                 .nationality(joinDto.getNationality())
                 .joinDate(Instant.now())

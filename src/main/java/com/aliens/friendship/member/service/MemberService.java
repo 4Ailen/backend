@@ -3,18 +3,17 @@ package com.aliens.friendship.member.service;
 import com.aliens.friendship.global.config.cache.CacheKey;
 import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import com.aliens.friendship.jwt.domain.LogoutAccessToken;
+import com.aliens.friendship.jwt.domain.RefreshToken;
+import com.aliens.friendship.jwt.domain.dto.LoginDto;
+import com.aliens.friendship.jwt.domain.dto.TokenDto;
+import com.aliens.friendship.jwt.repository.LogoutAccessTokenRedisRepository;
+import com.aliens.friendship.jwt.repository.RefreshTokenRedisRepository;
+import com.aliens.friendship.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.WithdrawalDto;
 import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.jwt.domain.RefreshToken;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.jwt.domain.dto.LoginDto;
-import com.aliens.friendship.jwt.domain.dto.MemberInfo;
-import com.aliens.friendship.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.jwt.repository.LogoutAccessTokenRedisRepository;
 import com.aliens.friendship.member.repository.MemberRepository;
-import com.aliens.friendship.jwt.repository.RefreshTokenRedisRepository;
-import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.repository.NationalityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,6 +24,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.NoSuchElementException;
 
 @Service
@@ -87,10 +90,8 @@ public class MemberService {
                 jwtTokenUtil.generateRefreshToken(username), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
-    // 2
-    // TODO: 만나이 반환으로 수정
     @Transactional(readOnly = true)
-    public MemberInfoDto getMemberInfo(int memberId) {
+    public MemberInfoDto getMemberInfo(int memberId) throws Exception{
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         return MemberInfoDto.builder()
                 .memberId(member.getId())
@@ -98,7 +99,8 @@ public class MemberService {
                 .mbti(member.getMbti())
                 .gender(member.getGender())
                 .nationality(member.getNationality().getId())
-                .age(member.getAge())
+                .birthday(member.getBirthday())
+                .age(getAgeFromBirthday(member.getBirthday()))
                 .name(member.getName())
                 .build();
     }
@@ -144,5 +146,26 @@ public class MemberService {
 
     private boolean lessThanReissueExpirationTimesLeft(String refreshToken) {
         return jwtTokenUtil.getRemainMilliSeconds(refreshToken) < JwtExpirationEnums.REISSUE_EXPIRATION_TIME.getValue();
+    }
+
+    private int getAgeFromBirthday(String birthday) throws Exception {
+        Calendar birthCalendar = getCalendarFromString(birthday);
+        Calendar today = Calendar.getInstance();
+
+        int age = today.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR);
+        if (today.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+
+        return age;
+    }
+
+    private Calendar getCalendarFromString(String date) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date birthDate = format.parse(date);
+        Calendar birthCalendar = Calendar.getInstance();
+        birthCalendar.setTime(birthDate);
+
+        return birthCalendar;
     }
 }

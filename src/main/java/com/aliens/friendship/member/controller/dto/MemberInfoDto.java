@@ -14,5 +14,6 @@ public class MemberInfoDto {
     private String gender;
     private int nationality;
     private int age;
+    private String birthday;
     private String name;
 }

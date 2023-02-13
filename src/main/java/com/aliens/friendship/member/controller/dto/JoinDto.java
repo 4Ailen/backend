@@ -13,7 +13,7 @@ public class JoinDto {
     private String mbti;
     private String gender;
     private Nationality nationality;
-    private Integer age;
+    private String birthday;
     private MultipartFile image;
     @Builder.Default
     private String imageUrl = "default.png";

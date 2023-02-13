@@ -24,7 +24,7 @@ public class MemberController {
     }
 
     @GetMapping("/{email}")
-    public Response<MemberInfoDto> getMember(@PathVariable int memberId) {
+    public Response<MemberInfoDto> getMember(@PathVariable int memberId) throws Exception {
         return Response.SUCCESS(memberService.getMemberInfo(memberId));
     }
 

@@ -1,10 +1,10 @@
 package com.aliens.friendship.jwt;
 
 import com.aliens.friendship.global.config.security.CustomUserDetailService;
-import com.aliens.friendship.jwt.domain.dto.JoinDto;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
 import com.aliens.friendship.member.service.MemberService;
@@ -13,7 +13,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,14 +38,14 @@ public class JwtUtilTest {
     JoinDto memberJoinRequest;
 
     @BeforeEach
-    public void setupMember() {
+    public void setupMember() throws Exception {
         Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
         memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
                 .email("skatks1016@naver.com")
                 .name("김명준")
                 .mbti("INTJ")
-                .age(21)
+                .birthday("1998-09-21")
                 .gender("male")
                 .nationality(nationality)
                 .build();
