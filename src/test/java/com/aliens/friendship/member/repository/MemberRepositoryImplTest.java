@@ -32,7 +32,7 @@ class MemberRepositoryImplTest {
     @Transactional
     @Test
     @DisplayName("이메일로 멤버와 권한 정보 함께 반환 성공")
-    void getMemberWithAuthority_Success_When_GivenEmail() throws Exception {
+    void GetMemberWithAuthority_Success_When_GivenEmail() throws Exception {
         //given: 회원 정보 생성 후 회원가입
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         memberService.join(mockJoinDto);
