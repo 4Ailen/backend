@@ -46,10 +46,4 @@ public class APIController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-    @GetMapping("/members/{memberId}")
-    public MemberInfoDto getMemberInfo(@PathVariable int memberId) throws Exception {
-        return memberService.getMemberInfo(memberId);
-    }
-
 }
