@@ -56,9 +56,10 @@ public class MemberService {
         memberRepository.save(Member.ofAdmin(joinDto));
     }
 
-    public void withdrawal(WithdrawalDto withdrawalDto) throws Exception {
-        Member member = memberRepository.findByEmail(withdrawalDto.getEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-        if (!passwordEncoder.matches(withdrawalDto.getPassword(), member.getPassword())) {
+    public void withdraw(String password) throws Exception {
+        String email = getCurrentMemberEmail();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
         }
         memberRepository.delete(member);
