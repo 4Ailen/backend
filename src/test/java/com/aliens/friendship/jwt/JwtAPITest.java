@@ -14,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext
+@Transactional
 public class JwtAPITest {
 
     @Autowired
@@ -42,8 +45,8 @@ public class JwtAPITest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
-    @Transactional
     public void setupMember() throws Exception{
+        MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
         Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
         JoinDto memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
@@ -53,6 +56,7 @@ public class JwtAPITest {
                 .birthday("1998-01-01")
                 .gender("male")
                 .nationality(nationality)
+                .image(mockMultipartFile)
                 .build();
         memberService.join(memberJoinRequest);
     }
