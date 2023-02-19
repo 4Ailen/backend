@@ -73,9 +73,9 @@ public class MemberService {
     public TokenDto login(LoginDto loginDto) {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         checkPassword(loginDto.getPassword(), member.getPassword());
-        String username = member.getEmail();
-        String accessToken = jwtTokenUtil.generateAccessToken(username);
-        RefreshToken refreshToken = saveRefreshToken(username);
+        String email = member.getEmail();
+        String accessToken = jwtTokenUtil.generateAccessToken(email);
+        RefreshToken refreshToken = saveRefreshToken(email);
         return TokenDto.of(accessToken, refreshToken.getRefreshToken());
     }
 
