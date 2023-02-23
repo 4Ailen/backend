@@ -13,6 +13,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,6 +35,8 @@ class EmailAuthenticationServiceTest {
     @Mock
     JavaMailSender javaMailSender;
 
+    @Mock
+    MemberRepository memberRepository;
 
     @Test
     @DisplayName("이메일 전송 성공")
@@ -62,5 +67,61 @@ class EmailAuthenticationServiceTest {
         // then: 예외 발생
         verify(javaMailSender, times(0)).send(any(SimpleMailMessage.class));
         assertEquals("이미 회원가입된 이메일입니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("이메일 인증 성공")
+    void ValidateEmail_Success_When_GivenValidEmailAndToken() throws Exception {
+        // given: 이메일 인증 객체 생성
+        String email = "test@case.com";
+        EmailAuthentication emailAuthentication = EmailAuthentication.createEmailAuthentication(email);
+        when(emailAuthenticationRepository.findByEmail(email)).thenReturn(emailAuthentication);
+
+        // when: 이메일 인증 함수 실행
+        emailAuthenticationService.validateEmail(email, emailAuthentication.getId());
+
+        // then: 이메일 인증 객체 업데이트 확인
+        verify(emailAuthenticationRepository, times(1)).save(any(EmailAuthentication.class));
+    }
+
+    @Test
+    @DisplayName("이메일 인증 예외: 인증 시간이 초과된 경우")
+    void ValidateEmail_ThrowException_When_GivenAuthenticationTimeExpired() {
+        // given: 이메일 인증 객체 생성(생성시간과 만료시간을 현재시간 이전으로 설정)
+        String email = "test@case.com";
+        EmailAuthentication mockEmailAuthentication = EmailAuthentication.builder()
+                .id(UUID.randomUUID().toString())
+                .email(email)
+                .createdTime(Instant.now().minus(10, ChronoUnit.MINUTES))
+                .expirationTime(Instant.now().minus(5, ChronoUnit.MINUTES))
+                .build();
+        when(emailAuthenticationRepository.findByEmail(email)).thenReturn(mockEmailAuthentication);
+
+        // when: 이메일 인증 함수 실행
+        Exception exception = assertThrows(Exception.class, () -> {
+            emailAuthenticationService.validateEmail(email, mockEmailAuthentication.getId());
+        });
+
+        // then: 예외 발생
+        assertEquals("이메일 인증 시간이 초과되었습니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("이메일 인증 예외: 유효하지 않은 토큰일 경우")
+    void ValidateEmail_ThrowException_When_GivenInvalidToken() {
+        // given: 이메일 인증 객체 생성
+        String email = "test@case.com";
+        EmailAuthentication mockEmailAuthentication = EmailAuthentication.createEmailAuthentication(email);
+        StringBuffer validToken = new StringBuffer(mockEmailAuthentication.getId());
+        String invalidToken = validToken.reverse().toString();
+        when(emailAuthenticationRepository.findByEmail(email)).thenReturn(mockEmailAuthentication);
+
+        // when: 이메일 인증 함수 실행
+        Exception exception = assertThrows(Exception.class, () -> {
+            emailAuthenticationService.validateEmail(email, invalidToken);
+        });
+
+        // then: 예외 발생
+        assertEquals("유효하지 않은 토큰입니다.", exception.getMessage());
     }
 }
