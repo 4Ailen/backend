@@ -31,6 +31,14 @@ public class EmailAuthenticationService {
         System.out.println("sendEmail");
     }
 
+    public void validateEmail(String email, String token) throws Exception {
+        EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
+        checkValidToken(emailAuthentication.getId(), token);
+        checkExpirationTime(emailAuthentication);
+        emailAuthentication.updateStatus(EmailAuthentication.Status.AUTHENTICATED);
+        emailAuthenticationRepository.save(emailAuthentication);
+    }
+
     private void deleteExistingEmailAuthentication(String email) {
         if (emailAuthenticationRepository.existsByEmail(email)) {
             emailAuthenticationRepository.deleteByEmail(email);
@@ -49,5 +57,17 @@ public class EmailAuthenticationService {
         authenticationEmail.setSubject("회원가입 이메일 인증");
         authenticationEmail.setText("http://localhost:8080/email/" + emailAuthentication.getEmail() + "/verification?token=" + emailAuthentication.getId());
         return authenticationEmail;
+    }
+
+    private void checkValidToken(String savedToken, String givenToken) throws Exception {
+        if (!savedToken.equals(givenToken)) {
+            throw new Exception("유효하지 않은 토큰입니다.");
+        }
+    }
+
+    private void checkExpirationTime(EmailAuthentication emailAuthentication) throws Exception {
+        if (Instant.now().isAfter(emailAuthentication.getExpirationTime())) {
+            throw new Exception("이메일 인증 시간이 초과되었습니다.");
+        }
     }
 }
