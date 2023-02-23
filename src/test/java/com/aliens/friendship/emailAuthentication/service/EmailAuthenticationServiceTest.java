@@ -54,7 +54,7 @@ class EmailAuthenticationServiceTest {
 
     @Test
     @DisplayName("이메일 전송 예외: 이미 가입된 이메일인 경우")
-    void SendEmail_Exception_When_GivenJoinedEmail() throws Exception {
+    void SendEmail_ThrowException_When_GivenJoinedEmail() throws Exception {
         // given: 회원가입
         String email = "test@case.com";
         when(memberRepository.existsByEmail(email)).thenReturn(true);
