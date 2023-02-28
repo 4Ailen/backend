@@ -2,9 +2,9 @@ package com.aliens.friendship.jwt;
 
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.member.repository.NationalityRepository;
 import com.aliens.friendship.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,18 +35,20 @@ public class JwtAPITest {
     private MockMvc mockMvc;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
     private MemberService memberService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private NationalityRepository nationalityRepository;
+
     @BeforeEach
     @Transactional
     public void setupMember() throws Exception{
-        Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
+        MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
+        Nationality nationality = new Nationality(1, "South Korea");
+        nationalityRepository.save(nationality);
         JoinDto memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
                 .email("skatks1016@naver.com")
@@ -52,6 +56,7 @@ public class JwtAPITest {
                 .mbti("INTJ")
                 .birthday("1998-01-01")
                 .gender("male")
+                .image(mockMultipartFile)
                 .nationality(nationality)
                 .build();
         memberService.join(memberJoinRequest);
@@ -81,7 +86,7 @@ public class JwtAPITest {
     @Test
     public void MemberAPIAccessWithToken() throws Exception {
         //given
-        final String url = "/health";
+        String url = "/health";
         LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
         TokenDto tokenResponse = memberService.login(loginMember);
 
