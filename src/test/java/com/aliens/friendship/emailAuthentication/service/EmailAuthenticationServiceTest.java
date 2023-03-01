@@ -43,6 +43,7 @@ class EmailAuthenticationServiceTest {
     void SendEmail_Success_When_GivenValidEmail() throws Exception {
         // given: 인증할 이메일
         String email = "test@case.com";
+        when(memberRepository.existsByEmail(email)).thenReturn(false);
 
         // when: 이메일 전송 함수 실행
         emailAuthenticationService.sendEmail(email);
