@@ -4,6 +4,7 @@ import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,9 @@ public class EmailAuthenticationService {
 
     private final JavaMailSender javaMailSender;
     private final EmailAuthenticationRepository emailAuthenticationRepository;
-
     private final MemberRepository memberRepository;
+    @Value("${spring.mail.authentication}")
+    private String authenticationUrl;
 
     public void sendEmail(String email) throws Exception {
         deleteExistingEmailAuthentication(email);
@@ -54,7 +56,7 @@ public class EmailAuthenticationService {
         SimpleMailMessage authenticationEmail = new SimpleMailMessage();
         authenticationEmail.setTo(emailAuthentication.getEmail());
         authenticationEmail.setSubject("회원가입 이메일 인증");
-        authenticationEmail.setText("http://localhost:8080/email/" + emailAuthentication.getEmail() + "/verification?token=" + emailAuthentication.getId());
+        authenticationEmail.setText(authenticationUrl + emailAuthentication.getEmail() + "/verification?token=" + emailAuthentication.getId());
         return authenticationEmail;
     }
 
