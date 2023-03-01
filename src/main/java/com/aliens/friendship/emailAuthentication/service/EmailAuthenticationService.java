@@ -28,7 +28,6 @@ public class EmailAuthenticationService {
         emailAuthenticationRepository.save(authenticationEmail);
         SimpleMailMessage authenticationMail = createAuthenticationMail(authenticationEmail);
         javaMailSender.send(authenticationMail);
-        System.out.println("sendEmail");
     }
 
     public void validateEmail(String email, String token) throws Exception {
