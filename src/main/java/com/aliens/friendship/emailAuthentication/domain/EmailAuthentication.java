@@ -38,10 +38,10 @@ public class EmailAuthentication {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
-    private Status status = Status.NOT_AUTHENTICATED;
+    private Status status = Status.NOT_VERIFIED;
 
     public enum Status {
-        AUTHENTICATED, NOT_AUTHENTICATED;
+        VERIFIED, NOT_VERIFIED;
     }
 
     public static EmailAuthentication createEmailAuthentication(String email) {

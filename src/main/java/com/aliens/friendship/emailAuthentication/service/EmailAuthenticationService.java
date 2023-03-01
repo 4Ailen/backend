@@ -35,7 +35,7 @@ public class EmailAuthenticationService {
         EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
         checkValidToken(emailAuthentication.getId(), token);
         checkExpirationTime(emailAuthentication);
-        emailAuthentication.updateStatus(EmailAuthentication.Status.AUTHENTICATED);
+        emailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
         emailAuthenticationRepository.save(emailAuthentication);
     }
 
