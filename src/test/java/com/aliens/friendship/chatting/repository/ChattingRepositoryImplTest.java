@@ -61,11 +61,11 @@ class ChattingRepositoryImplTest {
         assertEquals(partnerId2, matchingParticipants.get(3).getId());
     }
 
-    List<Member> createMember(){
+    private List<Member> createMember() {
         List<Member> members = new ArrayList<>();
-        for(int i=0; i<4; i++){
+        for (int i = 0; i < 4; i++) {
             Member member = Member.builder()
-                    .email("member"+i+"@test.com")
+                    .email("member" + i + "@test.com")
                     .password("1234567")
                     .mbti("ISFJ")
                     .gender("FEMALE")
@@ -83,9 +83,9 @@ class ChattingRepositoryImplTest {
         return members;
     }
 
-    List<MatchingParticipant> createMatchingParticipant(List<Member> members){
+    private List<MatchingParticipant> createMatchingParticipant(List<Member> members) {
         List<MatchingParticipant> matchingParticipants = new ArrayList<>();
-        for(int i=0; i<4; i++){
+        for (int i = 0; i < 4; i++) {
             MatchingParticipant matchingParticipant = MatchingParticipant.builder()
                     .member(members.get(i))
                     .isMatched(MatchingParticipant.Status.MATCHED)
@@ -99,18 +99,18 @@ class ChattingRepositoryImplTest {
         return matchingParticipants;
     }
 
-    List<ChattingRoom> createChattingRoom(){
+    private List<ChattingRoom> createChattingRoom() {
         List<ChattingRoom> chattingRooms = new ArrayList<>();
-        for(int i=1; i<=2; i++){
+        for (int i = 1; i <= 2; i++) {
             chattingRooms.add(chattingRoomRepository.save(ChattingRoom.builder()
-                    .id(i*(-1))
+                    .id(i * (-1))
                     .status(ChattingRoom.RoomStatus.OPEN).build()));
         }
 
         return chattingRooms;
     }
 
-    void createChatting(List<ChattingRoom> chattingRooms, List<MatchingParticipant> matchingParticipants){
+    private void createChatting(List<ChattingRoom> chattingRooms, List<MatchingParticipant> matchingParticipants) {
         chattingRepository.save(Chatting.builder()
                 .chattingRoom(chattingRooms.get(0))
                 .matchingParticipant(matchingParticipants.get(0)).build());
