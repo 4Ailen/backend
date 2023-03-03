@@ -7,9 +7,6 @@ import com.aliens.friendship.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
@@ -23,12 +20,14 @@ public class MemberController {
         return Response.SUCCESS("회원가입 성공");
     }
 
-    @GetMapping("/{email}")
-    public Response<MemberInfoDto> getMember(@PathVariable int memberId) throws Exception {
-        return Response.SUCCESS(memberService.getMemberInfo(memberId));
+    @GetMapping()
+    public Response<MemberInfoDto> getMemberInfo() throws Exception {
+        return Response.SUCCESS(memberService.getMemberInfo());
     }
 
-
-
-
+    @PostMapping("/withdraw")
+    public Response<String> withdraw(@RequestBody String password) throws Exception {
+        memberService.withdraw(password);
+        return Response.SUCCESS("회원탈퇴 성공");
+    }
 }
