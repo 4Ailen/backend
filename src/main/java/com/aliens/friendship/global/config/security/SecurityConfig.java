@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/", "/join/**", "/login").permitAll()
-                .antMatchers("/health","/logout").authenticated()
+                .antMatchers("/health", "/logout").authenticated()
                 .anyRequest().hasRole("USER")
 
                 .and()
@@ -77,7 +77,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/h2-console/**", "/favicon.ico");
+        return (web) -> web.ignoring().antMatchers("/h2-console/**", "/favicon.ico", "/email/**");
     }
 
 
