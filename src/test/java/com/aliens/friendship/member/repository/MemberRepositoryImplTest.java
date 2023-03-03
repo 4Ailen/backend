@@ -5,8 +5,13 @@ import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.service.MemberService;
+import com.aliens.friendship.member.service.ProfileImageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -15,27 +20,27 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@Transactional
 class MemberRepositoryImplTest {
-
-    @Autowired
-    private MemberService memberService;
 
     @Autowired
     private MemberRepository memberRepository;
 
-    @Transactional
     @Test
     @DisplayName("이메일로 멤버와 권한 정보 함께 반환 성공")
     void GetMemberWithAuthority_Success_When_GivenEmail() throws Exception {
-        //given: 회원 정보 생성 후 회원가입
+        //given: 회원 정보 생성 후 저장
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
-        memberService.join(mockJoinDto);
+        memberRepository.save(Member.ofUser(mockJoinDto));
 
         //when: 이메일로 member와 authority 정보 함께 반환
         Member member = memberRepository.findByUsernameWithAuthority("test@case.com").orElseThrow(() -> new NoSuchElementException("없는 회원입니다."));
