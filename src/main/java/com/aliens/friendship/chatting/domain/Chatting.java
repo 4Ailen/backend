@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class Chatting {
     public static final String TABLE_NAME = "chatting";
     public static final String COLUMN_ID_NAME = "chatting_id";
 
-    @Id
+    @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
