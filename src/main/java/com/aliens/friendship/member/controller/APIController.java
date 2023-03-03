@@ -41,15 +41,9 @@ public class APIController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken,
                        @RequestHeader("RefreshToken") String refreshToken) {
-        String username = jwtTokenUtil.getUsername(memberService.resolveToken(accessToken));
-        memberService.logout(TokenDto.of(accessToken, refreshToken), username);
+        String email = jwtTokenUtil.getEmail(memberService.resolveToken(accessToken));
+        memberService.logout(TokenDto.of(accessToken, refreshToken), email);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
-    @GetMapping("/members/{memberId}")
-    public MemberInfoDto getMemberInfo(@PathVariable int memberId) throws Exception {
-        return memberService.getMemberInfo(memberId);
     }
 
 }
