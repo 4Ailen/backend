@@ -27,7 +27,7 @@ class NationalityServiceTest {
 
     @Test
     @DisplayName("국적 목록 조회 성공")
-    void GetNationalities_Success_WhenValidDataExist() {
+    void GetNationalities_Success() {
         //given: 국적 목록 존재
         Nationality nationality1 = new Nationality(1, "USA");
         Nationality nationality2 = new Nationality(2, "Korea");
