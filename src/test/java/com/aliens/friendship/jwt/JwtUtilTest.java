@@ -42,14 +42,16 @@ public class JwtUtilTest {
 
     @BeforeEach
     public void setupMember() throws Exception {
+        MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
         Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
         memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
-                .email("skatks1016@naver.com")
+                .email("test@case.com")
                 .name("김명준")
                 .mbti("INTJ")
                 .birthday("1998-09-21")
-                .gender("male")
+                .image(mockMultipartFile)
+                .gender("MALE")
                 .nationality(nationality)
                 .build();
         memberService.join(memberJoinRequest);

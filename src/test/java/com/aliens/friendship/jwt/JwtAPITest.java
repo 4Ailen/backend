@@ -50,11 +50,11 @@ public class JwtAPITest {
         Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
         JoinDto memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
-                .email("skatks1016@naver.com")
+                .email("test@case.com")
                 .name("김명준")
                 .mbti("INTJ")
                 .birthday("1998-01-01")
-                .gender("male")
+                .gender("MALE")
                 .nationality(nationality)
                 .image(mockMultipartFile)
                 .build();
@@ -67,7 +67,7 @@ public class JwtAPITest {
     public void MemberAPIAccessToLogin() throws Exception {
         //given
         final String url = "/login";
-        LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
+        LoginDto loginMember = new LoginDto("test@case.com","1q2w3e4r");
 
         //when
         ResultActions resultActions = mockMvc.perform(post(url)
@@ -86,13 +86,14 @@ public class JwtAPITest {
     public void MemberAPIAccessWithToken() throws Exception {
         //given
         final String url = "/health";
-        LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
+        LoginDto loginMember = new LoginDto("test@case.com","1q2w3e4r");
         TokenDto tokenResponse = memberService.login(loginMember);
 
         //when
         ResultActions resultActions = mockMvc.perform(get(url)
                         .header("Authorization", "Bearer " + tokenResponse.getAccessToken()))
                 .andExpect(status().isOk());
+
 
         // then
         resultActions.andExpect(status().isOk());
@@ -104,7 +105,7 @@ public class JwtAPITest {
     public void MemberAPIAccessWithoutToken() throws Exception {
         //given
         final String url = "/health";
-        LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
+        LoginDto loginMember = new LoginDto("test@case.com","1q2w3e4r");
 
         //when
         ResultActions resultActions = mockMvc.perform(get(url)).andExpect(status().is4xxClientError());
@@ -119,7 +120,7 @@ public class JwtAPITest {
     public void MemberAPIAccessToLogout() throws Exception {
         //given
         final String url = "/logout";
-        LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
+        LoginDto loginMember = new LoginDto("test@case.com","1q2w3e4r");
         TokenDto tokenResponse = memberService.login(loginMember);
 
         //when

@@ -20,6 +20,10 @@ public class APIController {
     private final MemberService memberService;
     private final JwtTokenUtil jwtTokenUtil;
 
+    @GetMapping("/health")
+    public String health() {
+        return "OK";
+    }
 
     @PostMapping("/join")
     public String join(@RequestBody JoinDto joinDto) throws Exception {
