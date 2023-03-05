@@ -1,4 +1,4 @@
-package com.aliens.friendship.matching.service.model;
+package com.aliens.friendship.matching.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +13,6 @@ public class MatchingParticipantInfo {
 
     private int memberId;
     private int answer; // 1 또는 2 값
-    private int language;
+    private int FirstPreferLanguage;
+    private int SecondPreferLanguage;
 }

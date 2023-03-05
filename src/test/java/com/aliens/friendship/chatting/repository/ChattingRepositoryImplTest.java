@@ -2,7 +2,6 @@ package com.aliens.friendship.chatting.repository;
 
 import com.aliens.friendship.chatting.domain.Chatting;
 import com.aliens.friendship.chatting.domain.ChattingRoom;
-import com.aliens.friendship.jwt.domain.Authority;
 import com.aliens.friendship.matching.domain.Language;
 import com.aliens.friendship.matching.domain.MatchingParticipant;
 import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
@@ -11,19 +10,13 @@ import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -89,8 +82,8 @@ class ChattingRepositoryImplTest {
             MatchingParticipant matchingParticipant = MatchingParticipant.builder()
                     .member(members.get(i))
                     .isMatched(MatchingParticipant.Status.MATCHED)
-                    .questionAnswer(1)
-                    .preferredLanguage(new Language(1, "Korean"))
+                    .firstPreferLanguage(new Language(1, "Korean"))
+                    .secondPreferLanguage(new Language(2, "English"))
                     .build();
             matchingParticipantRepository.save(matchingParticipant);
             matchingParticipants.add(matchingParticipant);
