@@ -83,7 +83,7 @@ public class MatchingService {
     }
 
     private void init() {
-        languages = languageRepository.findLanguageTexts();
+        languages = languageRepository.findAllLanguageTexts();
         matchingParticipants = matchingParticipantRepository.findAllParticipants();
         languageQueuesWithCandidates = initLanguageQueuesWithCandidates();
     }
