@@ -4,6 +4,7 @@ import com.aliens.friendship.matching.repository.LanguageRepository;
 import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
 import com.aliens.friendship.matching.service.MatchingService;
 import com.aliens.friendship.matching.service.model.Participant;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +27,8 @@ public class MatchingServiceTest {
     MatchingService matchingService;
 
     @Test
-    void matchApplicants() {
+    @DisplayName("참여자 매칭 성공")
+    void MatchParticipants_Success() {
         // given: 언어 목록, 매칭 참여자 목록 생성
         int numberOfLanguages = 5;
         int numberOfParticipants = 30;
