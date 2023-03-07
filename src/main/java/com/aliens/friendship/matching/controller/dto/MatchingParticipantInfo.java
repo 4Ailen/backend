@@ -13,6 +13,6 @@ public class MatchingParticipantInfo {
 
     private int memberId;
     private int answer; // 1 또는 2 값
-    private int FirstPreferLanguage;
-    private int SecondPreferLanguage;
+    private int firstPreferLanguage;
+    private int secondPreferLanguage;
 }
