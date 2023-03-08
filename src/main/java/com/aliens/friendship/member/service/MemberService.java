@@ -1,5 +1,7 @@
 package com.aliens.friendship.member.service;
 
+import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.global.config.cache.CacheKey;
 import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import com.aliens.friendship.jwt.domain.LogoutAccessToken;
@@ -40,11 +42,12 @@ public class MemberService {
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final NationalityRepository nationalityRepository;
-
     private final ProfileImageService profileImageService;
+    private final EmailAuthenticationRepository emailAuthenticationRepository;
 
     public void join(JoinDto joinDto) throws Exception {
         checkDuplicatedEmail(joinDto.getEmail());
+        checkEmailAuthentication(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
         joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getImage()));
         memberRepository.save(Member.ofUser(joinDto));
@@ -173,6 +176,13 @@ public class MemberService {
     private void checkDuplicatedEmail(String email) throws Exception{
         if (memberRepository.findByEmail(email).isPresent()) {
             throw new Exception("이미 사용중인 이메일입니다.");
+        }
+    }
+
+    private void checkEmailAuthentication(String email) throws Exception {
+        EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
+        if(emailAuthentication.getStatus()==EmailAuthentication.Status.NOT_VERIFIED){
+            throw new Exception("이메일 인증이 완료되지 않았습니다.");
         }
     }
 }
