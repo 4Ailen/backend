@@ -98,4 +98,18 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.response").value("회원탈퇴 성공"));
         verify(memberService, times(1)).withdraw(password);
     }
+
+    @Test
+    @DisplayName("이메일 중복 여부 확인 성공")
+    void IsJoinedEmail_Success() throws Exception {
+        // given
+        String email = "test@case.com";
+        when(memberService.isJoinedEmail(email)).thenReturn(true);
+
+        // when & then
+        mockMvc.perform(get("/member/email/"+email+"/existence"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.existence").value("true"));
+        verify(memberService, times(1)).isJoinedEmail(email);
+    }
 }
