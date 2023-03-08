@@ -7,6 +7,9 @@ import com.aliens.friendship.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
@@ -29,5 +32,12 @@ public class MemberController {
     public Response<String> withdraw(@RequestBody String password) throws Exception {
         memberService.withdraw(password);
         return Response.SUCCESS("회원탈퇴 성공");
+    }
+
+    @GetMapping("/email/{email}/existence")
+    public Response<Map<String, Object>> isJoinedEmail(@PathVariable String email) {
+        Map<String, Object> existence = new HashMap<>();
+        existence.put("existence", memberService.isJoinedEmail(email));
+        return Response.SUCCESS(existence);
     }
 }

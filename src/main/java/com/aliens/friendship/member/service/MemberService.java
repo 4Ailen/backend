@@ -76,6 +76,10 @@ public class MemberService {
         return TokenDto.of(accessToken, refreshToken.getRefreshToken());
     }
 
+    public boolean isJoinedEmail(String email){
+        return memberRepository.findByEmail(email).isPresent();
+    }
+
     private void checkPassword(String rawPassword, String findMemberPassword) {
         if (!passwordEncoder.matches(rawPassword, findMemberPassword)) {
             throw new IllegalArgumentException("비밀번호가 맞지 않습니다.");
