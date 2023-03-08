@@ -1,5 +1,7 @@
 package com.aliens.friendship.member.service;
 
+import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.global.config.security.CustomUserDetails;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.JoinDto;
@@ -36,6 +38,9 @@ class MemberServiceTest {
     @Mock
     MemberRepository memberRepository;
 
+    @Mock
+    EmailAuthenticationRepository emailAuthenticationRepository;
+
     @Spy
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -50,7 +55,10 @@ class MemberServiceTest {
     void CreateMember_Success() throws Exception {
         //given: 회원가입 정보
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        EmailAuthentication mockEmailAuthentication = EmailAuthentication.createEmailAuthentication(mockJoinDto.getEmail());
+        mockEmailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.empty());
+        when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
         when(profileImageService.uploadProfileImage(mockJoinDto.getImage())).thenReturn("/testUrl");
 
         //when: 회원가입
@@ -58,6 +66,7 @@ class MemberServiceTest {
 
         //then: 회원가입 성공
         verify(memberRepository, times(1)).save(any(Member.class));
+        verify(emailAuthenticationRepository, times(1)).findByEmail(anyString());
         verify(profileImageService, times(1)).uploadProfileImage(any(MultipartFile.class));
     }
 
@@ -77,6 +86,25 @@ class MemberServiceTest {
         //then: 예외 발생
         verify(memberRepository, times(0)).save(any(Member.class));
         assertEquals("이미 사용중인 이메일입니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("회원가입 예외: 이메일 인증이 완료되지 않은 이메일일 경우")
+    void CreateMember_ThrowException_When_GivenUnauthenticatedEmail() throws Exception {
+        //given: 이메일 인증이 완료되지 않은 이메일
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        EmailAuthentication mockEmailAuthentication = EmailAuthentication.createEmailAuthentication(mockJoinDto.getEmail());
+        when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.empty());
+        when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
+
+        //when: 회원가입
+        Exception exception = assertThrows(Exception.class, () -> {
+            memberService.join(mockJoinDto);
+        });
+
+        //then: 예외 발생
+        verify(memberRepository, times(0)).save(any(Member.class));
+        assertEquals("이메일 인증이 완료되지 않았습니다.", exception.getMessage());
     }
 
     @Test
@@ -160,7 +188,7 @@ class MemberServiceTest {
                 .build();
     }
 
-    private Member createSpyMember(JoinDto joinDto){
+    private Member createSpyMember(JoinDto joinDto) {
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
         Member member = Member.ofUser(joinDto);
         Member spyMember = spy(member);
