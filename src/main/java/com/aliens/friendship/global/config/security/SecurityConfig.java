@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login","/member").permitAll()
+                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/member", "/member/{email}/password/temp").permitAll()
                 .antMatchers(HttpMethod.GET, "/member/email/**").permitAll()
                 .antMatchers("/health","/logout").authenticated()
                 .anyRequest().hasRole("USER")
