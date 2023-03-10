@@ -14,13 +14,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc(addFilters=false)
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(MemberController.class)
 class MemberControllerTest {
 
@@ -107,9 +109,29 @@ class MemberControllerTest {
         when(memberService.isJoinedEmail(email)).thenReturn(true);
 
         // when & then
-        mockMvc.perform(get("/member/email/"+email+"/existence"))
+        mockMvc.perform(get("/member/email/" + email + "/existence"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.existence").value("true"));
         verify(memberService, times(1)).isJoinedEmail(email);
+    }
+
+    @Test
+    @DisplayName("회원 임시 비밀번호 발급 요청 성공")
+    void IssueTemporaryPassword_Success() throws Exception {
+        // given
+        String email = "test@case.com";
+        String name = "test";
+        Map<String, String> nameMap = new HashMap<>();
+        nameMap.put("name", name);
+        doNothing().when(memberService).issueTemporaryPassword(email, nameMap.get("name"));
+
+        // when & then
+        mockMvc.perform(post("/member/" + email + "/password/temp")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(nameMap)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response").value("임시 비밀번호 발급 성공"));
+        verify(memberService, times(1)).issueTemporaryPassword(anyString(), anyString());
     }
 }

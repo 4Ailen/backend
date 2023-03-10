@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,6 +48,9 @@ class MemberServiceTest {
 
     @Mock
     ProfileImageService profileImageService;
+
+    @Mock
+    JavaMailSender javaMailSender;
 
     @InjectMocks
     MemberService memberService;
@@ -172,6 +177,24 @@ class MemberServiceTest {
         assertEquals("test@case.com", memberDto.getEmail());
         assertEquals("1998-12-31", memberDto.getBirthday());
         assertEquals(24, memberDto.getAge());
+    }
+
+    @Test
+    @DisplayName("회원 임시 비밀번호 발급 요청 성공")
+    void IssueTemporaryPassword_Success() throws Exception {
+        // given
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
+        doNothing().when(javaMailSender).send(any(SimpleMailMessage.class));
+
+        // when
+        memberService.issueTemporaryPassword(spyMember.getEmail(), spyMember.getName());
+
+        // then
+        verify(memberRepository, times(1)).findByEmail(anyString());
+        verify(memberRepository, times(1)).save(any(Member.class));
+        verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
     }
 
     private JoinDto createMockJoinDto(String email, String password) {
