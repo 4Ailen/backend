@@ -3,6 +3,7 @@ package com.aliens.friendship.member.controller;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -133,5 +134,24 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("임시 비밀번호 발급 성공"));
         verify(memberService, times(1)).issueTemporaryPassword(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 요청 성공")
+    void ChangePassword_Success() throws Exception {
+        // given
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
+                .currentPassword("currentPassword")
+                .newPassword("newPassword").build();
+        doNothing().when(memberService).changePassword(passwordUpdateRequestDto);
+
+        // when & then
+        mockMvc.perform(put("/member/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(passwordUpdateRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response").value("비밀번호 변경 성공"));
+        verify(memberService, times(1)).changePassword(any(PasswordUpdateRequestDto.class));
     }
 }

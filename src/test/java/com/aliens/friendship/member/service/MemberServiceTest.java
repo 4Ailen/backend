@@ -5,6 +5,7 @@ import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationR
 import com.aliens.friendship.global.config.security.CustomUserDetails;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.JoinDto;
+import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
@@ -195,6 +196,31 @@ class MemberServiceTest {
         verify(memberRepository, times(1)).findByEmail(anyString());
         verify(memberRepository, times(1)).save(any(Member.class));
         verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    void ChangePassword_Success() throws Exception {
+        // given
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
+                .currentPassword("currentPassword")
+                .newPassword("newPassword").build();
+        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
+        when(passwordEncoder.matches(passwordUpdateRequestDto.getCurrentPassword(), spyMember.getPassword())).thenReturn(true);
+
+        UserDetails userDetails = CustomUserDetails.of(spyMember);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        memberService.changePassword(passwordUpdateRequestDto);
+
+        // then
+        verify(memberRepository, times(1)).findByEmail(anyString());
+        verify(passwordEncoder, times(1)).matches(anyString(), anyString());
     }
 
     private JoinDto createMockJoinDto(String email, String password) {
