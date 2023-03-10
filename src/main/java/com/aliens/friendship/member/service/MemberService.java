@@ -13,6 +13,7 @@ import com.aliens.friendship.jwt.repository.RefreshTokenRedisRepository;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -224,5 +225,18 @@ public class MemberService {
         authenticationEmail.setSubject("[FriendShip] 임시 비밀번호 발급");
         authenticationEmail.setText("안녕하세요, " + name + "님!\n요청하신 임시 비밀번호는 다음과 같습니다.\n\n" + "임시 비밀번호: " + temporaryPassword + "\n\n\n해당 비밀번호로 로그인 후 비밀번호를 변경해주세요.");
         return authenticationEmail;
+    }
+
+    public void changePassword(PasswordUpdateRequestDto passwordUpdateRequestDto) throws Exception {
+        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        checkCurrentPassword(passwordUpdateRequestDto.getCurrentPassword(), member);
+        member.updatePassword(passwordEncoder.encode(passwordUpdateRequestDto.getNewPassword()));
+        memberRepository.save(member);
+    }
+
+    private void checkCurrentPassword(String currentPassword, Member member) throws Exception {
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            throw new Exception("현재 비밀번호가 일치하지 않습니다.");
+        }
     }
 }

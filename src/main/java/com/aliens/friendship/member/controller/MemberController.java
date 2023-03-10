@@ -3,6 +3,7 @@ package com.aliens.friendship.member.controller;
 import com.aliens.friendship.global.common.Response;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +46,11 @@ public class MemberController {
     public Response<String> issueTemporaryPassword(@PathVariable String email, @RequestBody Map<String, String> nameMap) throws Exception {
         memberService.issueTemporaryPassword(email, nameMap.get("name"));
         return Response.SUCCESS("임시 비밀번호 발급 성공");
+    }
+
+    @PutMapping("/password")
+    public Response<String> changePassword(@RequestBody PasswordUpdateRequestDto newPasswordDto) throws Exception {
+        memberService.changePassword(newPasswordDto);
+        return Response.SUCCESS("비밀번호 변경 성공");
     }
 }
