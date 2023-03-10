@@ -40,4 +40,10 @@ public class MemberController {
         existence.put("existence", memberService.isJoinedEmail(email));
         return Response.SUCCESS(existence);
     }
+
+    @PostMapping("/{email}/password/temp")
+    public Response<String> issueTemporaryPassword(@PathVariable String email, @RequestBody Map<String, String> nameMap) throws Exception {
+        memberService.issueTemporaryPassword(email, nameMap.get("name"));
+        return Response.SUCCESS("임시 비밀번호 발급 성공");
+    }
 }

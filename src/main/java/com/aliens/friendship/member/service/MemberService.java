@@ -15,9 +15,10 @@ import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.repository.MemberRepository;
-import com.aliens.friendship.member.repository.NationalityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +40,9 @@ public class MemberService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final JwtTokenUtil jwtTokenUtil;
-    private final NationalityRepository nationalityRepository;
     private final ProfileImageService profileImageService;
     private final EmailAuthenticationRepository emailAuthenticationRepository;
+    private final JavaMailSender javaMailSender;
 
     public void join(JoinDto joinDto) throws Exception {
         checkDuplicatedEmail(joinDto.getEmail());
@@ -76,7 +75,7 @@ public class MemberService {
         return TokenDto.of(accessToken, refreshToken.getRefreshToken());
     }
 
-    public boolean isJoinedEmail(String email){
+    public boolean isJoinedEmail(String email) {
         return memberRepository.findByEmail(email).isPresent();
     }
 
@@ -92,7 +91,7 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public MemberInfoDto getMemberInfo() throws Exception{
+    public MemberInfoDto getMemberInfo() throws Exception {
         String email = getCurrentMemberEmail();
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         return MemberInfoDto.builder()
@@ -177,7 +176,7 @@ public class MemberService {
         return userDetails.getUsername();
     }
 
-    private void checkDuplicatedEmail(String email) throws Exception{
+    private void checkDuplicatedEmail(String email) throws Exception {
         if (memberRepository.findByEmail(email).isPresent()) {
             throw new Exception("이미 사용중인 이메일입니다.");
         }
@@ -185,8 +184,45 @@ public class MemberService {
 
     private void checkEmailAuthentication(String email) throws Exception {
         EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
-        if(emailAuthentication.getStatus()==EmailAuthentication.Status.NOT_VERIFIED){
+        if (emailAuthentication.getStatus() == EmailAuthentication.Status.NOT_VERIFIED) {
             throw new Exception("이메일 인증이 완료되지 않았습니다.");
         }
+    }
+
+    public void issueTemporaryPassword(String email, String name) throws Exception {
+        Member member = checkMemberInfo(email, name);
+        String temporaryPassword = createTemporaryPassword();
+        member.updatePassword(passwordEncoder.encode(temporaryPassword));
+        memberRepository.save(member);
+        SimpleMailMessage authenticationMail = createAuthenticationMail(member.getEmail(), member.getName(), temporaryPassword);
+        javaMailSender.send(authenticationMail);
+    }
+
+    private Member checkMemberInfo(String email, String name) throws Exception {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원가입 되지 않은 이메일입니다."));
+        if (member.getName().equals(name)) {
+            return member;
+        } else {
+            throw new Exception("잘못된 이름입니다.");
+        }
+    }
+
+    private String createTemporaryPassword() {
+        Random random = new Random();
+        int length = 8 + random.nextInt(5);
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder password = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            password.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return password.toString();
+    }
+
+    private SimpleMailMessage createAuthenticationMail(String email, String name, String temporaryPassword) {
+        SimpleMailMessage authenticationEmail = new SimpleMailMessage();
+        authenticationEmail.setTo(email);
+        authenticationEmail.setSubject("[FriendShip] 임시 비밀번호 발급");
+        authenticationEmail.setText("안녕하세요, " + name + "님!\n요청하신 임시 비밀번호는 다음과 같습니다.\n\n" + "임시 비밀번호: " + temporaryPassword + "\n\n\n해당 비밀번호로 로그인 후 비밀번호를 변경해주세요.");
+        return authenticationEmail;
     }
 }
