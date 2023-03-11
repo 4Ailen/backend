@@ -239,4 +239,12 @@ public class MemberService {
             throw new Exception("현재 비밀번호가 일치하지 않습니다.");
         }
     }
+
+    public void changeProfileNameAndMbti(String name, String mbti) {
+        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        member.updateName(name);
+        member.updateMbti(mbti);
+        memberRepository.save(member);
+    }
+
 }

@@ -53,4 +53,10 @@ public class MemberController {
         memberService.changePassword(newPasswordDto);
         return Response.SUCCESS("비밀번호 변경 성공");
     }
+
+    @PatchMapping()
+    public Response<String> changeProfileNameAndMbti(@RequestBody Map<String, String> nameAndMbti) {
+        memberService.changeProfileNameAndMbti(nameAndMbti.get("name"), nameAndMbti.get("mbti"));
+        return Response.SUCCESS("프로필 이름과 mbti 값 변경 성공");
+    }
 }

@@ -91,6 +91,14 @@ public class Member {
         this.password = password;
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateMbti(String mbti) {
+        this.mbti = mbti;
+    }
+
     public static Member ofUser(JoinDto joinDto) {
         Member member = Member.builder()
                 .email(joinDto.getEmail())
