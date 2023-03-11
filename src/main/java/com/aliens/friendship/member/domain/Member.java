@@ -99,6 +99,10 @@ public class Member {
         this.mbti = mbti;
     }
 
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public static Member ofUser(JoinDto joinDto) {
         Member member = Member.builder()
                 .email(joinDto.getEmail())

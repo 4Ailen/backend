@@ -7,6 +7,7 @@ import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,5 +59,11 @@ public class MemberController {
     public Response<String> changeProfileNameAndMbti(@RequestBody Map<String, String> nameAndMbti) {
         memberService.changeProfileNameAndMbti(nameAndMbti.get("name"), nameAndMbti.get("mbti"));
         return Response.SUCCESS("프로필 이름과 mbti 값 변경 성공");
+    }
+
+    @PutMapping("/profile-image")
+    public Response<String> changeProfileImage(@RequestPart(value = "profileImage") MultipartFile profileImage) throws Exception {
+        memberService.changeProfileImage(profileImage);
+        return Response.SUCCESS("프로필 이미지 수정 성공");
     }
 }
