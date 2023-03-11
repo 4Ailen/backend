@@ -243,6 +243,31 @@ class MemberServiceTest {
 
         // then
         verify(memberRepository, times(1)).findByEmail(anyString());
+
+    @Test
+    @DisplayName("프로필 이미지 수정 성공")
+    void ChangeProfileImage_Success() throws Exception {
+        // given
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        MockMultipartFile newProfileImage = new MockMultipartFile("profileImage", "test2.jpg", "image/jpeg", "test data".getBytes());
+        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
+        when(profileImageService.deleteProfileImage(spyMember.getImageUrl())).thenReturn(true);
+        when(profileImageService.uploadProfileImage(newProfileImage)).thenReturn("/testUrl");
+
+        UserDetails userDetails = CustomUserDetails.of(spyMember);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        memberService.changeProfileImage(newProfileImage);
+
+        // then
+        verify(memberRepository, times(1)).findByEmail(anyString());
+        verify(profileImageService, times(1)).deleteProfileImage(anyString());
+        verify(profileImageService, times(1)).uploadProfileImage(any(MultipartFile.class));
+        verify(memberRepository, times(1)).save(any(Member.class));
     }
 
     private JoinDto createMockJoinDto(String email, String password) {

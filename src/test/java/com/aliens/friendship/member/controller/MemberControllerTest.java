@@ -12,9 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Part;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -172,6 +176,23 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("프로필 이름과 mbti 값 변경 성공"));
         verify(memberService, times(1)).changeProfileNameAndMbti(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("프로필 이미지 수정 요청 성공")
+    void ChangeProfileImage_Success() throws Exception {
+        // given
+        MockMultipartFile newProfileImage = new MockMultipartFile("profileImage", "test.jpg", "image/jpeg", "test data".getBytes());
+        doNothing().when(memberService).changeProfileImage(newProfileImage);
+
+        // when & then
+        mockMvc.perform(multipart(HttpMethod.PUT, "/member/profile-image")
+                        .file(newProfileImage)
+                        .contentType("multipart/form-data"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response").value("프로필 이미지 수정 성공"));
+        verify(memberService, times(1)).changeProfileImage(any(MultipartFile.class));
     }
 
 }
