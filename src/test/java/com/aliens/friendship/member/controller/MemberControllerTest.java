@@ -154,4 +154,24 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.response").value("비밀번호 변경 성공"));
         verify(memberService, times(1)).changePassword(any(PasswordUpdateRequestDto.class));
     }
+
+    @Test
+    @DisplayName("프로필 이름과 mbti 값 변경 요청 성공")
+    void ChangeProfileNameAndMbti_Success() throws Exception {
+        // given
+        Map<String, String> nameAndMbti = new HashMap<>();
+        nameAndMbti.put("name", "test");
+        nameAndMbti.put("mbti", "ISFJ");
+        doNothing().when(memberService).changeProfileNameAndMbti(nameAndMbti.get("name"), nameAndMbti.get("mbti"));
+
+        // when & then
+        mockMvc.perform(patch("/member")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(nameAndMbti)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response").value("프로필 이름과 mbti 값 변경 성공"));
+        verify(memberService, times(1)).changeProfileNameAndMbti(anyString(), anyString());
+    }
+
 }

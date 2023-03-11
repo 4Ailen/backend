@@ -223,6 +223,28 @@ class MemberServiceTest {
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
     }
 
+    @Test
+    @DisplayName("프로필 이름과 mbti 값 변경 성공")
+    void ChangeProfileNameAndMbti_Success() throws Exception {
+        // given
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        String newName = "test";
+        String newMbti = "ISFJ";
+        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
+
+        UserDetails userDetails = CustomUserDetails.of(spyMember);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        memberService.changeProfileNameAndMbti(newName, newMbti);
+
+        // then
+        verify(memberRepository, times(1)).findByEmail(anyString());
+    }
+
     private JoinDto createMockJoinDto(String email, String password) {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
         return JoinDto.builder()
