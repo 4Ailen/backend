@@ -116,6 +116,7 @@ class MemberControllerTest {
         // when & then
         mockMvc.perform(get("/member/email/" + email + "/existence"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response.existence").value("true"));
         verify(memberService, times(1)).isJoinedEmail(email);
     }

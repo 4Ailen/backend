@@ -221,6 +221,7 @@ class MemberServiceTest {
         // then
         verify(memberRepository, times(1)).findByEmail(anyString());
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
+        verify(memberRepository, times(1)).save(any(Member.class));
     }
 
     @Test
@@ -243,6 +244,8 @@ class MemberServiceTest {
 
         // then
         verify(memberRepository, times(1)).findByEmail(anyString());
+        verify(memberRepository, times(1)).save(any(Member.class));
+    }
 
     @Test
     @DisplayName("프로필 이미지 수정 성공")
