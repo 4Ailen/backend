@@ -62,7 +62,7 @@ public class MemberController {
     }
 
     @PutMapping("/profile-image")
-    public Response<String> changeProfileImage(@RequestPart(value = "profileImage") MultipartFile profileImage) throws Exception {
+    public Response<String> changeProfileImage(@RequestPart MultipartFile profileImage) throws Exception {
         memberService.changeProfileImage(profileImage);
         return Response.SUCCESS("프로필 이미지 수정 성공");
     }
