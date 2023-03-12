@@ -270,6 +270,22 @@ class MemberServiceTest {
         verify(memberRepository, times(1)).save(any(Member.class));
     }
 
+    @Test
+    @DisplayName("인증 상태 반환 성공")
+    void GetMeberAuthenticationStatus_Success() throws Exception {
+        // given
+        String email = "test@case.com";
+        EmailAuthentication emailAuthentication = EmailAuthentication.createEmailAuthentication(email);
+        when(emailAuthenticationRepository.findByEmail(email)).thenReturn(emailAuthentication);
+
+        // when
+        String status = memberService.getMemberAuthenticationStatus(email);
+
+        // then
+        verify(emailAuthenticationRepository, times(1)).findByEmail(anyString());
+        assertEquals(status, "NOT_AUTHENTICATED");
+    }
+
     private JoinDto createMockJoinDto(String email, String password) {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
         return JoinDto.builder()

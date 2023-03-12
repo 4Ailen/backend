@@ -195,4 +195,20 @@ class MemberControllerTest {
         verify(memberService, times(1)).changeProfileImage(any(MultipartFile.class));
     }
 
+    @Test
+    @DisplayName("인증 상태 요청 성공")
+    void GetMemberAuthenticationStatus_Success() throws Exception {
+        // given
+        String email = "test@case.com";
+        when(memberService.getMemberAuthenticationStatus(email)).thenReturn("AUTHENTICATED");
+
+        // when & then
+        mockMvc.perform(get("/member/" + email + "/authentication-status")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response.status").value("AUTHENTICATED"));
+        verify(memberService, times(1)).getMemberAuthenticationStatus(anyString());
+    }
+
 }
