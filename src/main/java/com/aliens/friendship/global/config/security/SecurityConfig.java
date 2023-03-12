@@ -41,8 +41,8 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/member", "/member/{email}/password/temp").permitAll()
-                .antMatchers(HttpMethod.GET, "/member/email/**", "/member/{email}/authentication-status").permitAll()
+                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/member", "/member/{email}/password/temp", "/email/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/member/email/**", "/member/{email}/authentication-status", "/email/**").permitAll()
                 .antMatchers("/health", "/logout").authenticated()
                 .anyRequest().hasRole("USER")
 
@@ -78,7 +78,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/h2-console/**", "/favicon.ico", "/email/**");
+        return (web) -> web.ignoring().antMatchers("/h2-console/**", "/favicon.ico");
     }
 
 
