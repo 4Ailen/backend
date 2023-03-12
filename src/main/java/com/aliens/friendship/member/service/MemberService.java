@@ -258,4 +258,14 @@ public class MemberService {
         member.updateImageUrl(profileImageService.uploadProfileImage(profileImage));
         memberRepository.save(member);
     }
+
+    public String getMemberAuthenticationStatus(String email) {
+        EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
+        String status = emailAuthentication.getStatus().toString();
+        if (status.equals("VERIFIED")) {
+            return "AUTHENTICATED";
+        } else {
+            return "NOT_AUTHENTICATED";
+        }
+    }
 }

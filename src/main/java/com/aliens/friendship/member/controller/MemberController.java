@@ -66,4 +66,11 @@ public class MemberController {
         memberService.changeProfileImage(profileImage);
         return Response.SUCCESS("프로필 이미지 수정 성공");
     }
+
+    @GetMapping("/{email}/authentication-status")
+    public Response<Map<String, String>> getMemberAuthenticationStatus(@PathVariable String email) {
+        Map<String, String> status = new HashMap<>();
+        status.put("status", memberService.getMemberAuthenticationStatus(email));
+        return Response.SUCCESS(status);
+    }
 }
