@@ -19,9 +19,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.transaction.Transactional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 public class JwtUtilTest {
 
     @Autowired
@@ -48,7 +51,7 @@ public class JwtUtilTest {
         nationalityRepository.save(nationality);
         memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
-                .email("skatks1016@naver.com")
+                .email("test@case.com")
                 .name("김명준")
                 .mbti("INTJ")
                 .birthday("1998-01-01")
@@ -78,7 +81,7 @@ public class JwtUtilTest {
         String token = jwtTokenUtil.generateAccessToken(memberJoinRequest.getEmail());
 
         //when
-        String username = jwtTokenUtil.getUsername(token);
+        String username = jwtTokenUtil.getEmail(token);
 
         //then
         assertThat(username).isEqualTo(memberJoinRequest.getEmail());
@@ -127,7 +130,7 @@ public class JwtUtilTest {
         TokenDto validatedToken = memberService.login(loginMember);
 
         //when
-        String username = jwtTokenUtil.getUsername(validatedToken.getAccessToken());
+        String username = jwtTokenUtil.getEmail(validatedToken.getAccessToken());
         memberService.logout(TokenDto.of("Bearer "+validatedToken.getAccessToken(), validatedToken.getRefreshToken()), username);
 
         //then

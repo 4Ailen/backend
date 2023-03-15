@@ -11,7 +11,6 @@ import com.aliens.friendship.jwt.repository.RefreshTokenRedisRepository;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
-import com.aliens.friendship.member.controller.dto.WithdrawalDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.repository.MemberRepository;
 import com.aliens.friendship.member.repository.NationalityRepository;
@@ -56,26 +55,21 @@ public class MemberService {
         memberRepository.save(Member.ofAdmin(joinDto));
     }
 
-    public void withdrawal(WithdrawalDto withdrawalDto) throws Exception {
-        Member member = memberRepository.findByEmail(withdrawalDto.getEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-        if (!passwordEncoder.matches(withdrawalDto.getPassword(), member.getPassword())) {
+    public void withdraw(String password) throws Exception {
+        String email = getCurrentMemberEmail();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
         }
         memberRepository.delete(member);
     }
 
-    private void checkDuplicatedEmail(String email) throws Exception{
-        if (memberRepository.findByEmail(email).isPresent()) {
-            throw new Exception("이미 사용중인 이메일입니다.");
-        }
-    }
-
     public TokenDto login(LoginDto loginDto) {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
         checkPassword(loginDto.getPassword(), member.getPassword());
-        String username = member.getEmail();
-        String accessToken = jwtTokenUtil.generateAccessToken(username);
-        RefreshToken refreshToken = saveRefreshToken(username);
+        String email = member.getEmail();
+        String accessToken = jwtTokenUtil.generateAccessToken(email);
+        RefreshToken refreshToken = saveRefreshToken(email);
         return TokenDto.of(accessToken, refreshToken.getRefreshToken());
     }
 
@@ -91,8 +85,9 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public MemberInfoDto getMemberInfo(int memberId) throws Exception{
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+    public MemberInfoDto getMemberInfo() throws Exception{
+        String email = getCurrentMemberEmail();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         return MemberInfoDto.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
@@ -167,5 +162,17 @@ public class MemberService {
         birthCalendar.setTime(birthDate);
 
         return birthCalendar;
+    }
+
+    private String getCurrentMemberEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return userDetails.getUsername();
+    }
+
+    private void checkDuplicatedEmail(String email) throws Exception{
+        if (memberRepository.findByEmail(email).isPresent()) {
+            throw new Exception("이미 사용중인 이메일입니다.");
+        }
     }
 }

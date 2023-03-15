@@ -1,0 +1,9 @@
+spring:
+  redis:
+    host: 127.0.0.1
+    port: '6379'
+  profiles:
+    include: mysql
+jwt:
+  secret: 4aliens'stempsecretkeysecretsecretsecretsecret
+
