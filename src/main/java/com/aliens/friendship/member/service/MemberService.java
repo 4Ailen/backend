@@ -258,9 +258,7 @@ public class MemberService {
     public void changeProfileImage(MultipartFile profileImage) throws Exception {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         if (!member.getImageUrl().equals("/default_image.jpg")) {
-            if (!profileImageService.deleteProfileImage(member.getImageUrl())) {
-                throw new Exception("기존 파일이 삭제되지 않았습니다.");
-            }
+            profileImageService.deleteProfileImage(member.getImageUrl());
         }
         member.updateImageUrl(profileImageService.uploadProfileImage(profileImage));
         memberRepository.save(member);
