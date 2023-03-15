@@ -237,7 +237,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("비밀번호 변경 성공")
     void ChangePassword_Success() throws Exception {
-        // given
+        // given: 가입 및 로그인 된 회원
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         Member spyMember = createSpyMember(mockJoinDto);
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
@@ -251,13 +251,67 @@ class MemberServiceTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // when
+        // when: 비밀번호 변경
         memberService.changePassword(passwordUpdateRequestDto);
 
-        // then
+        // then: 비밀번호 변경 성공
         verify(memberRepository, times(1)).findByEmail(anyString());
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
         verify(memberRepository, times(1)).save(any(Member.class));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 예외: 현재 비밀번호가 불일치하는 경우")
+    void ChangePassword_ThrowException_When_GivenNotMatchCurrentPassword() throws Exception {
+        //given: 가입 및 로그인 된 회원
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
+                .currentPassword(mockJoinDto.getPassword())
+                .newPassword("TestNewPassword").build();
+        when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(spyMember));
+        when(passwordEncoder.matches(passwordUpdateRequestDto.getCurrentPassword(), spyMember.getPassword())).thenReturn(false);
+
+        UserDetails userDetails = CustomUserDetails.of(spyMember);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //when: 비밀번호 변경
+        Exception exception = assertThrows(Exception.class, () -> {
+            memberService.changePassword(passwordUpdateRequestDto);
+        });
+
+        //then: 예외 발생
+        verify(memberRepository, times(0)).save(any(Member.class));
+        assertEquals("현재 비밀번호가 일치하지 않습니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 예외: 새 비밀번호가 현재 비밀번호와 일치하는 경우")
+    void ChangePassword_ThrowException_When_GivenNewPasswordMatchCurrentPassword() throws Exception {
+        //given: 가입 및 로그인 된 회원
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
+                .currentPassword(mockJoinDto.getPassword())
+                .newPassword(mockJoinDto.getPassword()).build();
+        when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(spyMember));
+        when(passwordEncoder.matches(passwordUpdateRequestDto.getCurrentPassword(), spyMember.getPassword())).thenReturn(true);
+
+        UserDetails userDetails = CustomUserDetails.of(spyMember);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //when: 비밀번호 변경
+        Exception exception = assertThrows(Exception.class, () -> {
+            memberService.changePassword(passwordUpdateRequestDto);
+        });
+
+        //then: 예외 발생
+        verify(memberRepository, times(0)).save(any(Member.class));
+        assertEquals("새 비밀번호가 현재 비밀번호와 일치합니다.", exception.getMessage());
     }
 
     @Test

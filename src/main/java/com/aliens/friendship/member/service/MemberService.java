@@ -231,6 +231,7 @@ public class MemberService {
     public void changePassword(PasswordUpdateRequestDto passwordUpdateRequestDto) throws Exception {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         checkCurrentPassword(passwordUpdateRequestDto.getCurrentPassword(), member);
+        checkNewPassword(passwordUpdateRequestDto);
         member.updatePassword(passwordEncoder.encode(passwordUpdateRequestDto.getNewPassword()));
         memberRepository.save(member);
     }
@@ -238,6 +239,12 @@ public class MemberService {
     private void checkCurrentPassword(String currentPassword, Member member) throws Exception {
         if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
             throw new Exception("현재 비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    private void checkNewPassword(PasswordUpdateRequestDto passwordUpdateRequestDto) throws Exception {
+        if (passwordUpdateRequestDto.getNewPassword().equals(passwordUpdateRequestDto.getCurrentPassword())) {
+            throw new Exception("새 비밀번호가 현재 비밀번호와 일치합니다.");
         }
     }
 
