@@ -201,7 +201,7 @@ public class MemberService {
     }
 
     private Member checkMemberInfo(String email, String name) throws Exception {
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원가입 되지 않은 이메일입니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         if (member.getName().equals(name)) {
             return member;
         } else {
