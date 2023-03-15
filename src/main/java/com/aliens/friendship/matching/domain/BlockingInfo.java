@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,15 +18,15 @@ public class BlockingInfo {
     public static final String TABLE_NAME = "blocking_info";
     public static final String COLUMN_ID_NAME = "blocking_info_id";
 
-    @Id
+    @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne( optional = false)
     @JoinColumn(name = "blocked_member_id", nullable = false)
     private Member blockedMember;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne( optional = false)
     @JoinColumn(name = "blocking_member_id", nullable = false)
     private Member blockingMember;
 
