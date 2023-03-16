@@ -11,7 +11,7 @@ import com.aliens.friendship.chatting.service.ChattingService;
 
 @Controller
 @RequiredArgsConstructor
-public class ChatController {
+public class MessageController {
 
     private final ChattingService chatService;
 
@@ -27,5 +27,4 @@ public class ChatController {
                 .message(chat.getMessage())
                 .build();
     }
-
 }
