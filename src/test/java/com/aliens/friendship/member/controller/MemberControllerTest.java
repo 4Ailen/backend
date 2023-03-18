@@ -1,6 +1,7 @@
 package com.aliens.friendship.member.controller;
 
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
+import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
@@ -54,7 +55,7 @@ class MemberControllerTest {
         doNothing().when(memberService).join(joinDto);
 
         // when & then
-        mockMvc.perform(post("/member")
+        mockMvc.perform(post("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(joinDto)))
                 .andExpect(status().isOk())
@@ -80,7 +81,7 @@ class MemberControllerTest {
         when(memberService.getMemberInfo()).thenReturn(expectedMemberInfoDto);
 
         // when & then
-        mockMvc.perform(get("/member")
+        mockMvc.perform(get("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
@@ -103,7 +104,7 @@ class MemberControllerTest {
         doNothing().when(memberService).withdraw(password);
 
         // when & then
-        mockMvc.perform(post("/member/withdraw")
+        mockMvc.perform(post("/api/v1/member/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(password))
                 .andExpect(status().isOk())
@@ -120,7 +121,7 @@ class MemberControllerTest {
         when(memberService.isJoinedEmail(email)).thenReturn(true);
 
         // when & then
-        mockMvc.perform(get("/member/email/" + email + "/existence"))
+        mockMvc.perform(get("/api/v1/member/email/" + email + "/existence"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response.existence").value("true"));
@@ -138,7 +139,7 @@ class MemberControllerTest {
         doNothing().when(memberService).issueTemporaryPassword(email, nameMap.get("name"));
 
         // when & then
-        mockMvc.perform(post("/member/" + email + "/password/temp")
+        mockMvc.perform(post("/api/v1/member/" + email + "/password/temp")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(nameMap)))
                 .andExpect(status().isOk())
@@ -157,7 +158,7 @@ class MemberControllerTest {
         doNothing().when(memberService).changePassword(passwordUpdateRequestDto);
 
         // when & then
-        mockMvc.perform(put("/member/password")
+        mockMvc.perform(put("/api/v1/member/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(passwordUpdateRequestDto)))
                 .andExpect(status().isOk())
@@ -176,7 +177,7 @@ class MemberControllerTest {
         doNothing().when(memberService).changeProfileNameAndMbti(nameAndMbti.get("name"), nameAndMbti.get("mbti"));
 
         // when & then
-        mockMvc.perform(patch("/member")
+        mockMvc.perform(patch("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(nameAndMbti)))
                 .andExpect(status().isOk())
@@ -193,7 +194,7 @@ class MemberControllerTest {
         doNothing().when(memberService).changeProfileImage(newProfileImage);
 
         // when & then
-        mockMvc.perform(multipart(HttpMethod.PUT, "/member/profile-image")
+        mockMvc.perform(multipart(HttpMethod.PUT, "/api/v1/member/profile-image")
                         .file(newProfileImage)
                         .contentType("multipart/form-data"))
                 .andExpect(status().isOk())
@@ -210,7 +211,7 @@ class MemberControllerTest {
         when(memberService.getMemberAuthenticationStatus(email)).thenReturn("AUTHENTICATED");
 
         // when & then
-        mockMvc.perform(get("/member/" + email + "/authentication-status")
+        mockMvc.perform(get("/api/v1/member/" + email + "/authentication-status")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))

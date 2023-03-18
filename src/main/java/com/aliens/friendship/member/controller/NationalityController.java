@@ -12,13 +12,13 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/member")
+@RequestMapping("api/v1/member")
 public class NationalityController {
 
     NationalityService nationalityService;
 
     @GetMapping("/nationalities")
-    public Response<Map<String,Object>> getNationalities() {
+    public Response<Map<String, Object>> getNationalities() {
         return Response.SUCCESS(nationalityService.getNationalities());
     }
 }
