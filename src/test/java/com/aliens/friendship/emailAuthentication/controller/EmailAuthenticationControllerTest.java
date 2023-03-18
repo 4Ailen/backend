@@ -40,7 +40,7 @@ class EmailAuthenticationControllerTest {
         doNothing().when(emailAuthenticationService).sendEmail(email);
 
         // when & then
-        mockMvc.perform(post("/email/" + email + "/verification"))
+        mockMvc.perform(post("/api/v1/email/" + email + "/verification"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("이메일 전송 성공"));
@@ -59,7 +59,7 @@ class EmailAuthenticationControllerTest {
         doNothing().when(emailAuthenticationService).validateEmail(email, token);
 
         // when & then
-        mockMvc.perform(get("/email/" + email + "/verification")
+        mockMvc.perform(get("/api/v1/email/" + email + "/verification")
                         .params(tokenMap))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
