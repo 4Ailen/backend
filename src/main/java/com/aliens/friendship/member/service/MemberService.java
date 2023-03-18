@@ -87,9 +87,9 @@ public class MemberService {
         }
     }
 
-    private RefreshToken saveRefreshToken(String username) {
-        return refreshTokenRedisRepository.save(RefreshToken.createRefreshToken(username,
-                jwtTokenUtil.generateRefreshToken(username), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
+    private RefreshToken saveRefreshToken(String email) {
+        return refreshTokenRedisRepository.save(RefreshToken.createRefreshToken(email,
+                jwtTokenUtil.generateRefreshToken(email), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
     @Transactional(readOnly = true)
@@ -124,27 +124,21 @@ public class MemberService {
     // 3
     public TokenDto reissue(String refreshToken) {
         refreshToken = resolveToken(refreshToken);
-        String username = getCurrentUsername();
-        RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username).orElseThrow(NoSuchElementException::new);
+        String email = getCurrentMemberEmail();
+        RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(email).orElseThrow(NoSuchElementException::new);
 
         if (refreshToken.equals(redisRefreshToken.getRefreshToken())) {
-            return reissueRefreshToken(refreshToken, username);
+            return reissueRefreshToken(refreshToken, email);
         }
         throw new IllegalArgumentException("토큰이 일치하지 않습니다.");
     }
 
-    private String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails principal = (UserDetails) authentication.getPrincipal();
-        return principal.getUsername();
-    }
-
-    private TokenDto reissueRefreshToken(String refreshToken, String username) {
+    private TokenDto reissueRefreshToken(String refreshToken, String email) {
         if (lessThanReissueExpirationTimesLeft(refreshToken)) {
-            String accessToken = jwtTokenUtil.generateAccessToken(username);
-            return TokenDto.of(accessToken, saveRefreshToken(username).getRefreshToken());
+            String accessToken = jwtTokenUtil.generateAccessToken(email);
+            return TokenDto.of(accessToken, saveRefreshToken(email).getRefreshToken());
         }
-        return TokenDto.of(jwtTokenUtil.generateAccessToken(username), refreshToken);
+        return TokenDto.of(jwtTokenUtil.generateAccessToken(email), refreshToken);
     }
 
     private boolean lessThanReissueExpirationTimesLeft(String refreshToken) {
