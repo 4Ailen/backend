@@ -151,7 +151,7 @@ class MemberServiceTest {
             memberService.withdraw("NotMatchPassword");
         });
 
-        //then: 회원탈퇴 성공
+        //then: 예외 발생
         verify(memberRepository, times(0)).delete(any(Member.class));
         assertEquals("비밀번호가 일치하지 않습니다.", exception.getMessage());
     }
