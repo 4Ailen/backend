@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,7 +19,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Part;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +38,13 @@ class MemberControllerTest {
     private MemberService memberService;
 
     @MockBean
-    JwtAuthenticationFilter jwtAuthenticationFilter;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Value("${spring.domain}")
+    private String domainUrl;
 
     @Test
     @DisplayName("회원가입 성공")
@@ -62,14 +68,14 @@ class MemberControllerTest {
     void GetMemberInfo_Success() throws Exception {
         // given
         MemberInfoDto expectedMemberInfoDto = MemberInfoDto.builder()
-                .memberId(1)
                 .email("test@example.com")
                 .mbti("ENFP")
                 .gender("남성")
-                .nationality(1)
+                .nationality("South Korea")
                 .age(24)
                 .birthday("1998-12-31")
                 .name("Ryan")
+                .profileImage(domainUrl + System.getProperty("user.dir") + "test")
                 .build();
         when(memberService.getMemberInfo()).thenReturn(expectedMemberInfoDto);
 
@@ -78,14 +84,14 @@ class MemberControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response.memberId").value(expectedMemberInfoDto.getMemberId()))
                 .andExpect(jsonPath("$.response.email").value(expectedMemberInfoDto.getEmail()))
                 .andExpect(jsonPath("$.response.mbti").value(expectedMemberInfoDto.getMbti()))
                 .andExpect(jsonPath("$.response.gender").value(expectedMemberInfoDto.getGender()))
                 .andExpect(jsonPath("$.response.nationality").value(expectedMemberInfoDto.getNationality()))
                 .andExpect(jsonPath("$.response.age").value(expectedMemberInfoDto.getAge()))
                 .andExpect(jsonPath("$.response.birthday").value(expectedMemberInfoDto.getBirthday()))
-                .andExpect(jsonPath("$.response.name").value(expectedMemberInfoDto.getName()));
+                .andExpect(jsonPath("$.response.name").value(expectedMemberInfoDto.getName()))
+                .andExpect(jsonPath("$.response.profileImage").value(expectedMemberInfoDto.getProfileImage()));
         verify(memberService, times(1)).getMemberInfo();
     }
 

@@ -75,7 +75,7 @@ class MemberRepositoryImplTest {
                 .gender("FEMALE")
                 .nationality(new Nationality(1, "South Korea"))
                 .birthday("1993-12-31")
-                .image(mockMultipartFile)
+                .profileImage(mockMultipartFile)
                 .build();
     }
 }

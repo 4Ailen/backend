@@ -65,7 +65,7 @@ class MemberServiceTest {
         mockEmailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.empty());
         when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
-        when(profileImageService.uploadProfileImage(mockJoinDto.getImage())).thenReturn("/testUrl");
+        when(profileImageService.uploadProfileImage(mockJoinDto.getProfileImage())).thenReturn("/testUrl");
 
         //when: 회원가입
         memberService.join(mockJoinDto);
@@ -162,7 +162,6 @@ class MemberServiceTest {
         //given: 회원가입된 회원
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         Member spyMember = createSpyMember(mockJoinDto);
-        when(spyMember.getId()).thenReturn(1);
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(spyMember));
 
         UserDetails userDetails = CustomUserDetails.of(spyMember);
@@ -389,7 +388,7 @@ class MemberServiceTest {
                 .gender("MALE")
                 .nationality(new Nationality(1, "South Korea"))
                 .birthday("1998-12-31")
-                .image(mockMultipartFile)
+                .profileImage(mockMultipartFile)
                 .build();
     }
 

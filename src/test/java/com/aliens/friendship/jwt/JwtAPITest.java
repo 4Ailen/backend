@@ -45,9 +45,9 @@ public class JwtAPITest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setupMember() throws Exception{
+    public void setupMember() throws Exception {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
+        Nationality nationality = Nationality.builder().id(1).text("korean").build();
         JoinDto memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
                 .email("test@case.com")
@@ -56,7 +56,7 @@ public class JwtAPITest {
                 .birthday("1998-01-01")
                 .gender("MALE")
                 .nationality(nationality)
-                .image(mockMultipartFile)
+                .profileImage(mockMultipartFile)
                 .build();
         memberService.join(memberJoinRequest);
     }

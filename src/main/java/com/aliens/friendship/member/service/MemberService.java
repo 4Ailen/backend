@@ -17,6 +17,7 @@ import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -45,12 +46,14 @@ public class MemberService {
     private final ProfileImageService profileImageService;
     private final EmailAuthenticationRepository emailAuthenticationRepository;
     private final JavaMailSender javaMailSender;
+    @Value("${spring.domain}")
+    private String domainUrl;
 
     public void join(JoinDto joinDto) throws Exception {
         checkDuplicatedEmail(joinDto.getEmail());
         checkEmailAuthentication(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
-        joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getImage()));
+        joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getProfileImage()));
         memberRepository.save(Member.ofUser(joinDto));
     }
 
@@ -97,14 +100,14 @@ public class MemberService {
         String email = getCurrentMemberEmail();
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         return MemberInfoDto.builder()
-                .memberId(member.getId())
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getId())
+                .nationality(member.getNationality().getText())
                 .birthday(member.getBirthday())
                 .age(getAgeFromBirthday(member.getBirthday()))
                 .name(member.getName())
+                .profileImage(domainUrl + System.getProperty("user.dir") + member.getImageUrl())
                 .build();
     }
 
