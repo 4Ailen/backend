@@ -20,8 +20,8 @@ public class EmailAuthenticationService {
     private final JavaMailSender javaMailSender;
     private final EmailAuthenticationRepository emailAuthenticationRepository;
     private final MemberRepository memberRepository;
-    @Value("${spring.mail.authentication}")
-    private String authenticationUrl;
+    @Value("${spring.domain}")
+    private String domainUrl;
 
     public void sendEmail(String email) throws Exception {
         deleteExistingEmailAuthentication(email);
@@ -56,7 +56,7 @@ public class EmailAuthenticationService {
         SimpleMailMessage authenticationEmail = new SimpleMailMessage();
         authenticationEmail.setTo(emailAuthentication.getEmail());
         authenticationEmail.setSubject("[FriendShip] 회원가입 이메일 인증");
-        authenticationEmail.setText("아래에 주어진 링크 접속을 통해 이메일 인증 완료 후 어플로 돌아가 회원가입을 완료해주세요.\n\n" + authenticationUrl + emailAuthentication.getEmail() + "/verification?token=" + emailAuthentication.getId());
+        authenticationEmail.setText("아래에 주어진 링크 접속을 통해 이메일 인증 완료 후 어플로 돌아가 회원가입을 완료해주세요.\n\n" + domainUrl + "email/" + emailAuthentication.getEmail() + "/verification?token=" + emailAuthentication.getId());
         return authenticationEmail;
     }
 
