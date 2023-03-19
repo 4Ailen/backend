@@ -1,5 +1,7 @@
 package com.aliens.friendship.jwt;
 
+import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.global.config.security.CustomUserDetailService;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
@@ -38,6 +40,9 @@ public class JwtUtilTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    EmailAuthenticationRepository emailAuthenticationRepository;
+
     JoinDto memberJoinRequest;
 
     @BeforeEach
@@ -54,6 +59,9 @@ public class JwtUtilTest {
                 .gender("MALE")
                 .nationality(nationality)
                 .build();
+        EmailAuthentication emailAuthentication = EmailAuthentication.createEmailAuthentication(memberJoinRequest.getEmail());
+        emailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
+        emailAuthenticationRepository.save(emailAuthentication);
         memberService.join(memberJoinRequest);
     }
 

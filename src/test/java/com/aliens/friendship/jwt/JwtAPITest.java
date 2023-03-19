@@ -1,5 +1,7 @@
 package com.aliens.friendship.jwt;
 
+import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
@@ -44,6 +46,9 @@ public class JwtAPITest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private EmailAuthenticationRepository emailAuthenticationRepository;
+
     @BeforeEach
     public void setupMember() throws Exception {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
@@ -58,6 +63,9 @@ public class JwtAPITest {
                 .nationality(nationality)
                 .profileImage(mockMultipartFile)
                 .build();
+        EmailAuthentication emailAuthentication = EmailAuthentication.createEmailAuthentication(memberJoinRequest.getEmail());
+        emailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
+        emailAuthenticationRepository.save(emailAuthentication);
         memberService.join(memberJoinRequest);
     }
 
