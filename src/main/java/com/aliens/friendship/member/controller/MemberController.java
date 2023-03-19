@@ -48,8 +48,8 @@ public class MemberController {
     }
 
     @PostMapping("/withdraw")
-    public Response<String> withdraw(@RequestBody String password) throws Exception {
-        memberService.withdraw(password);
+    public Response<String> withdraw(@RequestBody Map<String, String> password) throws Exception {
+        memberService.withdraw(password.get("password"));
         return Response.SUCCESS("회원탈퇴 성공");
     }
 

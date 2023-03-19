@@ -101,12 +101,14 @@ class MemberControllerTest {
     void Withdraw_Success() throws Exception {
         // given
         String password = "test1234";
-        doNothing().when(memberService).withdraw(password);
+        Map<String, String> passwordMap = new HashMap<>();
+        passwordMap.put("password", password);
+        doNothing().when(memberService).withdraw(passwordMap.get("password"));
 
         // when & then
         mockMvc.perform(post("/api/v1/member/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(password))
+                        .content(new ObjectMapper().writeValueAsString(passwordMap)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("회원탈퇴 성공"));
