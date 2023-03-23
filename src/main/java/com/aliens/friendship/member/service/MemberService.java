@@ -95,7 +95,7 @@ public class MemberService {
                 .gender(member.getGender())
                 .nationality(member.getNationality().getId())
                 .birthday(member.getBirthday())
-                .age(getAgeFromBirthday(member.getBirthday()))
+                .age(member.getAge())
                 .name(member.getName())
                 .build();
     }
@@ -141,27 +141,6 @@ public class MemberService {
 
     private boolean lessThanReissueExpirationTimesLeft(String refreshToken) {
         return jwtTokenUtil.getRemainMilliSeconds(refreshToken) < JwtExpirationEnums.REISSUE_EXPIRATION_TIME.getValue();
-    }
-
-    private int getAgeFromBirthday(String birthday) throws Exception {
-        Calendar birthCalendar = getCalendarFromString(birthday);
-        Calendar today = Calendar.getInstance();
-
-        int age = today.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR);
-        if (today.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
-            age--;
-        }
-
-        return age;
-    }
-
-    private Calendar getCalendarFromString(String date) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date birthDate = format.parse(date);
-        Calendar birthCalendar = Calendar.getInstance();
-        birthCalendar.setTime(birthDate);
-
-        return birthCalendar;
     }
 
     private String getCurrentMemberEmail() {

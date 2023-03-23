@@ -67,7 +67,7 @@ class MatchingRepositoryImplTest {
                     .name("최정은")
                     .nationality(new Nationality(1, "South Korea"))
                     .joinDate(Instant.now())
-                    .imageUrl("/testUrl")
+                    .profileImageUrl("/testUrl")
                     .build();
             member.updateIsApplied(Member.Status.APPLIED);
             memberRepository.save(member);

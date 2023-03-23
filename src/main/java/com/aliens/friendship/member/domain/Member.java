@@ -128,6 +128,27 @@ public class Member {
                 .collect(toList());
     }
 
+    public int getAge() throws Exception {
+        Calendar birthCalendar = getCalendarFromString(birthday);
+        Calendar today = Calendar.getInstance();
+
+        int age = today.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR);
+        if (today.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+
+        return age;
+    }
+
+    private Calendar getCalendarFromString(String date) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date birthDate = format.parse(date);
+        Calendar birthCalendar = Calendar.getInstance();
+        birthCalendar.setTime(birthDate);
+
+        return birthCalendar;
+    }
+
     public enum Status {
         APPLIED, NOT_APPLIED;
     }
