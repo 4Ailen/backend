@@ -177,3 +177,72 @@ class MatchingControllerTest {
         verify(matchingInfoService, times(1)).getApplicant();
     }
 }
+
+//=======
+//@Autowired
+//private MemberService memberService;
+//
+//@Autowired
+//private BlockingInfoService blockingInfoService;
+//
+//@Autowired
+//private MemberRepository memberRepository;
+//
+//@Autowired
+//private NationalityRepository nationalityRepository;
+//
+//        TokenDto token;
+//        JoinDto blockingMember;
+//        JoinDto blockedMember;
+//        int idOfBlockedMember;
+//
+//@Test
+//@DisplayName("차단 성공")
+//    void Blocking_Success() throws Exception {
+//
+//            //회원가입
+//            MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
+//            Nationality nationality = new Nationality(1, "South Korea");
+//            nationalityRepository.save(nationality);
+//            blockingMember = JoinDto.builder()
+//            .password("1q2w3e4r")
+//            .email("skatks1016@naver.com")
+//            .name("김명준")
+//            .mbti("INTJ")
+//            .birthday("1998-01-01")
+//            .gender("male")
+//            .image(mockMultipartFile)
+//            .nationality(nationality)
+//            .build();
+//
+//            blockedMember = JoinDto.builder()
+//            .password("1q2w3e4r")
+//            .email("skatks1125@naver.com")
+//            .name("최정은")
+//            .mbti("INTJ")
+//            .birthday("1998-01-01")
+//            .gender("male")
+//            .image(mockMultipartFile)
+//            .nationality(nationality)
+//            .build();
+//
+//            memberService.join(blockedMember);
+//            memberService.join(blockingMember);
+//
+//            //blockedMember의 Id값 추출
+//            Optional<Member> blockedMemberEntity = memberRepository.findByEmail(blockedMember.getEmail());
+//        idOfBlockedMember = blockedMemberEntity.get().getId();
+//
+//        // given
+//        LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
+//        TokenDto tokenResponse = memberService.login(loginMember);
+//        String accessToken = tokenResponse.getAccessToken();
+//
+//        // when & then
+//        mockMvc.perform(get("/matching/partner/" + idOfBlockedMember+ "/block")
+//        .header("Authorization", "Bearer " + accessToken))
+//        .andExpect(status().isOk());
+//        }
+//
+//        }
+//        >>>>>>> develop

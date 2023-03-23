@@ -7,6 +7,7 @@ import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.member.repository.NationalityRepository;
 import com.aliens.friendship.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,18 +41,22 @@ public class JwtUtilTest {
 
     JoinDto memberJoinRequest;
 
+    @Autowired
+    NationalityRepository nationalityRepository;
+
     @BeforeEach
     public void setupMember() throws Exception {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
+        Nationality nationality = new Nationality(1, "South Korea");
+        nationalityRepository.save(nationality);
         memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
                 .email("test@case.com")
                 .name("김명준")
                 .mbti("INTJ")
-                .birthday("1998-09-21")
+                .birthday("1998-01-01")
+                .gender("male")
                 .image(mockMultipartFile)
-                .gender("MALE")
                 .nationality(nationality)
                 .build();
         memberService.join(memberJoinRequest);
