@@ -1,10 +1,11 @@
 package com.aliens.friendship.chatting.repository;
 
-import com.aliens.friendship.chatting.domain.Chatting;
+import com.aliens.friendship.matching.domain.Applicant;
+import com.aliens.friendship.matching.domain.Matching;
 import com.aliens.friendship.chatting.domain.ChattingRoom;
 import com.aliens.friendship.matching.domain.Language;
-import com.aliens.friendship.matching.domain.MatchingParticipant;
-import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
+import com.aliens.friendship.matching.repository.MatchingRepository;
+import com.aliens.friendship.matching.repository.ApplicantRepository;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
@@ -22,16 +23,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ChattingRepositoryImplTest {
+class MatchingRepositoryImplTest {
 
     @Autowired
-    ChattingRepository chattingRepository;
+    MatchingRepository matchingRepository;
 
     @Autowired
     private ChattingRoomRepository chattingRoomRepository;
 
     @Autowired
-    private MatchingParticipantRepository matchingParticipantRepository;
+    private ApplicantRepository applicantRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -41,17 +42,17 @@ class ChattingRepositoryImplTest {
     void GetPartnerId_When_GivenMatchingParticipantAndChattingRoom() {
         // given: 신청자 4명(0, 1, 2, 3), 채팅룸[0](신청자[0], 신청자[1]), 채팅룸[1](신청자[2], 신청자[3])
         List<Member> members = createMember();
-        List<MatchingParticipant> matchingParticipants = createMatchingParticipant(members);
+        List<Applicant> applicants = createMatchingParticipant(members);
         List<ChattingRoom> chattingRooms = createChattingRoom();
-        createChatting(chattingRooms, matchingParticipants);
+        createChatting(chattingRooms, applicants);
 
         // when: 매칭 신청자가 입장하는 1: 1 채팅방의 대화 상대 id 반환
-        Integer partnerId1 = chattingRepository.findPartnerIdByMatchingParticipantAndChattingRoom(matchingParticipants.get(0), chattingRooms.get(0));
-        Integer partnerId2 = chattingRepository.findPartnerIdByMatchingParticipantAndChattingRoom(matchingParticipants.get(2), chattingRooms.get(1));
+        Integer partnerId1 = matchingRepository.findPartnerIdByApplicantAndChattingRoom(applicants.get(0), chattingRooms.get(0));
+        Integer partnerId2 = matchingRepository.findPartnerIdByApplicantAndChattingRoom(applicants.get(2), chattingRooms.get(1));
 
         // then: 대화 상대 id 반환 성공
-        assertEquals(partnerId1, matchingParticipants.get(1).getId());
-        assertEquals(partnerId2, matchingParticipants.get(3).getId());
+        assertEquals(partnerId1, applicants.get(1).getId());
+        assertEquals(partnerId2, applicants.get(3).getId());
     }
 
     private List<Member> createMember() {
@@ -76,20 +77,20 @@ class ChattingRepositoryImplTest {
         return members;
     }
 
-    private List<MatchingParticipant> createMatchingParticipant(List<Member> members) {
-        List<MatchingParticipant> matchingParticipants = new ArrayList<>();
+    private List<Applicant> createMatchingParticipant(List<Member> members) {
+        List<Applicant> applicants = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            MatchingParticipant matchingParticipant = MatchingParticipant.builder()
+            Applicant applicant = Applicant.builder()
                     .member(members.get(i))
-                    .isMatched(MatchingParticipant.Status.MATCHED)
+                    .isMatched(Applicant.Status.MATCHED)
                     .firstPreferLanguage(new Language(1, "Korean"))
                     .secondPreferLanguage(new Language(2, "English"))
                     .build();
-            matchingParticipantRepository.save(matchingParticipant);
-            matchingParticipants.add(matchingParticipant);
+            applicantRepository.save(applicant);
+            applicants.add(applicant);
         }
 
-        return matchingParticipants;
+        return applicants;
     }
 
     private List<ChattingRoom> createChattingRoom() {
@@ -103,18 +104,18 @@ class ChattingRepositoryImplTest {
         return chattingRooms;
     }
 
-    private void createChatting(List<ChattingRoom> chattingRooms, List<MatchingParticipant> matchingParticipants) {
-        chattingRepository.save(Chatting.builder()
+    private void createChatting(List<ChattingRoom> chattingRooms, List<Applicant> applicants) {
+        matchingRepository.save(Matching.builder()
                 .chattingRoom(chattingRooms.get(0))
-                .matchingParticipant(matchingParticipants.get(0)).build());
-        chattingRepository.save(Chatting.builder()
+                .applicant(applicants.get(0)).build());
+        matchingRepository.save(Matching.builder()
                 .chattingRoom(chattingRooms.get(0))
-                .matchingParticipant(matchingParticipants.get(1)).build());
-        chattingRepository.save(Chatting.builder()
+                .applicant(applicants.get(1)).build());
+        matchingRepository.save(Matching.builder()
                 .chattingRoom(chattingRooms.get(1))
-                .matchingParticipant(matchingParticipants.get(2)).build());
-        chattingRepository.save(Chatting.builder()
+                .applicant(applicants.get(2)).build());
+        matchingRepository.save(Matching.builder()
                 .chattingRoom(chattingRooms.get(1))
-                .matchingParticipant(matchingParticipants.get(3)).build());
+                .applicant(applicants.get(3)).build());
     }
 }

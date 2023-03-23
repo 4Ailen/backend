@@ -1,10 +1,12 @@
 package com.aliens.friendship.matching.controller;
 
 import com.aliens.friendship.global.common.Response;
-import com.aliens.friendship.matching.domain.Question;
+import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
+import com.aliens.friendship.matching.controller.dto.PartnersResponse;
 import com.aliens.friendship.matching.service.MatchingInfoService;
-import com.aliens.friendship.matching.controller.dto.MatchingParticipantInfo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
+import com.aliens.friendship.matching.service.MatchingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,14 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 public class MatchingController {
 
     private final MatchingInfoService matchingInfoService;
-
-    @Autowired
-    public MatchingController(MatchingInfoService matchingInfoService) {
-        this.matchingInfoService = matchingInfoService;
-    }
+    private final MatchingService matchingService;
 
     @GetMapping("/matching/languages")
     public Response<Map<String, Object>> getLanguages() {

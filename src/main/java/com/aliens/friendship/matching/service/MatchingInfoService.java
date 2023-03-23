@@ -1,11 +1,13 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.repository.BlockingInfoRepository;
+import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
+import com.aliens.friendship.matching.controller.dto.PartnersResponse;
 import com.aliens.friendship.matching.domain.Language;
 import com.aliens.friendship.matching.repository.LanguageRepository;
-import com.aliens.friendship.matching.domain.MatchingParticipant;
-import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
-import com.aliens.friendship.matching.controller.dto.MatchingParticipantInfo;
+import com.aliens.friendship.matching.domain.Applicant;
+import com.aliens.friendship.matching.repository.ApplicantRepository;
+import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
+import com.aliens.friendship.matching.repository.MatchingRepository;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.repository.MemberRepository;
 import com.aliens.friendship.matching.repository.QuestionRepository;
@@ -21,8 +23,8 @@ public class MatchingInfoService {
     private final LanguageRepository languageRepository;
     private final QuestionRepository questionRepository;
     private final MemberRepository memberRepository;
-    private final MatchingParticipantRepository matchingParticipantRepository;
-    private final BlockingInfoRepository blockingInfoRepository;
+    private final ApplicantRepository applicantRepository;
+    private final MatchingRepository matchingRepository;
 
     public Map<String, Object> getLanguages() {
         List<Language> languages = languageRepository.findAll();
@@ -45,8 +47,7 @@ public class MatchingInfoService {
         member.updateIsApplied(Member.Status.APPLIED);
         System.out.println("applicantInfo = " + matchingParticipantInfo.getAnswer());
 
-        // matching_applicant에 신청자 정보 저장
-        MatchingParticipant matchingParticipant = MatchingParticipant.builder()
+        Applicant applicant = Applicant.builder()
                 .member(member)
                 .firstPreferLanguage(languageRepository.findById(matchingParticipantInfo.getFirstPreferLanguage()).get())
                 .secondPreferLanguage(languageRepository.findById(matchingParticipantInfo.getSecondPreferLanguage()).get())
