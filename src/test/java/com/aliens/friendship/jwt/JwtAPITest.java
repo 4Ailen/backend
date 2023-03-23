@@ -2,9 +2,9 @@ package com.aliens.friendship.jwt;
 
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.member.repository.NationalityRepository;
 import com.aliens.friendship.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,25 +36,26 @@ public class JwtAPITest {
     private MockMvc mockMvc;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
     private MemberService memberService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private NationalityRepository nationalityRepository;
+
     @BeforeEach
     public void setupMember() throws Exception{
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
+        Nationality nationality = new Nationality(1, "South Korea");
+        nationalityRepository.save(nationality);
         JoinDto memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
                 .email("test@case.com")
                 .name("김명준")
                 .mbti("INTJ")
                 .birthday("1998-01-01")
-                .gender("MALE")
+                .gender("male")
                 .nationality(nationality)
                 .image(mockMultipartFile)
                 .build();

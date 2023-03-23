@@ -5,12 +5,18 @@ import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
 import com.aliens.friendship.matching.controller.dto.PartnersResponse;
 import com.aliens.friendship.matching.service.MatchingInfoService;
 import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
+import com.aliens.friendship.matching.service.BlockingInfoService;
 import com.aliens.friendship.matching.service.MatchingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -49,6 +55,15 @@ public class MatchingController {
     @PostMapping("/matching")
     public void match() {
         matchingService.matchParticipants();
+    }
+
+    @GetMapping("/matching/partner/{memberId}/block")
+    public Response<String> blocking(@PathVariable int memberId)throws Exception{
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        blockingInfoService.block(email,memberId);
+        return Response.SUCCESS("차단 성공");
     }
 
     // TODO: 새로 매칭 시작 전 member의 is_applied를 none으로 변경 후 matchingParticipants 데이터 모두 삭제
