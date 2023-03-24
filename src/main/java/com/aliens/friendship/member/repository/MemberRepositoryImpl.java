@@ -13,7 +13,6 @@ public class MemberRepositoryImpl implements MemberCustomRepository{
 
     private final JPAQueryFactory queryFactory;
 
-//    @Query("select m from Member m join fetch m.authorities a where m.email = :email")
     @Override
     public Optional<Member> findByUsernameWithAuthority(String email) {
         QMember qMember = QMember.member;

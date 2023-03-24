@@ -40,13 +40,7 @@ public class ChatMessage {
         this.sendDate =  now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
-    /**
-     * 채팅 생성
-     * @param room 채팅 방
-     * @param sender 보낸이
-     * @param message 내용
-     * @return Chat Entity
-     */
+
     @Builder
     public static ChatMessage createChat(Long room, String sender, String message,Integer category) {
         return ChatMessage.builder()

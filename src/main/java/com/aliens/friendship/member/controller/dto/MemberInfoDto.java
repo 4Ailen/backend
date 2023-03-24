@@ -8,12 +8,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MemberInfoDto {
-    private int memberId;
+    private Integer memberId;
     private String email;
     private String mbti;
     private String gender;
-    private int nationality;
-    private int age;
+    private String nationality;
     private String birthday;
     private String name;
+    private String profileImage;
+    private int age;
 }

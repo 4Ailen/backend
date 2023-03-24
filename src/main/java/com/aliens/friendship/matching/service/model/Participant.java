@@ -12,7 +12,7 @@ public class Participant {
     private int id;
     private String firstPreferLanguage;
     private String secondPreferLanguage;
-    private List<Participant> matchingList;
+    private List<Matching> matchingList;
 
     public Participant(int id, String firstPreferLanguage, String secondPreferLanguage) {
         this.id = id;
@@ -21,8 +21,8 @@ public class Participant {
         this.matchingList = new ArrayList<>();
     }
 
-    public void addToMatchingList(Participant participant) {
-        matchingList.add(participant);
+    public void addToMatchingList(Matching matching) {
+        matchingList.add(matching);
     }
 
     public int getNumberOfMatches() {
@@ -32,5 +32,4 @@ public class Participant {
     public String toString() {
         return "참가자 " + id;
     }
-
 }

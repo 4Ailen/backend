@@ -1,13 +1,13 @@
 package com.aliens.friendship.chatting.service;
 
 import com.aliens.friendship.chatting.domain.ChatMessage;
-import com.aliens.friendship.chatting.domain.Chatting;
+import com.aliens.friendship.matching.domain.Applicant;
+import com.aliens.friendship.matching.domain.Matching;
 import com.aliens.friendship.chatting.domain.ChattingRoom;
-import com.aliens.friendship.matching.domain.MatchingParticipant;
 import com.aliens.friendship.jwt.domain.dto.RoomInfoDto;
-import com.aliens.friendship.chatting.repository.ChattingRepository;
+import com.aliens.friendship.matching.repository.MatchingRepository;
 import com.aliens.friendship.chatting.repository.ChattingRoomRepository;
-import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
+import com.aliens.friendship.matching.repository.ApplicantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.aliens.friendship.chatting.repository.ChatMessageRepository;
@@ -22,25 +22,13 @@ import java.util.NoSuchElementException;
 @Transactional(readOnly = true)
 public class ChattingService {
     private final ChattingRoomRepository chattingRoomRepository;
-    private final MatchingParticipantRepository matchingParticipantRepository;
-    private final ChattingRepository chattingRepository;
+    private final ApplicantRepository applicantRepository;
+    private final MatchingRepository matchingRepository;
     private final ChatMessageRepository chatMessageRepository;
 
 
-
-
-    public List<RoomInfoDto> getRoomInfoDtosByMatchingParticipantId(Integer currentMemberId) {
-        List<RoomInfoDto> roomInfoDtos = new ArrayList<>();
-        MatchingParticipant matchingParticipant = matchingParticipantRepository.findById(currentMemberId).orElseThrow(() -> new NoSuchElementException("Can't find matchingParticipant "));
-        for(Chatting chatting : chattingRepository.findByMatchingParticipant(matchingParticipant)){
-            RoomInfoDto roomInfoDto = new RoomInfoDto();
-            roomInfoDto.setRoomId(chatting.getChattingRoom().getId());
-            roomInfoDto.setStatus(chatting.getChattingRoom().getStatus().toString());
-            roomInfoDto.setPartnerId(chattingRepository.findPartnerIdByMatchingParticipantAndChattingRoom(matchingParticipant, chatting.getChattingRoom()));
-            roomInfoDto.setChatMessages(findAllChatMessageByRoomId(chatting.getChattingRoom().getId()));
-            roomInfoDtos.add(roomInfoDto);
-        }
-        return roomInfoDtos;
+    public ChattingRoom findRoomById(Long id) {
+        return chattingRoomRepository.findById(id).orElseThrow();
     }
 
 
@@ -48,7 +36,6 @@ public class ChattingService {
     public ChattingRoom createRoom() {
         return chattingRoomRepository.save(new ChattingRoom());
     }
-
 
     @Transactional
     public ChatMessage saveChatMessage(Long roomId, String sender, String message,Integer category) {
@@ -58,15 +45,30 @@ public class ChattingService {
     }
 
 
+    public List<ChatMessage> findAllChatByRoomId(Long roomId) {
+        return chatMessageRepository.findAllByRoom(roomId);
+    }
+
     @Transactional
     public void updateRoomStatus(Long roomId, String status) {
         ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(()-> new NoSuchElementException("Can't find room "+roomId));
         ChattingRoom.RoomStatus roomStatus = ChattingRoom.RoomStatus.valueOf(status.toUpperCase());
         room.updateStatus(roomStatus);
+        chattingRoomRepository.save(room);
     }
 
-
-    public List<ChatMessage> findAllChatMessageByRoomId(Long roomId) {
-        return chatMessageRepository.findAllByRoom(roomId);
+    public List<RoomInfoDto> getRoomInfoDtoListByMatchingParticipantId(Integer matchingParticipantId) {
+        List<RoomInfoDto> roomInfoDtoList = new ArrayList<>();
+        Applicant applicant = applicantRepository.findById(matchingParticipantId).orElseThrow(() -> new NoSuchElementException("Can't find matchingParticipant " + matchingParticipantId));
+        for(Matching matching : matchingRepository.findByApplicant(applicant)){
+            RoomInfoDto roomInfoDto = new RoomInfoDto();
+            ChattingRoom chattingRoom = matching.getChattingRoom();
+            roomInfoDto.setRoomId(chattingRoom.getId());
+            roomInfoDto.setStatus(chattingRoom.getStatus().toString());
+            roomInfoDto.setChatMessages(chatMessageRepository.findAllByRoom(chattingRoom.getId()));
+            roomInfoDto.setPartnerId(matchingRepository.findPartnerIdByApplicantAndChattingRoom(applicant, chattingRoom));
+            roomInfoDtoList.add(roomInfoDto);
+        }
+        return roomInfoDtoList;
     }
 }

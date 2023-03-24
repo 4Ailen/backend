@@ -27,17 +27,11 @@ public class ChattingController {
     }
 
     @GetMapping("/chat/rooms")
-    public Response<List<RoomInfoDto>> getRooms()throws Exception{
+    public Response<List<RoomInfoDto>> getRooms() throws Exception {
         String email = getCurrentMemberEmail();
         Member currentMember = memberService.findByEmail(email);
-        List<RoomInfoDto> matchedRooms = chatService.getRoomInfoDtosByMatchingParticipantId(currentMember.getId());
+        List<RoomInfoDto> matchedRooms = chatService.getRoomInfoDtoListByMatchingParticipantId(currentMember.getId());
         return Response.SUCCESS(matchedRooms);
     }
 
-    // 사용하지 않기에 주석처리
-//    @PatchMapping("/chat/room/{roomId}/status/{status}")
-//    public Response<String> updateRoomStatus(@PathVariable int roomId, @PathVariable String status){
-//        chatService.updateRoomStatus(roomId, status);
-//        return Response.SUCCESS("Room status updated");
-//    }
 }

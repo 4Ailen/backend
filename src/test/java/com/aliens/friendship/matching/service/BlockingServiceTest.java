@@ -96,7 +96,7 @@ public class BlockingServiceTest {
                 .gender("MALE")
                 .nationality(nationality)
                 .birthday("1998-12-31")
-                .image(mockMultipartFile)
+                .profileImage(mockMultipartFile)
                 .build();
     }
 }
