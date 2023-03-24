@@ -1,13 +1,13 @@
 package com.aliens.friendship.chatting.service;
 
 import com.aliens.friendship.chatting.domain.ChatMessage;
-import com.aliens.friendship.chatting.domain.Chatting;
+import com.aliens.friendship.matching.domain.Applicant;
+import com.aliens.friendship.matching.domain.Matching;
 import com.aliens.friendship.chatting.domain.ChattingRoom;
-import com.aliens.friendship.matching.domain.MatchingParticipant;
 import com.aliens.friendship.jwt.domain.dto.RoomInfoDto;
-import com.aliens.friendship.chatting.repository.ChattingRepository;
+import com.aliens.friendship.matching.repository.MatchingRepository;
 import com.aliens.friendship.chatting.repository.ChattingRoomRepository;
-import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
+import com.aliens.friendship.matching.repository.ApplicantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.aliens.friendship.chatting.repository.ChatMessageRepository;
@@ -22,8 +22,8 @@ import java.util.NoSuchElementException;
 @Transactional(readOnly = true)
 public class ChattingService {
     private final ChattingRoomRepository chattingRoomRepository;
-    private final MatchingParticipantRepository matchingParticipantRepository;
-    private final ChattingRepository chattingRepository;
+    private final ApplicantRepository applicantRepository;
+    private final MatchingRepository matchingRepository;
     private final ChatMessageRepository chatRepository;
 
     /**
@@ -82,12 +82,13 @@ public class ChattingService {
 
     public List<RoomInfoDto> getRoomInfoDtoListByMatchingParticipantId(Integer matchingParticipantId) {
         List<RoomInfoDto> roomInfoDtoList = new ArrayList<>();
-        MatchingParticipant matchingParticipant = matchingParticipantRepository.findById(matchingParticipantId).orElseThrow(() -> new NoSuchElementException("Can't find matchingParticipant " + matchingParticipantId));
-        for(Chatting chatting : chattingRepository.findByMatchingParticipant(matchingParticipant)){
+        Applicant applicant = applicantRepository.findById(matchingParticipantId).orElseThrow(() -> new NoSuchElementException("Can't find matchingParticipant " + matchingParticipantId));
+        for(Matching matching : matchingRepository.findByApplicant(applicant)){
             RoomInfoDto roomInfoDto = new RoomInfoDto();
-            roomInfoDto.setRoomId(chatting.getChattingRoom().getId());
-            roomInfoDto.setStatus(chatting.getChattingRoom().getStatus().toString());
-            roomInfoDto.setPartnerId(chattingRepository.findPartnerIdByMatchingParticipantAndChattingRoom(matchingParticipant, chatting.getChattingRoom()));
+            ChattingRoom chattingRoom = matching.getChattingRoom();
+            roomInfoDto.setRoomId(chattingRoom.getId());
+            roomInfoDto.setStatus(chattingRoom.getStatus().toString());
+            roomInfoDto.setPartnerId(matchingRepository.findPartnerIdByApplicantAndChattingRoom(applicant, chattingRoom));
             roomInfoDtoList.add(roomInfoDto);
         }
         return roomInfoDtoList;

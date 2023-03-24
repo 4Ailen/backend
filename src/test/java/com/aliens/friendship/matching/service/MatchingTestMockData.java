@@ -1,4 +1,4 @@
-package com.aliens.friendship.matching;
+package com.aliens.friendship.matching.service;
 
 import com.aliens.friendship.matching.service.model.Participant;
 import lombok.Getter;

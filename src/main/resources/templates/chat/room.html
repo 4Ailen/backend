@@ -46,7 +46,7 @@
                     <th>Chat</th>
                 </tr>
                 </thead>
-                <tbody id="chatting">
+                <tbody id="matching">
                 </tbody>
             </table>
         </div>
@@ -67,7 +67,7 @@
         else {
             $("#conversation").hide();
         }
-        $("#chatting").html("");
+        $("#matching").html("");
     }
 
     function connect() {
@@ -106,7 +106,7 @@
     function loadChat(chatList){
         if(chatList != null) {
             for(chat in chatList) {
-                $("#chatting").append(
+                $("#matching").append(
                     "<tr><td>" + "[" + chatList[chat].sender + "]" + chatList[chat].message + "</td></tr>"
                 );
             }
@@ -115,7 +115,7 @@
 
     //보낸 채팅 보기
     function showChat(chatMessage) {
-        $("#chatting").append(
+        $("#matching").append(
             "<tr><td>" + "[" + chatMessage.sender + "]" + chatMessage.message + "</td></tr>"
         );
     }
