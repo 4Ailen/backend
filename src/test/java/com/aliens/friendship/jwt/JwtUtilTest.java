@@ -9,6 +9,7 @@ import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.member.repository.NationalityRepository;
 import com.aliens.friendship.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,9 @@ public class JwtUtilTest {
     EmailAuthenticationRepository emailAuthenticationRepository;
 
     JoinDto memberJoinRequest;
+
+    @Autowired
+    NationalityRepository nationalityRepository;
 
     @BeforeEach
     public void setupMember() throws Exception {

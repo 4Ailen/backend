@@ -43,7 +43,8 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/api/v1/member/authentication", "/api/v1/member", "/api/v1/member/{email}/password/temp", "/api/v1/email/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/member/email/{email}/existence", "/api/v1/member/{email}/authentication-status", "/api/v1/member/nationalities", "/api/v1/email/**").permitAll()
-                .antMatchers("/health", "/logout").authenticated()
+                .antMatchers("/matching/**", "/health", "/logout").authenticated()
+
                 .anyRequest().hasRole("USER")
 
                 .and()

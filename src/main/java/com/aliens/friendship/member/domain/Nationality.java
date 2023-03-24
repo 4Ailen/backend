@@ -26,4 +26,7 @@ public class Nationality {
     @Column(name = COLUMN_NATINALITYTEXT_NAME, nullable = false, length = 45)
     private String text;
 
+    public String getCountryImageUrl() {
+        return "도메인" + natinalityText + ".png";
+    }
 }

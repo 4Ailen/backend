@@ -16,7 +16,7 @@ public class ChattingRoom {
     public static final String COLUMN_ID_NAME = "chatting_room_id";
     public static final String COLUMN_STATUS_NAME = "status";
 
-    @Id @GeneratedValue
+    @Id
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 

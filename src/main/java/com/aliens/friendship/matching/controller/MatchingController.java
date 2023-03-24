@@ -1,57 +1,52 @@
 package com.aliens.friendship.matching.controller;
 
 import com.aliens.friendship.global.common.Response;
-import com.aliens.friendship.matching.domain.Question;
+import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
+import com.aliens.friendship.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.matching.service.MatchingInfoService;
+import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.matching.service.MatchingService;
-import com.aliens.friendship.matching.service.model.MatchedGroup;
-import com.aliens.friendship.matching.service.model.MatchingParticipantInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("api/v1/matching")
+@RequiredArgsConstructor
 public class MatchingController {
 
+    private final MatchingInfoService matchingInfoService;
     private final MatchingService matchingService;
 
-    @Autowired
-    public MatchingController(MatchingService matchingService) {
-        this.matchingService = matchingService;
-    }
-
-    @GetMapping("/matching/languages")
+    @GetMapping("/languages")
     public Response<Map<String, Object>> getLanguages() {
-        return Response.SUCCESS(matchingService.getLanguages());
+        return Response.SUCCESS(matchingInfoService.getLanguages());
     }
 
-    @GetMapping("/matching/question")
-    public Response<Question> getQuestion() {
-        return Response.SUCCESS(matchingService.chooseQuestion());
+    @PostMapping("/applicant")
+    public void applyMatching(@RequestBody ApplicantRequest applicantRequest) {
+        matchingInfoService.applyMatching(applicantRequest);
     }
 
-    @PostMapping("/matching/applicant")
-    public void applyMatching(@RequestBody MatchingParticipantInfo matchingParticipant) {
-        matchingService.applyMatching(matchingParticipant);
-    }
-
-    @GetMapping("/matching/status")
+    @GetMapping("/status")
     public Response<Map<String, String>> getStatus() {
-        Map<String, String> status = new HashMap<>();
-        status.put("status", matchingService.checkStatus());
-
-        return Response.SUCCESS(status);
+        return Response.SUCCESS(matchingInfoService.getMatchingStatus());
     }
 
-    @GetMapping("/matching/result")
-    public List<MatchedGroup> matchingTeams() {
-        // TODO: 본인 제외하고 반환
-        return matchingService.teamBuilding();
+    @GetMapping("/partners")
+    public Response<PartnersResponse> getPartners() {
+        return Response.SUCCESS(matchingInfoService.getPartnersResponse());
+    }
+
+    @GetMapping("/applicant")
+    public Response<ApplicantResponse> getApplicant() throws Exception {
+        return Response.SUCCESS(matchingInfoService.getApplicant());
+    }
+
+    @PostMapping()
+    public void match() {
+        matchingService.matchParticipants();
     }
 
     // TODO: 새로 매칭 시작 전 member의 is_applied를 none으로 변경 후 matchingParticipants 데이터 모두 삭제

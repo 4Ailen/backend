@@ -4,9 +4,9 @@ import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.member.repository.NationalityRepository;
 import com.aliens.friendship.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +38,6 @@ public class JwtAPITest {
     private MockMvc mockMvc;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
     private MemberService memberService;
 
     @Autowired
@@ -48,6 +45,9 @@ public class JwtAPITest {
 
     @Autowired
     private EmailAuthenticationRepository emailAuthenticationRepository;
+    
+    @Autowired
+    private NationalityRepository nationalityRepository;
 
     @BeforeEach
     public void setupMember() throws Exception {
@@ -59,7 +59,7 @@ public class JwtAPITest {
                 .name("김명준")
                 .mbti("INTJ")
                 .birthday("1998-01-01")
-                .gender("MALE")
+                .gender("male")
                 .nationality(nationality)
                 .profileImage(mockMultipartFile)
                 .build();

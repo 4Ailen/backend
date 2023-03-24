@@ -5,10 +5,10 @@ import com.aliens.friendship.member.controller.dto.JoinDto;
 import lombok.*;
 
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static javax.persistence.CascadeType.ALL;
@@ -30,6 +30,7 @@ public class Member {
     public static final String COLUMN_MBTI_NAME = "mbti";
     public static final String COLUMN_GENDER_NAME = "gender";
     public static final String COLUMN_BIRTHDAY_NAME = "birthday";
+    public static final String COLUNM_NATIONALITY_NAME = "nationality";
     public static final String COLUMN_NAME_NAME = "name";
     public static final String COLUMN_JOINDATE_NAME = "join_date";
     public static final String COLUMN_IMAGEURL_NAME = "image_url";
@@ -54,7 +55,7 @@ public class Member {
     private String gender;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "nationality", nullable = false)
+    @JoinColumn(name = COLUNM_NATIONALITY_NAME, nullable = false)
     private Nationality nationality;
 
     @Column(name = COLUMN_BIRTHDAY_NAME, nullable = false)
@@ -68,7 +69,7 @@ public class Member {
 
     @Column(name = COLUMN_IMAGEURL_NAME, nullable = false)
     @Builder.Default
-    private String imageUrl = "/default_image.jpg";
+    private String profileImageUrl = "/default_image.jpg";
 
     @Column(name = COLUMN_NOTIFICATIONSTATUS_NAME, nullable = false)
     @Builder.Default
@@ -113,7 +114,7 @@ public class Member {
                 .name(joinDto.getName())
                 .nationality(joinDto.getNationality())
                 .joinDate(Instant.now())
-                .imageUrl(joinDto.getImageUrl())
+                .profileImageUrl(joinDto.getImageUrl())
                 .build();
         member.addAuthority(Authority.ofUser(member));
         return member;
@@ -142,6 +143,27 @@ public class Member {
         return authorities.stream()
                 .map(Authority::getRole)
                 .collect(toList());
+    }
+
+    public int getAge() throws Exception {
+        Calendar birthCalendar = getCalendarFromString(birthday);
+        Calendar today = Calendar.getInstance();
+
+        int age = today.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR);
+        if (today.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+
+        return age;
+    }
+
+    private Calendar getCalendarFromString(String date) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date birthDate = format.parse(date);
+        Calendar birthCalendar = Calendar.getInstance();
+        birthCalendar.setTime(birthDate);
+
+        return birthCalendar;
     }
 
     public enum Status {
