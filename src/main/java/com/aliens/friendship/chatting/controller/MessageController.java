@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import com.aliens.friendship.chatting.domain.ChatMessage;
 import com.aliens.friendship.chatting.service.ChattingService;
 
+import java.time.LocalDateTime;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -15,15 +17,31 @@ public class MessageController {
 
     private final ChattingService chatService;
 
-    @MessageMapping("/{roomId}") //여기로 전송되면 메서드 호출 -> WebSocketConfig prefixes 에서 적용한건 앞에 생략
-    @SendTo("/room/{roomId}")   //구독하고 있는 장소로 메시지 전송 (목적지)  -> WebSocketConfig Broker 에서 적용한건 앞에 붙어줘야됨
-    public com.aliens.friendship.chatting.controller.dto.ChatMessage MessagingInterceptToSave(@DestinationVariable Integer roomId, com.aliens.friendship.chatting.controller.dto.ChatMessage message) {
+    @MessageMapping("/{roomId}")
+    @SendTo("/room/{roomId}")
+    public com.aliens.friendship.chatting.controller.dto.ChatMessage MessagingInterceptToSave(@DestinationVariable Long roomId, com.aliens.friendship.chatting.controller.dto.ChatMessage message) {
         //채팅 저장
-        ChatMessage chat = chatService.createChat(roomId, message.getSender(), message.getMessage());
+        ChatMessage chat = chatService.saveChatMessage(roomId, message.getSender(), message.getMessage(),0);
         return com.aliens.friendship.chatting.controller.dto.ChatMessage.builder()
                 .roomId(roomId)
                 .sender(chat.getSender())
                 .message(chat.getMessage())
+                .category(0)
+                .sendDate(LocalDateTime.now())
+                .build();
+    }
+
+    @MessageMapping("/{roomId}/vs_message")
+    @SendTo("/room/{roomId}")
+    public com.aliens.friendship.chatting.controller.dto.ChatMessage MessagingInterceptToSaveVsQuestion(@DestinationVariable Long roomId, com.aliens.friendship.chatting.controller.dto.ChatMessage message) {
+        //질문 채팅 저장
+        ChatMessage chat = chatService.saveChatMessage(roomId, message.getSender(), message.getMessage(),1);
+        return com.aliens.friendship.chatting.controller.dto.ChatMessage.builder()
+                .roomId(roomId)
+                .sender(chat.getSender())
+                .message(chat.getMessage())
+                .category(1)
+                .sendDate(LocalDateTime.now())
                 .build();
     }
 }
