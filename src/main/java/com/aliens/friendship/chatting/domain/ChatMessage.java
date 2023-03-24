@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RedisHash("ChatMessage")
 @Getter
@@ -18,23 +19,25 @@ public class ChatMessage {
     private Long id;
 
     @Indexed
-    private Integer room;
+    private Long room;
 
     private String sender;
 
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime sendDate;
+    private String sendDate;
+
+    private Integer category; // 0 일반,  1 vs 메시지, 2 차단된 상태입니다.
 
     @Builder
-    public ChatMessage(Integer room, String sender, String message) {
+    public ChatMessage(Long room, String sender, Integer category, String message) {
         this.room = room;
         this.sender = sender;
         this.message = message;
-        this.sendDate = LocalDateTime.now();
+        this.category = category;
+        LocalDateTime now = LocalDateTime.now();
+        this.sendDate =  now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     /**
@@ -44,10 +47,12 @@ public class ChatMessage {
      * @param message 내용
      * @return Chat Entity
      */
-    public static ChatMessage createChat(Integer room, String sender, String message) {
+    @Builder
+    public static ChatMessage createChat(Long room, String sender, String message,Integer category) {
         return ChatMessage.builder()
                 .room(room)
                 .sender(sender)
+                .category(category)
                 .message(message)
                 .build();
     }
