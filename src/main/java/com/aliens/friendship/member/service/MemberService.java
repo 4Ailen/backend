@@ -39,7 +39,6 @@ public class MemberService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final JwtTokenUtil jwtTokenUtil;
-    private final NationalityRepository nationalityRepository;
 
     private final ProfileImageService profileImageService;
 
@@ -174,5 +173,26 @@ public class MemberService {
         if (memberRepository.findByEmail(email).isPresent()) {
             throw new Exception("이미 사용중인 이메일입니다.");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Member findByEmail(String email)throws Exception {
+        return memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberInfoDto getMemberInfoByMemberId(Integer memberId) throws Exception{
+        String email = getCurrentMemberEmail();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        return MemberInfoDto.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .mbti(member.getMbti())
+                .gender(member.getGender())
+                .nationality(member.getNationality().getId())
+                .birthday(member.getBirthday())
+                .age(getAgeFromBirthday(member.getBirthday()))
+                .name(member.getName())
+                .build();
     }
 }

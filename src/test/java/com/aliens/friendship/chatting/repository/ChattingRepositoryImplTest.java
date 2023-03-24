@@ -96,7 +96,7 @@ class ChattingRepositoryImplTest {
         List<ChattingRoom> chattingRooms = new ArrayList<>();
         for (int i = 1; i <= 2; i++) {
             chattingRooms.add(chattingRoomRepository.save(ChattingRoom.builder()
-                    .id(i * (-1))
+                    .id(Long.valueOf(i * (-1)))
                     .status(ChattingRoom.RoomStatus.OPEN).build()));
         }
 
