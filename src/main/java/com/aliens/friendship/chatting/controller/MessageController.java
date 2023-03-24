@@ -31,7 +31,7 @@ public class MessageController {
                 .build();
     }
 
-    @MessageMapping("/{roomId}/vs_message")
+    @MessageMapping("/{roomId}/vsMessage")
     @SendTo("/room/{roomId}")
     public com.aliens.friendship.chatting.controller.dto.ChatMessage MessagingInterceptToSaveVsQuestion(@DestinationVariable Long roomId, com.aliens.friendship.chatting.controller.dto.ChatMessage message) {
         //질문 채팅 저장
