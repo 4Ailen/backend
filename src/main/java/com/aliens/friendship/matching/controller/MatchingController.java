@@ -7,46 +7,44 @@ import com.aliens.friendship.matching.service.MatchingInfoService;
 import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.matching.service.MatchingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
+@RequestMapping("api/v1/matching")
 @RequiredArgsConstructor
 public class MatchingController {
 
     private final MatchingInfoService matchingInfoService;
     private final MatchingService matchingService;
 
-    @GetMapping("/matching/languages")
+    @GetMapping("/languages")
     public Response<Map<String, Object>> getLanguages() {
         return Response.SUCCESS(matchingInfoService.getLanguages());
     }
 
-    @PostMapping("/matching/applicant")
+    @PostMapping("/applicant")
     public void applyMatching(@RequestBody ApplicantRequest applicantRequest) {
         matchingInfoService.applyMatching(applicantRequest);
     }
 
-    @GetMapping("/matching/status")
+    @GetMapping("/status")
     public Response<Map<String, String>> getStatus() {
         return Response.SUCCESS(matchingInfoService.getMatchingStatus());
     }
 
-    @GetMapping("/matching/partners")
+    @GetMapping("/partners")
     public Response<PartnersResponse> getPartners() {
         return Response.SUCCESS(matchingInfoService.getPartnersResponse());
     }
 
-    @GetMapping("/matching/applicant")
+    @GetMapping("/applicant")
     public Response<ApplicantResponse> getApplicant() throws Exception {
         return Response.SUCCESS(matchingInfoService.getApplicant());
     }
 
-    @PostMapping("/matching")
+    @PostMapping()
     public void match() {
         matchingService.matchParticipants();
     }

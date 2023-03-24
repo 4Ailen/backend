@@ -61,7 +61,7 @@ class MatchingControllerTest {
         when(matchingInfoService.getLanguages()).thenReturn(languageResponse);
 
         // When
-        ResultActions resultActions = mockMvc.perform(get("/matching/languages"));
+        ResultActions resultActions = mockMvc.perform(get("api/v1/matching/languages"));
 
         // Then
         verify(matchingInfoService, times(1)).getLanguages();
@@ -80,7 +80,7 @@ class MatchingControllerTest {
         request.setSecondPreferLanguage(2);
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/matching/applicant")
+        ResultActions resultActions = mockMvc.perform(post("api/v1/matching/applicant")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)));
 
@@ -98,7 +98,7 @@ class MatchingControllerTest {
         when(matchingInfoService.getMatchingStatus()).thenReturn(status);
 
         // When
-        ResultActions resultActions = mockMvc.perform(get("/matching/status"));
+        ResultActions resultActions = mockMvc.perform(get("api/v1/matching/status"));
 
         // Then
         resultActions.andExpect(status().isOk())
@@ -116,7 +116,7 @@ class MatchingControllerTest {
         when(matchingInfoService.getPartnersResponse()).thenReturn(partnersResponse);
 
         // When
-        ResultActions resultActions = mockMvc.perform(get("/matching/partners"));
+        ResultActions resultActions = mockMvc.perform(get("api/v1/matching/partners"));
 
         // Then
         resultActions.andExpect(status().isOk());
@@ -160,7 +160,7 @@ class MatchingControllerTest {
         when(matchingInfoService.getApplicant()).thenReturn(returnDto);
 
         // When
-        ResultActions resultActions = mockMvc.perform(get("/matching/applicant"));
+        ResultActions resultActions = mockMvc.perform(get("api/v1/matching/applicant"));
 
         // Then
         resultActions.andExpect(status().isOk())
