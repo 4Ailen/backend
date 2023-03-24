@@ -1,6 +1,5 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.repository.BlockingInfoRepository;
 import com.aliens.friendship.matching.domain.Language;
 import com.aliens.friendship.matching.repository.LanguageRepository;
 import com.aliens.friendship.matching.domain.MatchingParticipant;
@@ -8,7 +7,6 @@ import com.aliens.friendship.matching.repository.MatchingParticipantRepository;
 import com.aliens.friendship.matching.controller.dto.MatchingParticipantInfo;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.repository.MemberRepository;
-import com.aliens.friendship.matching.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +17,8 @@ import java.util.*;
 public class MatchingInfoService {
 
     private final LanguageRepository languageRepository;
-    private final QuestionRepository questionRepository;
     private final MemberRepository memberRepository;
     private final MatchingParticipantRepository matchingParticipantRepository;
-    private final BlockingInfoRepository blockingInfoRepository;
 
     public Map<String, Object> getLanguages() {
         List<Language> languages = languageRepository.findAll();
