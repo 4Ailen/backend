@@ -23,6 +23,11 @@ public class ProfileImageService {
         return DEFAULT_FILE_PATH + fileName;
     }
 
+    public boolean deleteProfileImage(String filePath) {
+        File file = new File(System.getProperty("user.dir") + filePath);
+        return file.delete();
+    }
+
     private void validateFile(MultipartFile uploadedFile) throws Exception {
         validateNotEmpty(uploadedFile);
         validateFileSize(uploadedFile);

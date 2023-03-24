@@ -37,7 +37,8 @@ public class Member {
     public static final String COLUMN_NOTIFICATIONSTATUS_NAME = "notification_status";
     public static final String COLUMN_ISAPPLIED_NAME = "is_applied";
 
-    @Id @GeneratedValue(strategy = IDENTITY)
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
@@ -85,6 +86,22 @@ public class Member {
 
     public void updateIsApplied(Status status) {
         this.isApplied = status;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateMbti(String mbti) {
+        this.mbti = mbti;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public static Member ofUser(JoinDto joinDto) {
