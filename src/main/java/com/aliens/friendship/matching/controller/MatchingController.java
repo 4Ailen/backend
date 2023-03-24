@@ -1,13 +1,18 @@
 package com.aliens.friendship.matching.controller;
 
+import com.aliens.friendship.chatting.service.ChattingService;
 import com.aliens.friendship.global.common.Response;
 import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
 import com.aliens.friendship.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.matching.service.BlockingInfoService;
 import com.aliens.friendship.matching.service.MatchingInfoService;
 import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.matching.service.MatchingService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
@@ -17,9 +22,12 @@ import java.util.Map;
 public class MatchingController {
 
     private final MatchingInfoService matchingInfoService;
+    private final BlockingInfoService blockingInfoService;
+    private final ChattingService chattingService;
     private final MatchingService matchingService;
 
-    @GetMapping("/languages")
+
+    @GetMapping("/matching/languages")
     public Response<Map<String, Object>> getLanguages() {
         return Response.SUCCESS(matchingInfoService.getLanguages());
     }
@@ -44,6 +52,16 @@ public class MatchingController {
         return Response.SUCCESS(matchingInfoService.getApplicant());
     }
 
+    @GetMapping("/matching/partner/{memberId}/block/{roomId}")
+    public Response<String> blocking(@PathVariable int memberId,Long roomId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        blockingInfoService.block(email, memberId);
+        chattingService.saveChatMessage(roomId, "공지", "차단된 상대입니다.", 3);
+        chattingService.updateRoomStatus(roomId, "CLOSE");
+        return Response.SUCCESS("차단 성공");
+    }
     @PostMapping()
     public void match() {
         matchingService.matchParticipants();

@@ -20,7 +20,7 @@ public class MatchingService {
     private List<Participant> matchingParticipants = new ArrayList<>();
     private Map<String, Queue<Participant>> languageQueuesWithCandidates = new HashMap<>();
     private int maxMatches = 3;
-    private int matchingIndex = 0;
+    private Long matchingIndex = Long.valueOf(0);
 
     public void matchParticipants() {
         init();

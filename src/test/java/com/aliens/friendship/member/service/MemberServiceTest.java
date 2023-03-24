@@ -344,7 +344,7 @@ class MemberServiceTest {
         Member spyMember = createSpyMember(mockJoinDto);
         MockMultipartFile newProfileImage = new MockMultipartFile("profileImage", "test2.jpg", "image/jpeg", "test data".getBytes());
         when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
-        when(profileImageService.deleteProfileImage(spyMember.getImageUrl())).thenReturn(true);
+        when(profileImageService.deleteProfileImage(spyMember.getProfileImageUrl())).thenReturn(true);
         when(profileImageService.uploadProfileImage(newProfileImage)).thenReturn("/testUrl");
 
         UserDetails userDetails = CustomUserDetails.of(spyMember);

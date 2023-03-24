@@ -37,7 +37,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @Transactional
 public class MemberService {
-
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
@@ -103,15 +102,14 @@ public class MemberService {
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getText())
+                .nationality(member.getNationality().getCountryImageUrl())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
-                .profileImage(domainUrl + System.getProperty("user.dir") + member.getImageUrl())
+                .profileImage(domainUrl + System.getProperty("user.dir") + member.getProfileImageUrl())
                 .build();
     }
 
-    // 4
     @CacheEvict(value = CacheKey.USER, key = "#username")
     public void logout(TokenDto tokenDto, String username) {
         String accessToken = resolveToken(tokenDto.getAccessToken());
@@ -124,7 +122,6 @@ public class MemberService {
         return token.substring(7);
     }
 
-    // 3
     public TokenDto reissue(String refreshToken) {
         refreshToken = resolveToken(refreshToken);
         String email = getCurrentMemberEmail();
@@ -233,8 +230,8 @@ public class MemberService {
 
     public void changeProfileImage(MultipartFile profileImage) throws Exception {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-        if (!member.getImageUrl().equals("/default_image.jpg")) {
-            profileImageService.deleteProfileImage(member.getImageUrl());
+        if (!member.getProfileImageUrl().equals("/default_image.jpg")) {
+            profileImageService.deleteProfileImage(member.getProfileImageUrl());
         }
         member.updateImageUrl(profileImageService.uploadProfileImage(profileImage));
         memberRepository.save(member);
@@ -248,5 +245,26 @@ public class MemberService {
         } else {
             return "NOT_AUTHENTICATED";
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Member findByEmail(String email)throws Exception {
+        return memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberInfoDto getMemberInfoByMemberId(Integer memberId) throws Exception{
+        String email = getCurrentMemberEmail();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        return MemberInfoDto.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .mbti(member.getMbti())
+                .gender(member.getGender())
+                .nationality(member.getNationality().getNatinalityText())
+                .birthday(member.getBirthday())
+                .age(member.getAge())
+                .name(member.getName())
+                .build();
     }
 }

@@ -24,56 +24,33 @@ public class ChattingService {
     private final ChattingRoomRepository chattingRoomRepository;
     private final ApplicantRepository applicantRepository;
     private final MatchingRepository matchingRepository;
-    private final ChatMessageRepository chatRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
-    /**
-     * 모든 채팅방 찾기
-     */
-    public List<ChattingRoom> findAllRoom() {
-        return chattingRoomRepository.findAll();
-    }
 
-    /**
-     * 특정 채팅방 찾기
-     * @param id room_id
-     */
-    public ChattingRoom findRoomById(Integer id) {
+    public ChattingRoom findRoomById(Long id) {
         return chattingRoomRepository.findById(id).orElseThrow();
     }
 
-    /**
-     * 채팅방 만들기
-     * @param name 방 이름
-     */
-    @Transactional(readOnly = false)
+
+    @Transactional
     public ChattingRoom createRoom() {
         return chattingRoomRepository.save(new ChattingRoom());
     }
 
-    /////////////////
-
-    /**
-     * 채팅 생성
-     * @param roomId 채팅방 id
-     * @param sender 보낸이
-     * @param message 내용
-     */
-    @Transactional(readOnly = false)
-    public ChatMessage createChat(Integer roomId, String sender, String message) {
+    @Transactional
+    public ChatMessage saveChatMessage(Long roomId, String sender, String message,Integer category) {
+        // 실제 있는 roomId인지 검증
         ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(() -> new NoSuchElementException("Can't find room "+roomId));
-        return chatRepository.save(ChatMessage.createChat(room.getId(), sender, message));
+        return chatMessageRepository.save(ChatMessage.createChat(room.getId(), sender, message,category));
     }
 
-    /**
-     * 채팅방 채팅내용 불러오기
-     * @param roomId 채팅방 id
-     */
+
     public List<ChatMessage> findAllChatByRoomId(Long roomId) {
-        return chatRepository.findAllByRoom(roomId);
+        return chatMessageRepository.findAllByRoom(roomId);
     }
 
-    @Transactional(readOnly = false)
-    public void updateRoomStatus(int roomId, String status) {
+    @Transactional
+    public void updateRoomStatus(Long roomId, String status) {
         ChattingRoom room = chattingRoomRepository.findById(roomId).orElseThrow(()-> new NoSuchElementException("Can't find room "+roomId));
         ChattingRoom.RoomStatus roomStatus = ChattingRoom.RoomStatus.valueOf(status.toUpperCase());
         room.updateStatus(roomStatus);
@@ -88,6 +65,7 @@ public class ChattingService {
             ChattingRoom chattingRoom = matching.getChattingRoom();
             roomInfoDto.setRoomId(chattingRoom.getId());
             roomInfoDto.setStatus(chattingRoom.getStatus().toString());
+            roomInfoDto.setChatMessages(chatMessageRepository.findAllByRoom(chattingRoom.getId()));
             roomInfoDto.setPartnerId(matchingRepository.findPartnerIdByApplicantAndChattingRoom(applicant, chattingRoom));
             roomInfoDtoList.add(roomInfoDto);
         }

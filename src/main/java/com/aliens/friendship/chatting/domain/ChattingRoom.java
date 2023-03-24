@@ -18,7 +18,7 @@ public class ChattingRoom {
 
     @Id
     @Column(name = COLUMN_ID_NAME, nullable = false)
-    private Integer id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default

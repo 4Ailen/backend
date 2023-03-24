@@ -28,9 +28,6 @@ class NationalityControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @MockBean
     private NationalityService nationalityService;
 
     @Test

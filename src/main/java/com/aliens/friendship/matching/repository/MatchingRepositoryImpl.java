@@ -17,7 +17,7 @@ public class MatchingRepositoryImpl implements MatchingCustomRepository {
     @Override
     public List<Integer> findPartnerIdsByApplicantId(Integer applicantId) {
         QMatching qMatching = QMatching.matching;
-        List<Integer> chattingRoomIds = queryFactory
+        List<Long> chattingRoomIds = queryFactory
                 .select(qMatching.chattingRoom.id)
                 .from(qMatching)
                 .where(qMatching.applicant.id.eq(applicantId))

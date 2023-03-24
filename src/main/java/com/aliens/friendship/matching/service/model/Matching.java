@@ -11,5 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Matching{
     private Participant partner;
-    private int chattingRoomId;
+    private Long chattingRoomId;
 }

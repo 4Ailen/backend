@@ -3,35 +3,35 @@ package com.aliens.friendship.chatting.controller;
 import com.aliens.friendship.jwt.domain.dto.RoomInfoDto;
 import com.aliens.friendship.global.common.Response;
 import com.aliens.friendship.chatting.service.ChattingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.aliens.friendship.member.domain.Member;
+import com.aliens.friendship.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 public class ChattingController {
-    private ChattingService chatService;
 
-    @Autowired
-    public ChattingController(ChattingService chatService){
-        this.chatService = chatService;
+    private final ChattingService chatService;
+    private final MemberService memberService;
+
+    private String getCurrentMemberEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return userDetails.getUsername();
     }
 
     @GetMapping("/chat/rooms")
-    public Response<Map<String, Object>> getRooms(){
-        //Todo: jwt를 통해 접속된 멤버 아이디를 가져와야함
-        Integer memberId = 10;
-        List<RoomInfoDto> rooms = chatService.getRoomInfoDtoListByMatchingParticipantId(memberId);
-        Map<String, Object> result = new HashMap<>();
-        result.put("chattingRooms",rooms);
-        return Response.SUCCESS(result);
+    public Response<List<RoomInfoDto>> getRooms() throws Exception {
+        String email = getCurrentMemberEmail();
+        Member currentMember = memberService.findByEmail(email);
+        List<RoomInfoDto> matchedRooms = chatService.getRoomInfoDtoListByMatchingParticipantId(currentMember.getId());
+        return Response.SUCCESS(matchedRooms);
     }
 
-    @PatchMapping("/chat/room/{roomId}/status/{status}")
-    public Response<String> updateRoomStatus(@PathVariable int roomId, @PathVariable String status){
-        chatService.updateRoomStatus(roomId, status);
-        return Response.SUCCESS("Room status updated");
-    }
 }

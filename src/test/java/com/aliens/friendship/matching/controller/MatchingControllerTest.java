@@ -1,12 +1,21 @@
 package com.aliens.friendship.matching.controller;
 
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
+import com.aliens.friendship.jwt.domain.dto.LoginDto;
+import com.aliens.friendship.jwt.domain.dto.TokenDto;
 import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
 import com.aliens.friendship.matching.controller.dto.PartnersResponse;
 import com.aliens.friendship.matching.domain.Language;
+import com.aliens.friendship.matching.service.BlockingInfoService;
 import com.aliens.friendship.matching.service.MatchingInfoService;
 import com.aliens.friendship.matching.service.MatchingService;
+import com.aliens.friendship.member.controller.dto.JoinDto;
+import com.aliens.friendship.member.domain.Member;
+import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.member.repository.NationalityRepository;
+import com.aliens.friendship.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +24,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -44,6 +55,19 @@ class MatchingControllerTest {
 
     @MockBean
     MatchingService matchingService;
+
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private NationalityRepository nationalityRepository;
+
+    JoinDto blockingMember;
+    JoinDto blockedMember;
+    int idOfBlockedMember;
 
     @Test
     @DisplayName("언어 목록 조회 성공")
@@ -176,73 +200,53 @@ class MatchingControllerTest {
 
         verify(matchingInfoService, times(1)).getApplicant();
     }
+
+    @Test
+    @DisplayName("차단 성공")
+    void Blocking_Success() throws Exception {
+
+        //회원가입
+        MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
+        Nationality nationality = new Nationality(1, "South Korea");
+        nationalityRepository.save(nationality);
+        blockingMember = JoinDto.builder()
+                .password("1q2w3e4r")
+                .email("skatks1016@naver.com")
+                .name("김명준")
+                .mbti("INTJ")
+                .birthday("1998-01-01")
+                .gender("male")
+                .profileImage(mockMultipartFile)
+                .nationality(nationality)
+                .build();
+
+        blockedMember = JoinDto.builder()
+                .password("1q2w3e4r")
+                .email("skatks1125@naver.com")
+                .name("최정은")
+                .mbti("INTJ")
+                .birthday("1998-01-01")
+                .gender("male")
+                .profileImage(mockMultipartFile)
+                .nationality(nationality)
+                .build();
+
+        memberService.join(blockedMember);
+        memberService.join(blockingMember);
+
+        //blockedMember의 Id값 추출
+        Optional<Member> blockedMemberEntity = memberRepository.findByEmail(blockedMember.getEmail());
+        idOfBlockedMember = blockedMemberEntity.get().getId();
+
+        // given
+        LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
+        TokenDto tokenResponse = memberService.login(loginMember);
+        String accessToken = tokenResponse.getAccessToken();
+
+        // when & then
+        mockMvc.perform(get("/matching/partner/" + idOfBlockedMember+ "/block")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk());
+    }
 }
 
-//=======
-//@Autowired
-//private MemberService memberService;
-//
-//@Autowired
-//private BlockingInfoService blockingInfoService;
-//
-//@Autowired
-//private MemberRepository memberRepository;
-//
-//@Autowired
-//private NationalityRepository nationalityRepository;
-//
-//        TokenDto token;
-//        JoinDto blockingMember;
-//        JoinDto blockedMember;
-//        int idOfBlockedMember;
-//
-//@Test
-//@DisplayName("차단 성공")
-//    void Blocking_Success() throws Exception {
-//
-//            //회원가입
-//            MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-//            Nationality nationality = new Nationality(1, "South Korea");
-//            nationalityRepository.save(nationality);
-//            blockingMember = JoinDto.builder()
-//            .password("1q2w3e4r")
-//            .email("skatks1016@naver.com")
-//            .name("김명준")
-//            .mbti("INTJ")
-//            .birthday("1998-01-01")
-//            .gender("male")
-//            .image(mockMultipartFile)
-//            .nationality(nationality)
-//            .build();
-//
-//            blockedMember = JoinDto.builder()
-//            .password("1q2w3e4r")
-//            .email("skatks1125@naver.com")
-//            .name("최정은")
-//            .mbti("INTJ")
-//            .birthday("1998-01-01")
-//            .gender("male")
-//            .image(mockMultipartFile)
-//            .nationality(nationality)
-//            .build();
-//
-//            memberService.join(blockedMember);
-//            memberService.join(blockingMember);
-//
-//            //blockedMember의 Id값 추출
-//            Optional<Member> blockedMemberEntity = memberRepository.findByEmail(blockedMember.getEmail());
-//        idOfBlockedMember = blockedMemberEntity.get().getId();
-//
-//        // given
-//        LoginDto loginMember = new LoginDto("skatks1016@naver.com","1q2w3e4r");
-//        TokenDto tokenResponse = memberService.login(loginMember);
-//        String accessToken = tokenResponse.getAccessToken();
-//
-//        // when & then
-//        mockMvc.perform(get("/matching/partner/" + idOfBlockedMember+ "/block")
-//        .header("Authorization", "Bearer " + accessToken))
-//        .andExpect(status().isOk());
-//        }
-//
-//        }
-//        >>>>>>> develop

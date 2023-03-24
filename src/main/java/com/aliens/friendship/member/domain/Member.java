@@ -101,7 +101,7 @@ public class Member {
     }
 
     public void updateImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        this.profileImageUrl = imageUrl;
     }
 
     public static Member ofUser(JoinDto joinDto) {

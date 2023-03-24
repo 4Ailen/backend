@@ -21,7 +21,7 @@ public class MatchingResultSaveService {
     private final MatchingRepository matchingRepository;
     private final ApplicantRepository applicantRepository;
 
-    public void saveMatchingResult(List<Participant> participants, int numberOfMatches) {
+    public void saveMatchingResult(List<Participant> participants, Long numberOfMatches) {
         deleteAllMatchings();
         deleteAllChattingRooms();
         createChattingRooms(numberOfMatches);
@@ -48,10 +48,10 @@ public class MatchingResultSaveService {
         matchingRepository.saveAll(chattings);
     }
 
-    private void createChattingRooms(int numberOfChattingRooms){
+    private void createChattingRooms(Long numberOfChattingRooms){
         for(int i = 0; i < numberOfChattingRooms; i++){
             ChattingRoom chattingRoom = ChattingRoom.builder()
-                    .id(i)
+                    .id(Long.valueOf(i))
                     .status(ChattingRoom.RoomStatus.CLOSE)
                     .build();
             chattingRoomRepository.save(chattingRoom);

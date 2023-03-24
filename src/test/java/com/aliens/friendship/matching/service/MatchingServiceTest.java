@@ -23,8 +23,6 @@ public class MatchingServiceTest {
     @Mock
     ApplicantRepository applicantRepository;
 
-    @Mock
-    MatchingResultSaveService matchingResultSaveService;
 
     @InjectMocks
     MatchingService matchingService;

@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MemberInfoDto {
-
+    private Integer memberId;
     private String email;
     private String mbti;
     private String gender;
