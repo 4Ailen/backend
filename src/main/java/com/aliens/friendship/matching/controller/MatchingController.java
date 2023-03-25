@@ -52,8 +52,8 @@ public class MatchingController {
         return Response.SUCCESS(matchingInfoService.getApplicant());
     }
 
-    @GetMapping("/partner/{memberId}/block")
-    public Response<String> blocking(@PathVariable Integer memberId, @RequestParam Long roomId) {
+    @PostMapping("/partner/{memberId}/block")
+    public Response<String> blocking(@PathVariable Integer memberId, @RequestBody Long roomId) {
         blockingInfoService.block(memberId);
         chattingService.blockChattingRoom(roomId);
         return Response.SUCCESS("차단 성공");
