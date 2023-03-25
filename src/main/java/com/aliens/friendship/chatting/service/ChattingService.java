@@ -34,7 +34,8 @@ public class ChattingService {
 
     @Transactional
     public ChattingRoom createRoom() {
-        return chattingRoomRepository.save(new ChattingRoom());
+        ChattingRoom room = new ChattingRoom(4040L, ChattingRoom.RoomStatus.PENDING);
+        return chattingRoomRepository.save(room);
     }
 
     @Transactional

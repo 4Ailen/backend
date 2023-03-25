@@ -209,8 +209,9 @@ class MatchingControllerTest {
         Long roomId = 1L;
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/v1/matching/partner/" + memberId + "/block").param("roomId", String.valueOf(roomId)));
-
+        ResultActions resultActions = mockMvc.perform(post("/api/v1/matching/partner/{memberId}/block", memberId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roomId.toString()));
         // then
         resultActions.andExpect(status().isOk());
         verify(chattingService, times(1)).blockChattingRoom(roomId);
