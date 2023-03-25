@@ -7,6 +7,9 @@ import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.domain.Member;
 import com.aliens.friendship.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +27,8 @@ public class BlockingInfoService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void block(String email, int memberId){
+    public void block(int memberId){
+        String email = getCurrentMemberEmail();
         Member blockingMember =  memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         Member blockedMember = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         BlockingInfo blockingInfo = BlockingInfo.builder().blockingMember(blockingMember).blockedMember(blockedMember).build();
@@ -35,6 +39,12 @@ public class BlockingInfoService {
         Member blockingMember =  memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         List<BlockingInfo> blockingInfos = blockingInfoRepository.findAllByBlockingMember(blockingMember);
         return blockingInfos;
+    }
+
+    private String getCurrentMemberEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return userDetails.getUsername();
     }
 }
 

@@ -30,6 +30,9 @@ class NationalityControllerTest {
     @MockBean
     private NationalityService nationalityService;
 
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Test
     @DisplayName("국적 목록 요청 성공")
     void GetNationalities_Success() throws Exception {
