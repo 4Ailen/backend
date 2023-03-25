@@ -27,7 +27,7 @@ public class MatchingController {
     private final MatchingService matchingService;
 
 
-    @GetMapping("/matching/languages")
+    @GetMapping("/languages")
     public Response<Map<String, Object>> getLanguages() {
         return Response.SUCCESS(matchingInfoService.getLanguages());
     }
@@ -52,14 +52,10 @@ public class MatchingController {
         return Response.SUCCESS(matchingInfoService.getApplicant());
     }
 
-    @GetMapping("/matching/partner/{memberId}/block/{roomId}")
-    public Response<String> blocking(@PathVariable int memberId,Long roomId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String email = userDetails.getUsername();
-        blockingInfoService.block(email, memberId);
-        chattingService.saveChatMessage(roomId, "공지", "차단된 상대입니다.", 3);
-        chattingService.updateRoomStatus(roomId, "CLOSE");
+    @GetMapping("/partner/{memberId}/block")
+    public Response<String> blocking(@PathVariable Integer memberId, @RequestParam Long roomId) {
+        blockingInfoService.block(memberId);
+        chattingService.blockChattingRoom(roomId);
         return Response.SUCCESS("차단 성공");
     }
     @PostMapping()

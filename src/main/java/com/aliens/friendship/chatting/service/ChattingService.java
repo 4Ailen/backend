@@ -71,4 +71,10 @@ public class ChattingService {
         }
         return roomInfoDtoList;
     }
+
+    @Transactional
+    public void blockChattingRoom(Long roomId) {
+        saveChatMessage(roomId, "공지", "차단된 상대입니다.", 3);
+        updateRoomStatus(roomId, "CLOSE");
+    }
 }

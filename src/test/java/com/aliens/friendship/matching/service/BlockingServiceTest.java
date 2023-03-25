@@ -1,5 +1,7 @@
 package com.aliens.friendship.matching.service;
 
+import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.matching.domain.BlockingInfo;
 import com.aliens.friendship.matching.repository.BlockingInfoRepository;
 import com.aliens.friendship.matching.service.BlockingInfoService;
@@ -9,94 +11,114 @@ import com.aliens.friendship.member.domain.Nationality;
 import com.aliens.friendship.member.repository.MemberRepository;
 import com.aliens.friendship.member.repository.NationalityRepository;
 import com.aliens.friendship.member.service.MemberService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class BlockingServiceTest {
 
-    @Autowired
+    @Mock
     MemberRepository memberRepository;
 
-    @Autowired
+    @Mock
     MemberService memberService;
 
-    @Autowired
+    @Mock
     BlockingInfoRepository blockingInfoRepository;
 
-    @Autowired
+    @InjectMocks
     BlockingInfoService blockingInfoService;
 
-    @Autowired
+    @Mock
     NationalityRepository nationalityRepository;
 
+    @Mock
+    EmailAuthenticationRepository emailAuthenticationRepository;
+
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private UserDetails userDetails;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @BeforeEach
+    public void setUp() {
+        SecurityContextHolder.setContext(securityContext);
+    }
 
     @Test
     @DisplayName("차단 성공")
     void Blocking_Success_When_ValidMember() throws Exception {
 
-        //given: 차단자와 피차단자 세팅
-        JoinDto mockJoinDto1 = createMockJoinDto("idontwannameetyouagain@case.com", "TestPassword");
-        JoinDto mockJoinDto2 = createMockJoinDto("plzGiveMeOneMoreTime@case.com", "TestPsword");
-        memberService.join(mockJoinDto1);
-        memberService.join(mockJoinDto2);
-        Member blockedMember = memberRepository.findByEmail(mockJoinDto2.getEmail()).orElseThrow();
+        //given
+        Integer id = 1;
+        Member blockingMember = MemberFixture.createTestMember();
+        Member blockedMember = mock(Member.class);
+        when(blockedMember.getId()).thenReturn(id);
+        when(memberRepository.findByEmail(blockingMember.getEmail())).thenReturn(Optional.of(blockingMember));
+        when(memberRepository.findById(id)).thenReturn(Optional.of(blockedMember));
+        setUpAuthentication(blockingMember);
 
-        //when: 차단 실행
-        blockingInfoService.block(mockJoinDto1.getEmail(), blockedMember.getId());
+        // when
+        blockingInfoService.block(id);
 
-        //then: 차단 목록 조회 성공
-        List<BlockingInfo> blockingInfos = blockingInfoService.findAllByBlockingMember(mockJoinDto1.getEmail());
-        assertThat(blockingInfos.get(0).getBlockedMember().getEmail()).isEqualTo(mockJoinDto2.getEmail());
-        assertThat(blockingInfos.get(0).getBlockingMember().getEmail()).isEqualTo(mockJoinDto1.getEmail());
+        // then
+        verify(memberRepository, times(1)).findByEmail(blockingMember.getEmail());
+        verify(memberRepository, times(1)).findById(blockedMember.getId());
+        ArgumentCaptor<BlockingInfo> captor = ArgumentCaptor.forClass(BlockingInfo.class);
+        verify(blockingInfoRepository, times(1)).save(captor.capture());
+        BlockingInfo blockingInfo = captor.getValue();
+        assertEquals(blockingInfo.getBlockedMember(), blockedMember);
+        assertEquals(blockingInfo.getBlockingMember(), blockingMember);
     }
 
     @Test
     @DisplayName("차단 예외: 상대가 존재하지 않는 회원일 경우")
     void Blocking_ThrowException_When_GivenNotExistMember() throws Exception {
+        //given
+        Integer id = 1;
+        Member blockingMember = MemberFixture.createTestMember();
+        when(memberRepository.findById(1)).thenReturn(Optional.empty());
+        setUpAuthentication(blockingMember);
 
-        //given: 차단자와 피차단자 세팅
-        JoinDto mockJoinDto1 = createMockJoinDto("idontwannameetyouagain@case.com", "TestPassword");
-        JoinDto mockJoinDto2 = createMockJoinDto("plzGiveMeOneMoreTime@case.com", "TestPsword");
-        memberService.join(mockJoinDto1);
-        memberService.join(mockJoinDto2);
-        Member blockedMember = memberRepository.findByEmail(mockJoinDto2.getEmail()).orElseThrow();
-        int fakeMemberId = 1234;
-
-        //when: 차단 실행
-        Exception exception = assertThrows(Exception.class, () -> {
-            blockingInfoService.block(mockJoinDto1.getEmail(), fakeMemberId);
+        // when
+        Exception exception = assertThrows(NoSuchElementException.class, () -> {
+            blockingInfoService.block(id);
         });
 
-
-        //then: 예외 발생
-        assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
+        // then
+        verify(memberRepository, times(1)).findByEmail(blockingMember.getEmail());
+        assertEquals(exception.getMessage(), "존재하지 않는 회원입니다.");
     }
 
-
-    private JoinDto createMockJoinDto(String email, String password) {
-        MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        Nationality nationality = new Nationality(1, "South Korea");
-        nationalityRepository.save(nationality);
-        return JoinDto.builder()
-                .email(email)
-                .password(password)
-                .name("Ryan")
-                .mbti("ENFJ")
-                .gender("MALE")
-                .nationality(nationality)
-                .birthday("1998-12-31")
-                .profileImage(mockMultipartFile)
-                .build();
+    private void setUpAuthentication(Member member) {
+        Authentication auth = new UsernamePasswordAuthenticationToken("testuser", "password");
+        Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
+        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn(member.getEmail());
+        when(memberRepository.findByEmail(member.getEmail())).thenReturn(Optional.of(member));
     }
 }

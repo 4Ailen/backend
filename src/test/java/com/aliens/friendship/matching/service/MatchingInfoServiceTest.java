@@ -148,11 +148,10 @@ class MatchingInfoServiceTest {
     @DisplayName("매칭 상태 조회 성공")
     void GetMatchingStatus_Success() {
         // given
-        Member member = mock(Member.class);
+        Member member = MemberFixture.createTestMember(Member.Status.APPLIED);
         when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
         setUpAuthentication(member);
         Applicant applicant = mock(Applicant.class);
-        when(member.getIsApplied()).thenReturn(Member.Status.APPLIED);
         when(applicantRepository.findById(anyInt())).thenReturn(Optional.of(applicant));
         when(applicant.getIsMatched()).thenReturn(Applicant.Status.MATCHED);
 
@@ -355,7 +354,7 @@ class MatchingInfoServiceTest {
         Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn("test@example.com");
-        when(memberRepository.findByEmail("test@example.com")).thenReturn(Optional.of(member));
+        when(userDetails.getUsername()).thenReturn(member.getEmail());
+        when(memberRepository.findByEmail(member.getEmail())).thenReturn(Optional.of(member));
     }
 }
