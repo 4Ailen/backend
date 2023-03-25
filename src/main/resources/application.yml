@@ -4,6 +4,6 @@ spring:
     port: '6379'
   profiles:
     include: mysql
-jwt:
-  secret: 4aliens'stempsecretkeysecretsecretsecretsecret
+  jwt:
+    secret: 4aliens'stempsecretkeysecretsecretsecretsecret
 
