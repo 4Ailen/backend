@@ -19,8 +19,8 @@ public class ProfileImageService {
     public String uploadProfileImage(MultipartFile uploadedFile) throws Exception {
         validateFile(uploadedFile);
         String fileName = getRandomFileName();
-        uploadedFile.transferTo(new File(getUploadPath(fileName)));
-        return DEFAULT_FILE_PATH + fileName;
+        uploadedFile.transferTo(new File(getUploadPath(fileName+"."+getFileExtension(uploadedFile.getOriginalFilename()))));
+        return DEFAULT_FILE_PATH + fileName+"."+getFileExtension(uploadedFile.getOriginalFilename());
     }
 
     public boolean deleteProfileImage(String filePath) {
