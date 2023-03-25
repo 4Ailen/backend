@@ -65,7 +65,7 @@ public class ChattingControllerTest {
 
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
-                session.subscribe("/"+roomId, new StompFrameHandler() {
+                session.subscribe("/room/"+roomId, new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return ChatMessage.class;
