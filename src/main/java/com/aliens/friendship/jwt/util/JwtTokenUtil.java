@@ -19,7 +19,7 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
 
-    @Value("${jwt.secret}")
+    @Value("${spring.jwt.secret}")
     private String SECRET_KEY;
 
     public Claims extractAllClaims(String token) {
