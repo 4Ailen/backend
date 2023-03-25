@@ -52,7 +52,7 @@ public class ChattingControllerTest {
         this.sockJsClient = new SockJsClient(transports);
         this.stompClient = new WebSocketStompClient(sockJsClient);
         this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        roomId = Long.valueOf(1);
+        roomId = Long.valueOf(4040);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ChattingControllerTest {
 
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
-                session.subscribe("/"+roomId, new StompFrameHandler() {
+                session.subscribe("/room/"+roomId, new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return ChatMessage.class;
