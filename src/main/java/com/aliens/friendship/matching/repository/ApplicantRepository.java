@@ -12,6 +12,9 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Integer> {
         List<Applicant> applicants = findAll();
         List<Participant> participants = new ArrayList<>();
         for (Applicant applicant : applicants) {
+            if (applicant.getId() == 1) {
+                continue;
+            }
             Participant participant = new Participant(
                     applicant.getId(),
                     applicant.getFirstPreferLanguage().getLanguageText(),

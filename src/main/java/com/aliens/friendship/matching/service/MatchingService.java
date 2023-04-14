@@ -1,11 +1,13 @@
 package com.aliens.friendship.matching.service;
 
+import com.aliens.friendship.matching.domain.Applicant;
 import com.aliens.friendship.matching.repository.LanguageRepository;
 import com.aliens.friendship.matching.repository.ApplicantRepository;
 import com.aliens.friendship.matching.service.model.Matching;
 import com.aliens.friendship.matching.service.model.Participant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -91,6 +93,12 @@ public class MatchingService {
     private void init() {
         languages = languageRepository.findAllLanguageTexts();
         matchingParticipants = applicantRepository.findAllParticipants();
+        for (Applicant applicant : applicantRepository.findAll()) {
+            if (applicant.getId() == 1) {
+                continue;
+            }
+            applicant.updateIsMatched(Applicant.Status.MATCHING);
+        }
         languageQueuesWithCandidates = createNewLanguageQueuesWithCandidates();
     }
 
