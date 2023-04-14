@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface BlockingInfoRepository extends JpaRepository<BlockingInfo, Integer> {
     List<BlockingInfo> findAllByBlockingMember(Member blockingMember);
+
+    List<BlockingInfo> findAllByBlockedMember(Member blockedMember);
 }
