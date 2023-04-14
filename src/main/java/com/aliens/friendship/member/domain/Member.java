@@ -36,6 +36,7 @@ public class Member {
     public static final String COLUMN_IMAGEURL_NAME = "image_url";
     public static final String COLUMN_NOTIFICATIONSTATUS_NAME = "notification_status";
     public static final String COLUMN_ISAPPLIED_NAME = "is_applied";
+    public static final String COLUMN_ISWITHDRAWN_NAME = "is_withdrawn";
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -80,12 +81,21 @@ public class Member {
     @Builder.Default
     private Status isApplied = Status.NOT_APPLIED;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = COLUMN_ISWITHDRAWN_NAME, nullable = false, length = 45)
+    @Builder.Default
+    private Status isWithdrawn = Status.NOT_WITHDRAWN;
+
     @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
     public void updateIsApplied(Status status) {
         this.isApplied = status;
+    }
+
+    public void updateIsWithdrawn(Status status) {
+        this.isWithdrawn = status;
     }
 
     public void updatePassword(String password) {
@@ -167,7 +177,7 @@ public class Member {
     }
 
     public enum Status {
-        APPLIED, NOT_APPLIED;
+        APPLIED, NOT_APPLIED, WITHDRAWN, NOT_WITHDRAWN;
     }
 
 

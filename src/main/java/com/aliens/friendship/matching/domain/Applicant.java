@@ -46,7 +46,7 @@ public class Applicant {
     }
 
     public enum Status {
-        MATCHED, NOT_MATCHED;
+        MATCHED, MATCHING, NOT_MATCHED;
     }
 
 }
