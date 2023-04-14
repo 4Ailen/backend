@@ -1,8 +1,16 @@
 package com.aliens.friendship.member.service;
 
+import com.aliens.friendship.chatting.domain.ChattingRoom;
 import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.global.config.security.CustomUserDetails;
+import com.aliens.friendship.matching.domain.Applicant;
+import com.aliens.friendship.matching.domain.BlockingInfo;
+import com.aliens.friendship.matching.domain.Language;
+import com.aliens.friendship.matching.domain.Matching;
+import com.aliens.friendship.matching.repository.ApplicantRepository;
+import com.aliens.friendship.matching.repository.BlockingInfoRepository;
+import com.aliens.friendship.matching.repository.MatchingRepository;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
@@ -28,6 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,6 +53,15 @@ class MemberServiceTest {
 
     @Mock
     EmailAuthenticationRepository emailAuthenticationRepository;
+
+    @Mock
+    BlockingInfoRepository blockingInfoRepository;
+
+    @Mock
+    ApplicantRepository applicantRepository;
+
+    @Mock
+    MatchingRepository matchingRepository;
 
     @Spy
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -114,12 +133,87 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원탈퇴 성공")
-    void DeleteMember_Success() throws Exception {
+    @DisplayName("회원탈퇴 성공: 매칭 신청을 하지 않은 경우")
+    void DeleteMember_Success_When_GivenNotAppliedMember() throws Exception {
         //given: 가입 및 로그인 된 회원
+        JoinDto mockJoinDto1 = createMockJoinDto("test1@case.com", "Test1Password");
+        JoinDto mockJoinDto2 = createMockJoinDto("test2@case.com", "Test2Password");
+        Member mockMember1 = createSpyMember(mockJoinDto1);
+        Member mockMember2 = createSpyMember(mockJoinDto2);
+        List<BlockingInfo> mockBlockingMembers = new ArrayList<>();
+        List<BlockingInfo> mockBlockedMembers = new ArrayList<>();
+        mockBlockingMembers.add(new BlockingInfo(0, mockMember2, mockMember1));
+        mockBlockedMembers.add(new BlockingInfo(1, mockMember1, mockMember2));
+        when(memberRepository.findByEmail(mockJoinDto1.getEmail())).thenReturn(Optional.of(mockMember1));
+        when(blockingInfoRepository.findAllByBlockingMember(mockMember1)).thenReturn(mockBlockingMembers);
+        when(blockingInfoRepository.findAllByBlockingMember(mockMember1)).thenReturn(mockBlockedMembers);
+        doNothing().when(blockingInfoRepository).delete(any(BlockingInfo.class));
+
+        UserDetails userDetails = CustomUserDetails.of(mockMember1);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //when: 회원탈퇴
+        memberService.withdraw("Test1Password");
+
+        //then: 회원탈퇴 성공
+        verify(memberRepository, times(1)).delete(any(Member.class));
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 성공: 매칭 신청은 했으나 매칭 로직은 실행 전인 경우")
+    void DeleteMember_Success_WhenGivenAppliedButNotMatchedMember() throws Exception {
+        //given: 가입 및 로그인 된 회원, 신청자
+        JoinDto mockJoinDto1 = createMockJoinDto("test1@case.com", "Test1Password");
+        JoinDto mockJoinDto2 = createMockJoinDto("test2@case.com", "Test2Password");
+        Member mockMember1 = createSpyMember(mockJoinDto1);
+        Member mockMember2 = createSpyMember(mockJoinDto2);
+        mockMember1.updateIsApplied(Member.Status.APPLIED);
+        Applicant applicant = Applicant.builder()
+                .member(mockMember1)
+                .firstPreferLanguage(new Language(1, "English"))
+                .secondPreferLanguage(new Language(2, "Chinese"))
+                .isMatched(Applicant.Status.NOT_MATCHED)
+                .build();
+        List<BlockingInfo> mockBlockingMembers = new ArrayList<>();
+        List<BlockingInfo> mockBlockedMembers = new ArrayList<>();
+        mockBlockingMembers.add(new BlockingInfo(0, mockMember2, mockMember1));
+        mockBlockedMembers.add(new BlockingInfo(1, mockMember1, mockMember2));
+        when(memberRepository.findByEmail(mockJoinDto1.getEmail())).thenReturn(Optional.of(mockMember1));
+        when(applicantRepository.findById(mockMember1.getId())).thenReturn(Optional.of(applicant));
+        doNothing().when(applicantRepository).delete(any(Applicant.class));
+        when(blockingInfoRepository.findAllByBlockingMember(mockMember1)).thenReturn(mockBlockingMembers);
+        when(blockingInfoRepository.findAllByBlockingMember(mockMember1)).thenReturn(mockBlockedMembers);
+        doNothing().when(blockingInfoRepository).delete(any(BlockingInfo.class));
+
+        UserDetails userDetails = CustomUserDetails.of(mockMember1);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //when: 회원탈퇴
+        memberService.withdraw("Test1Password");
+
+        //then: 회원탈퇴 성공
+        verify(memberRepository, times(1)).delete(any(Member.class));
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 성공: 매칭 신청 후 매칭 로직이 실행 중인 경우")
+    void DeleteMember_Success_WhenGivenAppliedAndMatchingMember() throws Exception {
+        //given: 가입 및 로그인 된 회원, 신청자
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         Member mockMember = createSpyMember(mockJoinDto);
+        mockMember.updateIsApplied(Member.Status.APPLIED);
+        Applicant applicant = Applicant.builder()
+                .member(mockMember)
+                .firstPreferLanguage(new Language(1, "English"))
+                .secondPreferLanguage(new Language(2, "Chinese"))
+                .isMatched(Applicant.Status.MATCHING)
+                .build();
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(mockMember));
+        when(applicantRepository.findById(mockMember.getId())).thenReturn(Optional.of(applicant));
 
         UserDetails userDetails = CustomUserDetails.of(mockMember);
         Authentication authentication = mock(Authentication.class);
@@ -130,7 +224,63 @@ class MemberServiceTest {
         memberService.withdraw("TestPassword");
 
         //then: 회원탈퇴 성공
+        assertEquals(mockMember.getIsWithdrawn(), Member.Status.WITHDRAWN);
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 성공: 매칭 신청 후 매칭 로직이 실행된 후의 경우")
+    void DeleteMember_Success_WhenGivenAppliedAndMatchedMember() throws Exception {
+        //given: 가입 및 로그인 된 회원, 신청자
+        JoinDto mockJoinDto1 = createMockJoinDto("test1@case.com", "Test1Password");
+        JoinDto mockJoinDto2 = createMockJoinDto("test2@case.com", "Test2Password");
+        JoinDto widthDrawnDto = createMockJoinDto("", "");
+        Member mockMember1 = createSpyMember(mockJoinDto1);
+        Member mockMember2 = createSpyMember(mockJoinDto2);
+        Member widthDrawnMember = createSpyMember(widthDrawnDto);
+        mockMember1.updateIsApplied(Member.Status.APPLIED);
+        Applicant applicant = Applicant.builder()
+                .member(mockMember1)
+                .firstPreferLanguage(new Language(1, "English"))
+                .secondPreferLanguage(new Language(2, "Chinese"))
+                .isMatched(Applicant.Status.NOT_MATCHED)
+                .build();
+        Applicant withDrawnApplicant = Applicant.builder()
+                .member(widthDrawnMember)
+                .firstPreferLanguage(new Language(1, "English"))
+                .secondPreferLanguage(new Language(2, "Chinese"))
+                .isMatched(Applicant.Status.NOT_MATCHED)
+                .build();
+        applicant.updateIsMatched(Applicant.Status.MATCHED);
+        List<Matching> matchings = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            matchings.add(Matching.builder()
+                    .applicant(applicant)
+                    .chattingRoom(new ChattingRoom((long) i, ChattingRoom.RoomStatus.OPEN)).build());
+        }
+        List<BlockingInfo> mockBlockingMembers = new ArrayList<>();
+        List<BlockingInfo> mockBlockedMembers = new ArrayList<>();
+        mockBlockingMembers.add(new BlockingInfo(0, mockMember2, mockMember1));
+        mockBlockedMembers.add(new BlockingInfo(1, mockMember1, mockMember2));
+        when(memberRepository.findByEmail(mockJoinDto1.getEmail())).thenReturn(Optional.of(mockMember1));
+        when(applicantRepository.findById(mockMember1.getId())).thenReturn(Optional.of(applicant));
+        when(applicantRepository.findById(1)).thenReturn(Optional.of(withDrawnApplicant));
+        when(matchingRepository.findByApplicant(applicant)).thenReturn(matchings);
+        doNothing().when(applicantRepository).delete(any(Applicant.class));
+        when(blockingInfoRepository.findAllByBlockingMember(mockMember1)).thenReturn(mockBlockingMembers);
+        when(blockingInfoRepository.findAllByBlockingMember(mockMember1)).thenReturn(mockBlockedMembers);
+        doNothing().when(blockingInfoRepository).delete(any(BlockingInfo.class));
+
+        UserDetails userDetails = CustomUserDetails.of(mockMember1);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //when: 회원탈퇴
+        memberService.withdraw("Test1Password");
+
+        //then: 회원탈퇴 성공
         verify(memberRepository, times(1)).delete(any(Member.class));
+        ;
     }
 
     @Test
