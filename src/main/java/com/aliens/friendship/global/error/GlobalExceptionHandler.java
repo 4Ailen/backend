@@ -15,14 +15,29 @@ import static com.aliens.friendship.global.error.GlobalExceptionCode.*;
 public class GlobalExceptionHandler {
 
     /**
-     * 존재하지 않는 자원 접근 예외 핸들링
+     * ResourceNotFoundException 핸들링
      * Custom Exception
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    protected ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+    protected ResponseEntity<ErrorResponse> handlingResourceNotFoundException(
             ResourceNotFoundException e
     ) {
-        log.error("handle ResourceNotFoundException");
+        log.error("[handling ResourceNotFoundException] {}", e.getExceptionCode().getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(e.getExceptionCode()),
+                HttpStatus.valueOf(e.getExceptionCode().getHttpStatus().value())
+        );
+    }
+
+    /**
+     * InvalidResourceOwnerException 핸들링
+     * Custom Exception
+     */
+    @ExceptionHandler(InvalidResourceOwnerException.class)
+    protected ResponseEntity<ErrorResponse> handlingInvalidResourceOwnerException(
+            InvalidResourceOwnerException e
+    ) {
+        log.error("[handling InvalidResourceOwnerException] {}", e.getCode().getMessage());
         return new ResponseEntity<>(
                 ErrorResponse.of(e.getCode()),
                 HttpStatus.valueOf(e.getCode().getHttpStatus().value())
@@ -30,12 +45,12 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 요청 파라미터 검증 예외 핸들링
+     * BindException 핸들링
      * Built-In Exception
      */
     @ExceptionHandler(BindException.class)
-    protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
-        log.error("handle BindException");
+    protected ResponseEntity<ErrorResponse> handlingBindException(BindException e) {
+        log.error("[handling BindException] {}", INVALID_REQUEST_PARAMETER.getMessage());
         return new ResponseEntity<>(
                 ErrorResponse.of(INVALID_REQUEST_PARAMETER, e.getBindingResult()),
                 HttpStatus.valueOf(INVALID_REQUEST_PARAMETER.getHttpStatus().value())
@@ -43,14 +58,14 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 유효하지 않은 HTTP Method 요청 예외 핸들링
+     * HttpRequestMethodNotSupportedException 핸들링
      * Built-In Exception
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
+    protected ResponseEntity<ErrorResponse> handlingHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException e
     ) {
-        log.error("handle HttpRequestMethodNotSupportedException");
+        log.error("[handling HttpRequestMethodNotSupportedException] {}", INVALID_REQUEST_METHOD.getMessage());
         return new ResponseEntity<>(
                 ErrorResponse.of(INVALID_REQUEST_METHOD),
                 HttpStatus.valueOf(INVALID_REQUEST_METHOD.getHttpStatus().value())
@@ -58,29 +73,14 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 유효하지 않은 리소스 소유자의 요청 예외 핸들링
-     * Custom Exception
-     */
-    @ExceptionHandler(InvalidResourceOwnerException.class)
-    protected ResponseEntity<ErrorResponse> handleInvalidResourceOwnerException(
-            InvalidResourceOwnerException e
-    ) {
-        log.error("handle InvalidResourceOwnerException", e);
-        return new ResponseEntity<>(
-                ErrorResponse.of(e.getCode()),
-                HttpStatus.valueOf(e.getCode().getHttpStatus().value())
-        );
-    }
-
-    /**
-     * 최상위 예외 핸들링
+     * Exception 핸들링
      * Built-In Exception
      */
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(
+    protected ResponseEntity<ErrorResponse> handlingException(
             Exception e
     ) {
-        log.error("handle Exception", e);
+        log.error("[handling Exception]", e);
         return new ResponseEntity<>(
                 ErrorResponse.of(SERVER_ERROR),
                 HttpStatus.valueOf(SERVER_ERROR.getHttpStatus().value())
