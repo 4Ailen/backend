@@ -7,11 +7,12 @@ import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
+import com.aliens.friendship.member.controller.dto.ProfileImageRequest;
 import com.aliens.friendship.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class MemberController {
     private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping()
-    public Response<String> join(JoinDto joinDto) throws Exception {
+    public Response<String> join(@Valid JoinDto joinDto) throws Exception {
         memberService.join(joinDto);
         return Response.SUCCESS("회원가입 성공");
     }
@@ -79,8 +80,8 @@ public class MemberController {
     }
 
     @PutMapping("/profile-image")
-    public Response<String> changeProfileImage(@RequestParam MultipartFile profileImage) throws Exception {
-        memberService.changeProfileImage(profileImage);
+    public Response<String> changeProfileImage(@ModelAttribute @Valid ProfileImageRequest request) throws Exception {
+        memberService.changeProfileImage(request.getProfileImage());
         return Response.SUCCESS("프로필 이미지 수정 성공");
     }
 
