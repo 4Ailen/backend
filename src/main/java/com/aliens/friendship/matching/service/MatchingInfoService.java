@@ -75,7 +75,7 @@ public class MatchingInfoService {
                     .name(partner.getName())
                     .mbti(partner.getMbti())
                     .gender(partner.getGender())
-                    .nationality(partner.getNationality().getNatinalityText())
+                    .nationality(partner.getNationality().getNationalityText())
                     .countryImage(partner.getNationality().getCountryImageUrl())
                     .profileImage(partner.getProfileImageUrl())
                     .build();
@@ -100,7 +100,7 @@ public class MatchingInfoService {
                 .gender(member.getGender())
                 .mbti(member.getMbti())
                 .age(member.getAge())
-                .nationality(member.getNationality().getNatinalityText())
+                .nationality(member.getNationality().getNationalityText())
                 .profileImage(member.getProfileImageUrl())
                 .countryImage(member.getNationality().getCountryImageUrl())
                 .build();

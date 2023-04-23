@@ -194,7 +194,7 @@ class MatchingInfoServiceTest {
                     assertEquals(partner.getName(), partnerResponse.getName());
                     assertEquals(partner.getMbti(), partnerResponse.getMbti());
                     assertEquals(partner.getGender(), partnerResponse.getGender());
-                    assertEquals(partner.getNationality().getNatinalityText(), partnerResponse.getNationality());
+                    assertEquals(partner.getNationality().getNationalityText(), partnerResponse.getNationality());
                     assertEquals(partner.getNationality().getCountryImageUrl(), partnerResponse.getCountryImage());
                     assertEquals(partner.getProfileImageUrl(), partnerResponse.getProfileImage());
                 }
@@ -303,7 +303,7 @@ class MatchingInfoServiceTest {
                 assertEquals(member.getName(), applicantResponse.getMember().getName());
                 assertEquals(member.getGender(), applicantResponse.getMember().getGender());
                 assertEquals(member.getMbti(), applicantResponse.getMember().getMbti());
-                assertEquals(member.getNationality().getNatinalityText(), applicantResponse.getMember().getNationality());
+                assertEquals(member.getNationality().getNationalityText(), applicantResponse.getMember().getNationality());
                 assertEquals(member.getAge(), applicantResponse.getMember().getAge());
                 assertEquals(member.getNationality().getCountryImageUrl(), applicantResponse.getMember().getCountryImage());
                 assertEquals(member.getProfileImageUrl(), applicantResponse.getMember().getProfileImage());
