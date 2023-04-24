@@ -20,11 +20,15 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,13 +59,30 @@ class MemberControllerTest {
         doNothing().when(memberService).join(joinDto);
 
         // when & then
-        mockMvc.perform(post("/api/v1/member")
+        mockMvc.perform(multipart("/api/v1/member")
+                        .file((MockMultipartFile) createMockImage())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(joinDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("회원가입 성공"));
         verify(memberService, times(1)).join(any(JoinDto.class));
+    }
+
+    // Mock 회원 프로필 이미지 생성
+    private static MockMultipartFile createMockImage()
+            throws IOException {
+        final String fileName = "test"; //파일명
+        final String contentType = "png"; //파일타입
+        final String filePath = "src/test/resources/testImage/"+fileName+"."+contentType; //파일경로
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        return new MockMultipartFile(
+                "profileImage",
+                fileName + "." + contentType,
+                "image/png",
+                fileInputStream
+        );
     }
 
     @Test

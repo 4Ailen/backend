@@ -56,6 +56,6 @@ class NationalityServiceTest {
         });
 
         //then: 국적 목록 조회 실패
-        assertEquals("국적 목록이 데이터베이스에 없습니다.", exception.getMessage());
+        assertEquals("국적 목록이 존재하지 않습니다.", exception.getMessage());
     }
 }
