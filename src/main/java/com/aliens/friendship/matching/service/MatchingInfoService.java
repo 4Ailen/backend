@@ -69,17 +69,30 @@ public class MatchingInfoService {
     public PartnersResponse getPartnersResponse() {
         Member member = memberRepository.findById(getCurrentMemberId()).get();
         PartnersResponse partnersResponse = new PartnersResponse();
-        for(Member partner: getPartners(member)) {
-            PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
-                    .memberId(partner.getId())
-                    .name(partner.getName())
-                    .mbti(partner.getMbti())
-                    .gender(partner.getGender())
-                    .nationality(partner.getNationality().getNatinalityText())
-                    .countryImage(partner.getNationality().getCountryImageUrl())
-                    .profileImage(partner.getProfileImageUrl())
-                    .build();
-            partnersResponse.getPartners().add(partnerDto);
+        for (Member partner : getPartners(member)) {
+            if (partner.getStatus() == Member.Status.WITHDRAWN) {
+                PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
+                        .memberId(-1)
+                        .name("탈퇴한 사용자")
+                        .mbti("")
+                        .gender("")
+                        .nationality("")
+                        .countryImage("")
+                        .profileImage("")
+                        .build();
+                partnersResponse.getPartners().add(partnerDto);
+            } else {
+                PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
+                        .memberId(partner.getId())
+                        .name(partner.getName())
+                        .mbti(partner.getMbti())
+                        .gender(partner.getGender())
+                        .nationality(partner.getNationality().getNatinalityText())
+                        .countryImage(partner.getNationality().getCountryImageUrl())
+                        .profileImage(partner.getProfileImageUrl())
+                        .build();
+                partnersResponse.getPartners().add(partnerDto);
+            }
         }
         return partnersResponse;
     }
