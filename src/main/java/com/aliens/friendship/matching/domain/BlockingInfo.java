@@ -2,6 +2,8 @@ package com.aliens.friendship.matching.domain;
 
 import com.aliens.friendship.member.domain.Member;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -23,10 +25,12 @@ public class BlockingInfo {
     private Integer id;
 
     @ManyToOne( optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "blocked_member_id", nullable = false)
     private Member blockedMember;
 
     @ManyToOne( optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "blocking_member_id", nullable = false)
     private Member blockingMember;
 
