@@ -98,7 +98,7 @@ class MatchingInfoServiceTest {
         matchingInfoService.applyMatching(applicantRequest);
 
         // then
-        assertEquals(Member.Status.APPLIED, member.getIsApplied());
+        assertEquals(Member.Status.APPLIED, member.getStatus());
         verify(applicantRepository, times(1)).save(any(Applicant.class));
     }
 

@@ -22,7 +22,7 @@ public class MemberFixture {
                 .joinDate(joinDate)
                 .profileImageUrl(profileImageUrl)
                 .notificationStatus(notificationStatus)
-                .isApplied(isApplied)
+                .status(isApplied)
                 .authorities(new HashSet<>())
                 .build();
     }

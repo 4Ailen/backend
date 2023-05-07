@@ -35,8 +35,8 @@ public class Member {
     public static final String COLUMN_JOINDATE_NAME = "join_date";
     public static final String COLUMN_IMAGEURL_NAME = "image_url";
     public static final String COLUMN_NOTIFICATIONSTATUS_NAME = "notification_status";
-    public static final String COLUMN_ISAPPLIED_NAME = "is_applied";
-    public static final String COLUMN_ISWITHDRAWN_NAME = "is_withdrawn";
+    public static final String COLUMN_STATUS_NAME = "status";
+    public static final String COLUMN_WITHDRAWALDATE_NAME = "withdrawal_date";
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -77,25 +77,19 @@ public class Member {
     private Byte notificationStatus = 0;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = COLUMN_ISAPPLIED_NAME, nullable = false, length = 45)
+    @Column(name = COLUMN_STATUS_NAME, nullable = false, length = 45)
     @Builder.Default
-    private Status isApplied = Status.NOT_APPLIED;
+    private Status status = Status.NOT_APPLIED;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = COLUMN_ISWITHDRAWN_NAME, nullable = false, length = 45)
-    @Builder.Default
-    private Status isWithdrawn = Status.NOT_WITHDRAWN;
+    @Column(name = COLUMN_WITHDRAWALDATE_NAME)
+    private String withdrawalDate;
 
     @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
-    public void updateIsApplied(Status status) {
-        this.isApplied = status;
-    }
-
-    public void updateIsWithdrawn(Status status) {
-        this.isWithdrawn = status;
+    public void updateStatus(Status status) {
+        this.status = status;
     }
 
     public void updatePassword(String password) {
@@ -112,6 +106,10 @@ public class Member {
 
     public void updateImageUrl(String imageUrl) {
         this.profileImageUrl = imageUrl;
+    }
+
+    public void updateWithdrawalDate(String withdrawalDate) {
+        this.withdrawalDate = withdrawalDate;
     }
 
     public static Member ofUser(JoinDto joinDto) {
@@ -177,7 +175,7 @@ public class Member {
     }
 
     public enum Status {
-        APPLIED, NOT_APPLIED, WITHDRAWN, NOT_WITHDRAWN;
+        APPLIED, NOT_APPLIED, WITHDRAWN;
     }
 
 

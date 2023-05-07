@@ -42,7 +42,7 @@ public class MatchingInfoService {
                 .secondPreferLanguage(getLanguageById(applicantRequest.getSecondPreferLanguage()))
                 .isMatched(Applicant.Status.NOT_MATCHED)
                 .build();
-        member.updateIsApplied(Member.Status.APPLIED);
+        member.updateStatus(Member.Status.APPLIED);
 
         applicantRepository.save(applicant);
     }
@@ -54,7 +54,7 @@ public class MatchingInfoService {
     public Map<String, String> getMatchingStatus() {
         Member member = memberRepository.findById(getCurrentMemberId()).get();
         String status;
-        if (member.getIsApplied().equals(Member.Status.APPLIED)) {
+        if (member.getStatus().equals(Member.Status.APPLIED)) {
             if (applicantRepository.findById(member.getId()).get().getIsMatched() == Applicant.Status.MATCHED) {
                 status = "MATCHED";
             } else {
@@ -141,10 +141,10 @@ public class MatchingInfoService {
 
     private void validateApplied(Member member) {
         boolean ApplicantPresent = applicantRepository.findById(member.getId()).isPresent();
-        if (member.getIsApplied().equals(Member.Status.NOT_APPLIED) && !ApplicantPresent) {
+        if (member.getStatus().equals(Member.Status.NOT_APPLIED) && !ApplicantPresent) {
             throw new IllegalArgumentException("매칭 신청을 하지 않은 사용자입니다.");
         }
-        if(member.getIsApplied().equals(Member.Status.APPLIED) && !ApplicantPresent) {
+        if (member.getStatus().equals(Member.Status.APPLIED) && !ApplicantPresent) {
             throw new IllegalArgumentException("매칭 신청자의 정보가 없습니다.");
         }
     }
