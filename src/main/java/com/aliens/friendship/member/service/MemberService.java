@@ -11,12 +11,6 @@ import com.aliens.friendship.jwt.domain.dto.TokenDto;
 import com.aliens.friendship.jwt.repository.LogoutAccessTokenRedisRepository;
 import com.aliens.friendship.jwt.repository.RefreshTokenRedisRepository;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
-import com.aliens.friendship.matching.domain.Applicant;
-import com.aliens.friendship.matching.domain.BlockingInfo;
-import com.aliens.friendship.matching.domain.Matching;
-import com.aliens.friendship.matching.repository.ApplicantRepository;
-import com.aliens.friendship.matching.repository.BlockingInfoRepository;
-import com.aliens.friendship.matching.repository.MatchingRepository;
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
@@ -45,15 +39,12 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
-    private final ApplicantRepository applicantRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final ProfileImageService profileImageService;
     private final EmailAuthenticationRepository emailAuthenticationRepository;
     private final JavaMailSender javaMailSender;
     @Value("${spring.domain}")
     private String domainUrl;
-    private final MatchingRepository matchingRepository;
-    private final BlockingInfoRepository blockingInfoRepository;
 
     public void join(JoinDto joinDto) throws Exception {
         checkDuplicatedEmail(joinDto.getEmail());
@@ -74,35 +65,8 @@ public class MemberService {
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
         }
-        if (member.getIsApplied().equals(Member.Status.APPLIED)) { // 매칭 신청을 한 경우
-            Applicant applicant = applicantRepository.findById(member.getId()).orElseThrow(() -> new NoSuchElementException("신청자가 아닙니다."));
-            if (applicant.getIsMatched() == Applicant.Status.MATCHING) { // 매칭 로직이 돌아가고 있는 경우
-                member.updateIsWithdrawn(Member.Status.WITHDRAWN);
-            } else { // 매칭 로직이 돌아가기 전 후
-                if (applicant.getIsMatched() == Applicant.Status.MATCHED) {
-                    Applicant withDrawnApplicant = applicantRepository.findById(1).orElseThrow(() -> new NoSuchElementException("신청자가 아닙니다."));
-                    for (Matching matching : matchingRepository.findByApplicant(applicant)) {
-                        matching.updateApplicant(withDrawnApplicant);
-                        matchingRepository.save(matching);
-                    }
-                }
-                applicantRepository.delete(applicant);
-                deleteBlockingInfo(member);
-                memberRepository.delete(member);
-            }
-        } else { // 매칭 신청을 하지 않은 경우
-            deleteBlockingInfo(member);
-            memberRepository.delete(member);
-        }
     }
 
-    private void deleteBlockingInfo(Member member) {
-        for (BlockingInfo blockingMember : blockingInfoRepository.findAllByBlockingMember(member)) {
-            blockingInfoRepository.delete(blockingMember);
-        }
-        for (BlockingInfo blockedMember : blockingInfoRepository.findAllByBlockedMember(member)) {
-            blockingInfoRepository.delete(blockedMember);
-        }
     }
 
     public TokenDto login(LoginDto loginDto) {
