@@ -138,10 +138,7 @@ class MemberServiceTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String withdrawnDate = currentDate.format(formatter);
 
-        UserDetails userDetails = CustomUserDetails.of(mockMember1);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         //when: 회원탈퇴
         memberService.withdraw("Test1Password");
@@ -159,10 +156,7 @@ class MemberServiceTest {
         Member spyMember = createSpyMember(mockJoinDto);
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(spyMember));
 
-        UserDetails userDetails = CustomUserDetails.of(mockMember);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         //when: 회원탈퇴
         Exception exception = assertThrows(Exception.class, () -> {
@@ -183,10 +177,7 @@ class MemberServiceTest {
         Member spyMember = createSpyMember(mockJoinDto);
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(spyMember));
 
-        UserDetails userDetails = CustomUserDetails.of(spyMember);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         //when: 회원 정보 요청
         MemberInfoDto memberDto = memberService.getMemberInfo();
@@ -264,10 +255,7 @@ class MemberServiceTest {
         when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
         when(passwordEncoder.matches(passwordUpdateRequestDto.getCurrentPassword(), spyMember.getPassword())).thenReturn(true);
 
-        UserDetails userDetails = CustomUserDetails.of(spyMember);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         // when: 비밀번호 변경
         memberService.changePassword(passwordUpdateRequestDto);
@@ -290,10 +278,7 @@ class MemberServiceTest {
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(spyMember));
         when(passwordEncoder.matches(passwordUpdateRequestDto.getCurrentPassword(), spyMember.getPassword())).thenReturn(false);
 
-        UserDetails userDetails = CustomUserDetails.of(spyMember);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         //when: 비밀번호 변경
         Exception exception = assertThrows(Exception.class, () -> {
@@ -317,10 +302,7 @@ class MemberServiceTest {
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(spyMember));
         when(passwordEncoder.matches(passwordUpdateRequestDto.getCurrentPassword(), spyMember.getPassword())).thenReturn(true);
 
-        UserDetails userDetails = CustomUserDetails.of(spyMember);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         //when: 비밀번호 변경
         Exception exception = assertThrows(Exception.class, () -> {
@@ -342,10 +324,7 @@ class MemberServiceTest {
         String newMbti = "ISFJ";
         when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
 
-        UserDetails userDetails = CustomUserDetails.of(spyMember);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         // when
         memberService.changeProfileNameAndMbti(newName, newMbti);
@@ -366,10 +345,7 @@ class MemberServiceTest {
         when(profileImageService.deleteProfileImage(spyMember.getProfileImageUrl())).thenReturn(true);
         when(profileImageService.uploadProfileImage(newProfileImage)).thenReturn("/testUrl");
 
-        UserDetails userDetails = CustomUserDetails.of(spyMember);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationWithSpyMember(spyMember);
 
         // when
         memberService.changeProfileImage(newProfileImage);
@@ -416,5 +392,12 @@ class MemberServiceTest {
         Member member = Member.ofUser(joinDto);
         Member spyMember = spy(member);
         return spyMember;
+    }
+
+    private void setAuthenticationWithSpyMember(Member mockMember) {
+        UserDetails userDetails = CustomUserDetails.of(mockMember);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
