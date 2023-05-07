@@ -20,7 +20,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import javax.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,7 +96,7 @@ public class JwtUtilTest {
 
     @DisplayName("토큰 유효성 검증 (유효 토큰)")
     @Test
-    public void validateTokenHasValidity() {
+    public void validateTokenHasValidity() throws Exception {
         //given
         LoginDto loginMember = new LoginDto(memberJoinRequest.getEmail(),"1q2w3e4r");
         String validatedToken = memberService.login(loginMember).getAccessToken();
@@ -113,7 +112,7 @@ public class JwtUtilTest {
 
     @DisplayName("토큰 유효성 검증 (메일이 다른 토큰)")
     @Test
-    public void validateTokenHasDifferentEmail() {
+    public void validateTokenHasDifferentEmail() throws Exception {
         //given
         LoginDto loginMember = new LoginDto(memberJoinRequest.getEmail(),"1q2w3e4r");
         memberService.login(loginMember);
@@ -131,7 +130,7 @@ public class JwtUtilTest {
 
     @DisplayName("토큰 유효성 검증 (로그아웃한 토큰)")
     @Test
-    public void validateTokenHasLogout() throws InterruptedException {
+    public void validateTokenHasLogout() throws Exception {
         //given
         LoginDto loginMember = new LoginDto(memberJoinRequest.getEmail(),"1q2w3e4r");
         TokenDto validatedToken = memberService.login(loginMember);

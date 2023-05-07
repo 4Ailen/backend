@@ -77,13 +77,14 @@ public class MemberService {
         return currentDate.format(formatter);
     }
 
-    public TokenDto login(LoginDto loginDto) {
     // TODO: 탈퇴 일주일 후 삭제
     public void deleteWithdrawnMember(Member member) {
         memberRepository.delete(member);
     }
 
+    public TokenDto login(LoginDto loginDto) throws Exception {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
+        checkWithdrawn(member.getStatus());
         checkPassword(loginDto.getPassword(), member.getPassword());
         String email = member.getEmail();
         String accessToken = jwtTokenUtil.generateAccessToken(email);
@@ -93,6 +94,12 @@ public class MemberService {
 
     public boolean isJoinedEmail(String email) {
         return memberRepository.findByEmail(email).isPresent();
+    }
+
+    private void checkWithdrawn(Member.Status status) throws Exception {
+        if (status == Member.Status.WITHDRAWN) {
+            throw new Exception("탈퇴한 회원입니다.");
+        }
     }
 
     private void checkPassword(String rawPassword, String findMemberPassword) {

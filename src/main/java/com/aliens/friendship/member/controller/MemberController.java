@@ -30,7 +30,7 @@ public class MemberController {
     }
 
     @PostMapping("/authentication")
-    public Response<TokenDto> login(@RequestBody LoginDto loginDto) {
+    public Response<TokenDto> login(@RequestBody LoginDto loginDto) throws Exception {
         return Response.SUCCESS(memberService.login(loginDto));
     }
 
