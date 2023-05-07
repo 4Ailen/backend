@@ -25,6 +25,8 @@ class MemberRepositoryImplTest {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private NationalityRepository nationalityRepository;
 
     @Test
     @DisplayName("이메일로 멤버와 권한 정보 함께 반환 성공")
@@ -58,13 +60,14 @@ class MemberRepositoryImplTest {
 
     private JoinDto createMockJoinDto(String email, String password) {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
+        Nationality nationality = nationalityRepository.save(new Nationality(1, "South Korea"));
         return JoinDto.builder()
                 .email(email)
                 .password(password)
                 .name("Joy")
                 .mbti("ISFJ")
                 .gender("FEMALE")
-                .nationality(new Nationality(1, "South Korea"))
+                .nationality(nationality)
                 .birthday("1993-12-31")
                 .profileImage(mockMultipartFile)
                 .build();

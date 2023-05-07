@@ -20,11 +20,17 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpMethod.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,13 +61,30 @@ class MemberControllerTest {
         doNothing().when(memberService).join(joinDto);
 
         // when & then
-        mockMvc.perform(post("/api/v1/member")
+        mockMvc.perform(multipart("/api/v1/member")
+                        .file((MockMultipartFile) createMockImage())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(joinDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("회원가입 성공"));
         verify(memberService, times(1)).join(any(JoinDto.class));
+    }
+
+    // Mock 회원 프로필 이미지 생성
+    private static MockMultipartFile createMockImage()
+            throws IOException {
+        final String fileName = "test"; //파일명
+        final String contentType = "png"; //파일타입
+        final String filePath = "src/test/resources/testImage/"+fileName+"."+contentType; //파일경로
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        return new MockMultipartFile(
+                "profileImage",
+                fileName + "." + contentType,
+                "image/png",
+                fileInputStream
+        );
     }
 
     @Test
@@ -196,13 +219,71 @@ class MemberControllerTest {
         doNothing().when(memberService).changeProfileImage(newProfileImage);
 
         // when & then
-        mockMvc.perform(multipart(HttpMethod.PUT, "/api/v1/member/profile-image")
+        mockMvc.perform(multipart(PUT, "/api/v1/member/profile-image")
                         .file(newProfileImage)
                         .contentType("multipart/form-data"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("프로필 이미지 수정 성공"));
         verify(memberService, times(1)).changeProfileImage(any(MultipartFile.class));
+    }
+
+    @DisplayName("프로필 이미지 검증 실페 - 이미지가 없을 경우")
+    @Test
+    void profileImage_validation_null() throws Exception {
+        // When & Then
+        mockMvc.perform(
+                        multipart(PUT, "/api/v1/member/profile-image")
+                                .contentType("multipart/form-data"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.code").value("GB-C-001"))
+                .andExpect(jsonPath("$.message").value("유효하지 않은 요청 파라미터입니다."))
+                .andExpect(jsonPath("$.errors[0].field").value("profileImage"))
+                .andExpect(jsonPath("$.errors[0].value").value(""))
+                .andExpect(jsonPath("$.errors[0].reason").value("회원 프로필 이미지는 필수 값입니다."))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    @DisplayName("프로필 이미지 검증 실패 - 유효하지 않은 크기의 이미지인 경우")
+    @Test
+    void profileImage_validation_invalid_size() throws Exception {
+        final String fileName = "bigsize-image"; //파일명
+        final String contentType = "png"; //파일타입
+        final String filePath = "src/test/resources/testImage/"+fileName+"."+contentType; //파일경로
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        MockMultipartFile newProfileImage = new MockMultipartFile("profileImage", "bigsize-image.jpg", "image/png", fileInputStream);
+
+        // When & Then
+        mockMvc.perform(
+                        multipart(PUT, "/api/v1/member/profile-image")
+                                .file(newProfileImage)
+                                .contentType("multipart/form-data"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.code").value("GB-C-001"))
+                .andExpect(jsonPath("$.message").value("유효하지 않은 요청 파라미터입니다."))
+                .andExpect(jsonPath("$.errors[0].field").value("profileImage"))
+                .andExpect(jsonPath("$.errors[0].value").isNotEmpty())
+                .andExpect(jsonPath("$.errors[0].reason").value("회원 프로필 이미지는 10MB 이하여야 합니다."))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    @DisplayName("프로필 이미지 검증 실패 - 유효하지 않은 이미지 확장자인 경우")
+    @Test
+    void profileImage_validation_invalid_extension() throws Exception {
+        MockMultipartFile newProfileImage = new MockMultipartFile("profileImage", "test-image.gif", "image/gif", "test-data".getBytes());
+
+        // When & Then
+        mockMvc.perform(
+                        multipart(PUT, "/api/v1/member/profile-image")
+                                .file(newProfileImage)
+                                .contentType("multipart/form-data"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.code").value("GB-C-001"))
+                .andExpect(jsonPath("$.message").value("유효하지 않은 요청 파라미터입니다."))
+                .andExpect(jsonPath("$.errors[0].field").value("profileImage"))
+                .andExpect(jsonPath("$.errors[0].value").isNotEmpty())
+                .andExpect(jsonPath("$.errors[0].reason").value("회원 프로필 이미지는 [jpg, jpeg, png] 확장자만 가능합니다."))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     @Test

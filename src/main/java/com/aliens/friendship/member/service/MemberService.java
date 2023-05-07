@@ -15,6 +15,7 @@ import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.member.domain.Member;
+import com.aliens.friendship.member.exception.*;
 import com.aliens.friendship.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.NoSuchElementException;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -63,15 +63,15 @@ public class MemberService {
 
     public void withdraw(String password) throws Exception {
         String email = getCurrentMemberEmail();
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new Exception("비밀번호가 일치하지 않습니다.");
+            throw new InvalidMemberPasswordException();
         }
         memberRepository.delete(member);
     }
 
     public TokenDto login(LoginDto loginDto) {
-        Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new NoSuchElementException("회원이 없습니다."));
+        Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(MemberNotFoundException::new);
         checkPassword(loginDto.getPassword(), member.getPassword());
         String email = member.getEmail();
         String accessToken = jwtTokenUtil.generateAccessToken(email);
@@ -85,7 +85,7 @@ public class MemberService {
 
     private void checkPassword(String rawPassword, String findMemberPassword) {
         if (!passwordEncoder.matches(rawPassword, findMemberPassword)) {
-            throw new IllegalArgumentException("비밀번호가 맞지 않습니다.");
+            throw new InvalidMemberPasswordException();
         }
     }
 
@@ -97,7 +97,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberInfoDto getMemberInfo() throws Exception {
         String email = getCurrentMemberEmail();
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         return MemberInfoDto.builder()
                 .email(member.getEmail())
                 .mbti(member.getMbti())
@@ -153,33 +153,25 @@ public class MemberService {
 
     private void checkDuplicatedEmail(String email) throws Exception {
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new Exception("이미 사용중인 이메일입니다.");
+            throw new DuplicateMemberEmailException();
         }
     }
 
     private void checkEmailAuthentication(String email) throws Exception {
         EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
         if (emailAuthentication.getStatus() == EmailAuthentication.Status.NOT_VERIFIED) {
-            throw new Exception("이메일 인증이 완료되지 않았습니다.");
+            throw new EmailVerificationException();
         }
     }
 
     public void issueTemporaryPassword(String email, String name) throws Exception {
-        Member member = checkMemberInfo(email, name);
+        Member member = memberRepository.findByEmailAndName(email, name)
+                .orElseThrow(MemberNotFoundException::new);
         String temporaryPassword = createTemporaryPassword();
         member.updatePassword(passwordEncoder.encode(temporaryPassword));
         memberRepository.save(member);
         SimpleMailMessage authenticationMail = createAuthenticationMail(member.getEmail(), member.getName(), temporaryPassword);
         javaMailSender.send(authenticationMail);
-    }
-
-    private Member checkMemberInfo(String email, String name) throws Exception {
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-        if (member.getName().equals(name)) {
-            return member;
-        } else {
-            throw new Exception("잘못된 이름입니다.");
-        }
     }
 
     private String createTemporaryPassword() {
@@ -202,7 +194,7 @@ public class MemberService {
     }
 
     public void changePassword(PasswordUpdateRequestDto passwordUpdateRequestDto) throws Exception {
-        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         checkCurrentPassword(passwordUpdateRequestDto.getCurrentPassword(), member);
         checkNewPassword(passwordUpdateRequestDto);
         member.updatePassword(passwordEncoder.encode(passwordUpdateRequestDto.getNewPassword()));
@@ -211,25 +203,25 @@ public class MemberService {
 
     private void checkCurrentPassword(String currentPassword, Member member) throws Exception {
         if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
-            throw new Exception("현재 비밀번호가 일치하지 않습니다.");
+            throw new InvalidMemberPasswordException();
         }
     }
 
     private void checkNewPassword(PasswordUpdateRequestDto passwordUpdateRequestDto) throws Exception {
         if (passwordUpdateRequestDto.getNewPassword().equals(passwordUpdateRequestDto.getCurrentPassword())) {
-            throw new Exception("새 비밀번호가 현재 비밀번호와 일치합니다.");
+            throw new PasswordChangeFailedException();
         }
     }
 
     public void changeProfileNameAndMbti(String name, String mbti) {
-        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         member.updateName(name);
         member.updateMbti(mbti);
         memberRepository.save(member);
     }
 
     public void changeProfileImage(MultipartFile profileImage) throws Exception {
-        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         if (!member.getProfileImageUrl().equals("/default_image.jpg")) {
             profileImageService.deleteProfileImage(member.getProfileImageUrl());
         }
@@ -248,20 +240,20 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Member findByEmail(String email)throws Exception {
-        return memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
+    public Member findByEmail(String email) throws Exception {
+        return memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
-    public MemberInfoDto getMemberInfoByMemberId(Integer memberId) throws Exception{
+    public MemberInfoDto getMemberInfoByMemberId(Integer memberId) throws Exception {
         String email = getCurrentMemberEmail();
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         return MemberInfoDto.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getNatinalityText())
+                .nationality(member.getNationality().getNationalityText())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
