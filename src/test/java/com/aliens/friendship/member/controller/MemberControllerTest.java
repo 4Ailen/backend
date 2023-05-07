@@ -101,6 +101,8 @@ class MemberControllerTest {
     void Withdraw_Success() throws Exception {
         // given
         String password = "test1234";
+        String accessToken = "testAccessToken";
+        String refreshToken = "testRefreshToken";
         Map<String, String> passwordMap = new HashMap<>();
         passwordMap.put("password", password);
         doNothing().when(memberService).withdraw(passwordMap.get("password"));
@@ -108,7 +110,9 @@ class MemberControllerTest {
         // when & then
         mockMvc.perform(post("/api/v1/member/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(passwordMap)))
+                        .content(new ObjectMapper().writeValueAsString(passwordMap))
+                        .header("Authorization", "Bearer " + accessToken)
+                        .header("RefreshToken", refreshToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response").value("회원탈퇴 성공"));
