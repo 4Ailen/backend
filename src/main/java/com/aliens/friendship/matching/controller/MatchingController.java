@@ -2,17 +2,16 @@ package com.aliens.friendship.matching.controller;
 
 import com.aliens.friendship.chatting.service.ChattingService;
 import com.aliens.friendship.global.common.Response;
+import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
 import com.aliens.friendship.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.matching.controller.dto.ReportRequest;
 import com.aliens.friendship.matching.service.BlockingInfoService;
 import com.aliens.friendship.matching.service.MatchingInfoService;
-import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.matching.service.MatchingService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import com.aliens.friendship.matching.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -26,6 +25,7 @@ public class MatchingController {
     private final ChattingService chattingService;
     private final MatchingService matchingService;
 
+    private final ReportService reportService;
 
     @GetMapping("/languages")
     public Response<Map<String, Object>> getLanguages() {
@@ -56,8 +56,15 @@ public class MatchingController {
     public Response<String> blocking(@PathVariable Integer memberId, @RequestBody Long roomId) {
         blockingInfoService.block(memberId);
         chattingService.blockChattingRoom(roomId);
-        return Response.SUCCESS("차단 성공");
+        return Response.SUCCESS("차단 완료");
     }
+
+    @PostMapping("/partner/{memberId}/report")
+    public Response<String> report(@PathVariable Integer memberId, @RequestBody ReportRequest reportRequest) {
+        reportService.report(memberId, reportRequest);
+        return Response.SUCCESS("신고 완료");
+    }
+
     @PostMapping()
     public void match() {
         matchingService.matchParticipants();
