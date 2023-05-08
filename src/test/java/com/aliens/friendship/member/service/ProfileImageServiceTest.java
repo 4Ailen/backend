@@ -29,11 +29,25 @@ class ProfileImageServiceTest {
         // when: 파일 업로드
         String uploadedFilePath = profileImageService.uploadProfileImage(mockMultipartFile);
 
-        // then: 파일이 업로드 되었는지 확인R
+        // then: 파일이 업로드 되었는지 확인
         assertNotNull(uploadedFilePath);
         File uploadedFile = new File(System.getProperty("user.dir") + uploadedFilePath);
         assertTrue(uploadedFile.exists());
         uploadedFile.delete();
+    }
+
+    @Test
+    @DisplayName("프로필 이미지가 없는 경우")
+    public void UploadProfileImage_Success_WithoutProfileImage() throws Exception {
+        // given: 프로필 이미지가 없는 경우
+        MockMultipartFile mockMultipartFile = null;
+        String DEFAULT_PROFILE_IMAGE_PATH = "/files/default_profile_image.png";
+
+        // when: 파일 업로드
+        String uploadedFilePath = profileImageService.uploadProfileImage(mockMultipartFile);
+
+        // then: 기본 파일 경로를 반환하는지 확인
+        assertTrue(uploadedFilePath.equals(DEFAULT_PROFILE_IMAGE_PATH));
     }
 
     // Mock 회원 프로필 이미지 생성

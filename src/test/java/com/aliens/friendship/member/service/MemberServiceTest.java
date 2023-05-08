@@ -81,6 +81,36 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("회원가입 성공: 프로필 이미지가 없는 경우")
+    void CreateMember_Success_When_ProfileImageIsNull() throws Exception {
+        //given: 프로필 이미지가 없는 회원가입 정보
+        JoinDto mockJoinDto = JoinDto.builder()
+                        .email("test@case.com")
+                        .password("TestPassword")
+                        .name("Ryan")
+                        .mbti("ENFJ")
+                        .gender("MALE")
+                        .nationality(new Nationality(1, "South Korea"))
+                        .birthday("1998-12-31")
+                        .profileImage(null)
+                        .build();
+        String DEFAULT_PROFILE_IMAGE_PATH = "/files/default_profile_image.png";
+        EmailAuthentication mockEmailAuthentication = EmailAuthentication.createEmailAuthentication(mockJoinDto.getEmail());
+        mockEmailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
+        when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.empty());
+        when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
+        when(profileImageService.uploadProfileImage(mockJoinDto.getProfileImage())).thenReturn(DEFAULT_PROFILE_IMAGE_PATH);
+
+        //when: 회원가입
+        memberService.join(mockJoinDto);
+
+        //then: 회원가입 성공
+        verify(memberRepository, times(1)).save(any(Member.class));
+        verify(emailAuthenticationRepository, times(1)).findByEmail(anyString());
+        verify(profileImageService, times(1)).uploadProfileImage(null);
+    }
+
+    @Test
     @DisplayName("회원가입 예외: 이미 존재하는 이메일일 경우")
     void CreateMember_ThrowException_When_GivenExistEmail() throws Exception {
         //given: 이미 존재하는 이메일
