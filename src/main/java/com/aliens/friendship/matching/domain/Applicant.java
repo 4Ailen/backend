@@ -26,9 +26,8 @@ public class Applicant {
     private Integer id;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.REMOVE)
     @JoinColumn(name = COLUMN_ID_NAME, nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
     @Enumerated(EnumType.STRING)

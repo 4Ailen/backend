@@ -24,13 +24,11 @@ public class BlockingInfo {
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @ManyToOne( optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne( optional = false, cascade=CascadeType.REMOVE)
     @JoinColumn(name = "blocked_member_id", nullable = false)
     private Member blockedMember;
 
-    @ManyToOne( optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne( optional = false, cascade=CascadeType.REMOVE)
     @JoinColumn(name = "blocking_member_id", nullable = false)
     private Member blockingMember;
 
