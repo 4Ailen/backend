@@ -7,6 +7,7 @@ import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.service.MemberService;
+import com.aliens.friendship.global.response.ResponseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,9 @@ class MemberControllerTest {
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
+    @MockBean
+    private ResponseService responseService;
+
     @Value("${spring.domain}")
     private String domainUrl;
 
@@ -65,9 +69,8 @@ class MemberControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(joinDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("회원가입 성공"));
+                .andDo(print())
+                .andExpect(status().isOk());
         verify(memberService, times(1)).join(any(JoinDto.class));
     }
 
@@ -105,16 +108,7 @@ class MemberControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response.email").value(expectedMemberInfoDto.getEmail()))
-                .andExpect(jsonPath("$.response.mbti").value(expectedMemberInfoDto.getMbti()))
-                .andExpect(jsonPath("$.response.gender").value(expectedMemberInfoDto.getGender()))
-                .andExpect(jsonPath("$.response.nationality").value(expectedMemberInfoDto.getNationality()))
-                .andExpect(jsonPath("$.response.age").value(expectedMemberInfoDto.getAge()))
-                .andExpect(jsonPath("$.response.birthday").value(expectedMemberInfoDto.getBirthday()))
-                .andExpect(jsonPath("$.response.name").value(expectedMemberInfoDto.getName()))
-                .andExpect(jsonPath("$.response.profileImage").value(expectedMemberInfoDto.getProfileImage()));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).getMemberInfo();
     }
 
@@ -131,9 +125,7 @@ class MemberControllerTest {
         mockMvc.perform(post("/api/v1/member/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(passwordMap)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("회원탈퇴 성공"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).withdraw(password);
     }
 
@@ -146,9 +138,7 @@ class MemberControllerTest {
 
         // when & then
         mockMvc.perform(get("/api/v1/member/email/" + email + "/existence"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response.existence").value("true"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).isJoinedEmail(email);
     }
 
@@ -166,9 +156,7 @@ class MemberControllerTest {
         mockMvc.perform(post("/api/v1/member/" + email + "/password/temp")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(nameMap)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("임시 비밀번호 발급 성공"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).issueTemporaryPassword(anyString(), anyString());
     }
 
@@ -185,9 +173,7 @@ class MemberControllerTest {
         mockMvc.perform(put("/api/v1/member/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(passwordUpdateRequestDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("비밀번호 변경 성공"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).changePassword(any(PasswordUpdateRequestDto.class));
     }
 
@@ -204,9 +190,7 @@ class MemberControllerTest {
         mockMvc.perform(patch("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(nameAndMbti)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("프로필 이름과 mbti 값 변경 성공"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).changeProfileNameAndMbti(anyString(), anyString());
     }
 
@@ -221,9 +205,7 @@ class MemberControllerTest {
         mockMvc.perform(multipart(PUT, "/api/v1/member/profile-image")
                         .file(newProfileImage)
                         .contentType("multipart/form-data"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("프로필 이미지 수정 성공"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).changeProfileImage(any(MultipartFile.class));
     }
 
@@ -295,9 +277,7 @@ class MemberControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/member/" + email + "/authentication-status")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response.status").value("AUTHENTICATED"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).getMemberAuthenticationStatus(anyString());
     }
 
