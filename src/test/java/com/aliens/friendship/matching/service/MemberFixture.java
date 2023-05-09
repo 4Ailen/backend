@@ -1,7 +1,7 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Nationality;
 
 import java.time.Instant;
 import java.util.HashSet;

@@ -1,11 +1,12 @@
 package com.aliens.friendship.member.controller;
 
+import com.aliens.friendship.domain.member.controller.MemberController;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
-import com.aliens.friendship.jwt.util.JwtTokenUtil;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.controller.dto.MemberInfoDto;
-import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
-import com.aliens.friendship.member.service.MemberService;
+import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
+import com.aliens.friendship.domain.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
