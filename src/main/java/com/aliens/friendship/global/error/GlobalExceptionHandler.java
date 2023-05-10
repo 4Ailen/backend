@@ -1,33 +1,89 @@
 package com.aliens.friendship.global.error;
 
-import com.aliens.friendship.global.common.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static com.aliens.friendship.global.common.Response.ERROR;
+import static com.aliens.friendship.global.error.GlobalExceptionCode.*;
 
-@ControllerAdvice
+@Slf4j
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
-    private ResponseEntity<Response<?>> newResponse(Throwable throwable, HttpStatus status) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
-        return new ResponseEntity<>(ERROR(throwable, status), headers, status);
+    /**
+     * ResourceNotFoundException 핸들링
+     * Custom Exception
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    protected ResponseEntity<ErrorResponse> handlingResourceNotFoundException(
+            ResourceNotFoundException e
+    ) {
+        log.error("[handling ResourceNotFoundException] {}", e.getExceptionCode().getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(e.getExceptionCode()),
+                HttpStatus.valueOf(e.getExceptionCode().getHttpStatus().value())
+        );
     }
 
-    @ExceptionHandler({
-            IllegalArgumentException.class,
-    })
-    public ResponseEntity<?> handleBadRequestException(Exception e) {
-        log.debug("Bad request exception occurred: {}", e.getMessage(), e);
-        return newResponse(e, HttpStatus.BAD_REQUEST);
+    /**
+     * InvalidResourceOwnerException 핸들링
+     * Custom Exception
+     */
+    @ExceptionHandler(InvalidResourceOwnerException.class)
+    protected ResponseEntity<ErrorResponse> handlingInvalidResourceOwnerException(
+            InvalidResourceOwnerException e
+    ) {
+        log.error("[handling InvalidResourceOwnerException] {}", e.getCode().getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(e.getCode()),
+                HttpStatus.valueOf(e.getCode().getHttpStatus().value())
+        );
     }
 
+    /**
+     * BindException 핸들링
+     * Built-In Exception
+     */
+    @ExceptionHandler(BindException.class)
+    protected ResponseEntity<ErrorResponse> handlingBindException(BindException e) {
+        log.error("[handling BindException] {}", INVALID_REQUEST_PARAMETER.getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(INVALID_REQUEST_PARAMETER, e.getBindingResult()),
+                HttpStatus.valueOf(INVALID_REQUEST_PARAMETER.getHttpStatus().value())
+        );
+    }
+
+    /**
+     * HttpRequestMethodNotSupportedException 핸들링
+     * Built-In Exception
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    protected ResponseEntity<ErrorResponse> handlingHttpRequestMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException e
+    ) {
+        log.error("[handling HttpRequestMethodNotSupportedException] {}", INVALID_REQUEST_METHOD.getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(INVALID_REQUEST_METHOD),
+                HttpStatus.valueOf(INVALID_REQUEST_METHOD.getHttpStatus().value())
+        );
+    }
+
+    /**
+     * Exception 핸들링
+     * Built-In Exception
+     */
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<ErrorResponse> handlingException(
+            Exception e
+    ) {
+        log.error("[handling Exception]", e);
+        return new ResponseEntity<>(
+                ErrorResponse.of(SERVER_ERROR),
+                HttpStatus.valueOf(SERVER_ERROR.getHttpStatus().value())
+        );
+    }
 }

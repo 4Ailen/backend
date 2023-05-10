@@ -1,9 +1,11 @@
 package com.aliens.friendship.member.repository;
 
-import com.aliens.friendship.jwt.domain.Authority;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.domain.jwt.domain.Authority;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ class MemberRepositoryImplTest {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private NationalityRepository nationalityRepository;
 
     @Test
     @DisplayName("이메일로 멤버와 권한 정보 함께 반환 성공")
@@ -58,13 +62,14 @@ class MemberRepositoryImplTest {
 
     private JoinDto createMockJoinDto(String email, String password) {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
+        Nationality nationality = nationalityRepository.save(new Nationality(1, "South Korea"));
         return JoinDto.builder()
                 .email(email)
                 .password(password)
                 .name("Joy")
                 .mbti("ISFJ")
                 .gender("FEMALE")
-                .nationality(new Nationality(1, "South Korea"))
+                .nationality(nationality)
                 .birthday("1993-12-31")
                 .profileImage(mockMultipartFile)
                 .build();

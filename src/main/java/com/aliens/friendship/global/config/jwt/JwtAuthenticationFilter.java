@@ -1,8 +1,8 @@
 package com.aliens.friendship.global.config.jwt;
 
 import com.aliens.friendship.global.config.security.CustomUserDetailService;
-import com.aliens.friendship.jwt.repository.LogoutAccessTokenRedisRepository;
-import com.aliens.friendship.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.domain.jwt.repository.LogoutAccessTokenRedisRepository;
+import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

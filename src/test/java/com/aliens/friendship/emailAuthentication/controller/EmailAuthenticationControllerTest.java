@@ -1,7 +1,8 @@
 package com.aliens.friendship.emailAuthentication.controller;
 
-import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
-import com.aliens.friendship.emailAuthentication.service.EmailAuthenticationService;
+import com.aliens.friendship.domain.emailAuthentication.controller.EmailAuthenticationController;
+import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.domain.emailAuthentication.service.EmailAuthenticationService;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

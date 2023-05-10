@@ -1,8 +1,9 @@
 package com.aliens.friendship.member.controller;
 
+import com.aliens.friendship.domain.member.controller.NationalityController;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.service.NationalityService;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.service.NationalityService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

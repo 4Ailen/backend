@@ -1,7 +1,7 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Nationality;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ public class MemberFixture {
     public static Member createTestMember() {
         Nationality nationality = Nationality.builder()
                 .id(1)
-                .natinalityText("Korean")
+                .nationalityText("Korean")
                 .build();
         return createMember(1, "test@test.com", "password", "ENFP", "F", nationality, "2000-01-01", "Test User",
                 Instant.now(), "/default_image.jpg", (byte) 0, Member.Status.NOT_APPLIED);
@@ -39,7 +39,7 @@ public class MemberFixture {
     public static Member createTestMember(Integer id, String email) {
         Nationality nationality = Nationality.builder()
                 .id(1)
-                .natinalityText("Korean")
+                .nationalityText("Korean")
                 .build();
         return createMember(id, email, "password", "ENFP", "F", nationality, "2000-01-01", "Test User",
                 Instant.now(), "/default_image.jpg", (byte) 0, Member.Status.NOT_APPLIED);
@@ -48,7 +48,7 @@ public class MemberFixture {
     public static Member createTestMember(Member.Status isApplied) {
         Nationality nationality = Nationality.builder()
                 .id(1)
-                .natinalityText("Korean")
+                .nationalityText("Korean")
                 .build();
         return createMember(1, "test@test.com", "password", "ENFP", "F", nationality, "2000-01-01", "Test User",
                 Instant.now(), "/default_image.jpg", (byte) 0, isApplied);
