@@ -19,16 +19,8 @@ public class ProfileImageValidator
             ConstraintValidatorContext context
     ) {
 
-        // 요청된 이미지 값이 Null 인지 체크
-        if (requestImage == null || requestImage.isEmpty()) {
-            context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("회원 프로필 이미지는 필수 값입니다.")
-                    .addConstraintViolation();
-            return false;
-        }
-
         // 이미지 확장자 검증
-        if (!validateImageExtension(ImageUtil.getImageExtension(requestImage.getOriginalFilename()))) {
+        if (requestImage != null && !validateImageExtension(ImageUtil.getImageExtension(requestImage.getOriginalFilename()))) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("회원 프로필 이미지는 " + ALLOWED_IMAGE_EXTENSIONS + " 확장자만 가능합니다.")
                     .addConstraintViolation();
@@ -36,7 +28,7 @@ public class ProfileImageValidator
         }
 
         // 이미지 크기 검증
-        if (!validateImageSize(requestImage.getSize())) {
+        if (requestImage != null && !validateImageSize(requestImage.getSize())) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("회원 프로필 이미지는 10MB 이하여야 합니다.")
                     .addConstraintViolation();
