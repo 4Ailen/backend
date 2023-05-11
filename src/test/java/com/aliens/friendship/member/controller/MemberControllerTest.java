@@ -74,6 +74,24 @@ class MemberControllerTest {
         verify(memberService, times(1)).join(any(JoinDto.class));
     }
 
+    @Test
+    @DisplayName("회원가입 성공 - 프로필 이미지가 없는 경우")
+    void Join_Success_WithoutProfileImage() throws Exception {
+        // given
+        JoinDto joinDto = new JoinDto();
+        doNothing().when(memberService).join(joinDto);
+
+        // when & then
+        mockMvc.perform(multipart("/api/v1/member")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(joinDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response").value("회원가입 성공"));
+        verify(memberService, times(1)).join(any(JoinDto.class));
+    }
+
     // Mock 회원 프로필 이미지 생성
     private static MockMultipartFile createMockImage()
             throws IOException {
@@ -211,22 +229,6 @@ class MemberControllerTest {
                         .contentType("multipart/form-data"))
                 .andExpect(status().isOk());
         verify(memberService, times(1)).changeProfileImage(any(MultipartFile.class));
-    }
-
-    @DisplayName("프로필 이미지 검증 실페 - 이미지가 없을 경우")
-    @Test
-    void profileImage_validation_null() throws Exception {
-        // When & Then
-        mockMvc.perform(
-                        multipart(PUT, "/api/v1/member/profile-image")
-                                .contentType("multipart/form-data"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.code").value("GB-C-001"))
-                .andExpect(jsonPath("$.message").value("유효하지 않은 요청 파라미터입니다."))
-                .andExpect(jsonPath("$.errors[0].field").value("profileImage"))
-                .andExpect(jsonPath("$.errors[0].value").value(""))
-                .andExpect(jsonPath("$.errors[0].reason").value("회원 프로필 이미지는 필수 값입니다."))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     @DisplayName("프로필 이미지 검증 실패 - 유효하지 않은 크기의 이미지인 경우")

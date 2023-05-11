@@ -8,6 +8,8 @@ import com.aliens.friendship.domain.matching.service.BlockingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingInfoService;
 import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.domain.matching.service.MatchingService;
+import com.aliens.friendship.domain.matching.service.ReportService;
+import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,7 @@ public class MatchingController {
     private final ChattingService chattingService;
     private final MatchingService matchingService;
 
+    private final ReportService reportService;
 
     @GetMapping("/languages")
     public Response<Map<String, Object>> getLanguages() {
@@ -53,8 +56,15 @@ public class MatchingController {
     public Response<String> blocking(@PathVariable Integer memberId, @RequestBody Long roomId) {
         blockingInfoService.block(memberId);
         chattingService.blockChattingRoom(roomId);
-        return Response.SUCCESS("차단 성공");
+        return Response.SUCCESS("차단 완료");
     }
+
+    @PostMapping("/partner/{memberId}/report")
+    public Response<String> report(@PathVariable Integer memberId, @RequestBody ReportRequest reportRequest) {
+        reportService.report(memberId, reportRequest);
+        return Response.SUCCESS("신고 완료");
+    }
+
     @PostMapping()
     public void match() {
         matchingService.matchParticipants();
