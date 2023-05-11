@@ -2,6 +2,8 @@ package com.aliens.friendship.matching.domain;
 
 import com.aliens.friendship.member.domain.Member;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -24,7 +26,7 @@ public class Applicant {
     private Integer id;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.REMOVE)
     @JoinColumn(name = COLUMN_ID_NAME, nullable = false)
     private Member member;
 
@@ -46,7 +48,7 @@ public class Applicant {
     }
 
     public enum Status {
-        MATCHED, NOT_MATCHED;
+        MATCHED, MATCHING, NOT_MATCHED;
     }
 
 }

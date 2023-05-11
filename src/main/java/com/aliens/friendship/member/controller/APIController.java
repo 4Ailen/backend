@@ -2,9 +2,7 @@ package com.aliens.friendship.member.controller;
 
 import com.aliens.friendship.member.controller.dto.JoinDto;
 import com.aliens.friendship.jwt.domain.dto.LoginDto;
-import com.aliens.friendship.jwt.domain.dto.MemberInfo;
 import com.aliens.friendship.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.member.service.MemberService;
 import com.aliens.friendship.jwt.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class APIController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginDto) throws Exception {
         return ResponseEntity.ok(memberService.login(loginDto));
     }
 

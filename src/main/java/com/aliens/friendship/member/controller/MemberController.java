@@ -30,7 +30,7 @@ public class MemberController {
     }
 
     @PostMapping("/authentication")
-    public Response<TokenDto> login(@RequestBody LoginDto loginDto) {
+    public Response<TokenDto> login(@RequestBody LoginDto loginDto) throws Exception {
         return Response.SUCCESS(memberService.login(loginDto));
     }
 
@@ -48,8 +48,12 @@ public class MemberController {
     }
 
     @PostMapping("/withdraw")
-    public Response<String> withdraw(@RequestBody Map<String, String> password) throws Exception {
+    public Response<String> withdraw(@RequestBody Map<String, String> password,
+                                     @RequestHeader("Authorization") String accessToken,
+                                     @RequestHeader("RefreshToken") String refreshToken) throws Exception {
         memberService.withdraw(password.get("password"));
+        String email = jwtTokenUtil.getEmail(memberService.resolveToken(accessToken));
+        memberService.logout(TokenDto.of(accessToken, refreshToken), email);
         return Response.SUCCESS("회원탈퇴 성공");
     }
 
