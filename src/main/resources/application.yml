@@ -5,5 +5,5 @@ spring:
   profiles:
     include: mysql
   jwt:
-    
+    secret:
 

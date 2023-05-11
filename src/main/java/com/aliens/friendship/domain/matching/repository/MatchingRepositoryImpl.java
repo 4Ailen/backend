@@ -3,7 +3,7 @@ package com.aliens.friendship.domain.matching.repository;
 import com.aliens.friendship.domain.chatting.domain.ChattingRoom;
 import com.aliens.friendship.domain.matching.domain.Applicant;
 import com.aliens.friendship.domain.matching.domain.Matching;
-import com.aliens.friendship.matching.domain.QMatching;
+import com.aliens.friendship.domain.matching.domain.QMatching;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 

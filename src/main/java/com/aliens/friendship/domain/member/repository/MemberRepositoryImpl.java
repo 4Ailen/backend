@@ -1,7 +1,7 @@
 package com.aliens.friendship.domain.member.repository;
 
 import com.aliens.friendship.domain.member.domain.Member;
-import com.aliens.friendship.member.domain.QMember;
+import com.aliens.friendship.domain.member.domain.QMember;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 

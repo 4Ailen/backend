@@ -14,7 +14,12 @@ public class ProfileImageService {
     //todo: 파일 기본 경로 properties로 설정
     private static final String DEFAULT_FILE_PATH = "/files/";
 
+    private static final String DEFAULT_PROFILE_IMAGE_PATH = "/files/default_profile_image.png";
+
     public String uploadProfileImage(MultipartFile uploadedFile) throws Exception {
+        if (uploadedFile == null || uploadedFile.isEmpty()) {
+            return DEFAULT_PROFILE_IMAGE_PATH;
+        }
         String fileName = getRandomFileName();
         uploadedFile.transferTo(new File(getUploadPath(fileName + "." + getImageExtension(uploadedFile.getOriginalFilename()))));
         return DEFAULT_FILE_PATH + fileName + "." + getImageExtension(uploadedFile.getOriginalFilename());
