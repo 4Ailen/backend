@@ -45,7 +45,7 @@ public class MemberController {
      * 토큰이라는 단건 결과를 응답
      */
     @PostMapping("/authentication")
-    public SingleResult<TokenDto> login(@RequestBody LoginDto loginDto) {
+    public SingleResult<TokenDto> login(@RequestBody LoginDto loginDto) throws Exception {
         return responseService.getSingleResult(
                 OK.value(),
                 "성공적으로 토큰이 발급되었습니다.",
@@ -74,8 +74,12 @@ public class MemberController {
     }
 
     @PostMapping("/withdraw")
-    public CommonResult withdraw(@RequestBody Map<String, String> password) throws Exception {
+    public CommonResult withdraw(@RequestBody Map<String, String> password,
+                                 @RequestHeader("Authorization") String accessToken,
+                                 @RequestHeader("RefreshToken") String refreshToken) throws Exception {
         memberService.withdraw(password.get("password"));
+        String email = jwtTokenUtil.getEmail(memberService.resolveToken(accessToken));
+        memberService.logout(TokenDto.of(accessToken, refreshToken), email);
         return responseService.getSuccessResult(
                 OK.value(),
                 "회원탈퇴 성공"

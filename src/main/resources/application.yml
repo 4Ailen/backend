@@ -6,4 +6,3 @@ spring:
     include: mysql
   jwt:
     secret:
-

@@ -31,7 +31,7 @@ public class APIController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginDto) throws Exception {
         return ResponseEntity.ok(memberService.login(loginDto));
     }
 

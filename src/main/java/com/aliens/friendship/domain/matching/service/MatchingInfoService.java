@@ -42,7 +42,7 @@ public class MatchingInfoService {
                 .secondPreferLanguage(getLanguageById(applicantRequest.getSecondPreferLanguage()))
                 .isMatched(Applicant.Status.NOT_MATCHED)
                 .build();
-        member.updateIsApplied(Member.Status.APPLIED);
+        member.updateStatus(Member.Status.APPLIED);
 
         applicantRepository.save(applicant);
     }
@@ -54,7 +54,7 @@ public class MatchingInfoService {
     public Map<String, String> getMatchingStatus() {
         Member member = memberRepository.findById(getCurrentMemberId()).get();
         String status;
-        if (member.getIsApplied().equals(Member.Status.APPLIED)) {
+        if (member.getStatus().equals(Member.Status.APPLIED)) {
             if (applicantRepository.findById(member.getId()).get().getIsMatched() == Applicant.Status.MATCHED) {
                 status = "MATCHED";
             } else {
@@ -69,17 +69,30 @@ public class MatchingInfoService {
     public PartnersResponse getPartnersResponse() {
         Member member = memberRepository.findById(getCurrentMemberId()).get();
         PartnersResponse partnersResponse = new PartnersResponse();
-        for(Member partner: getPartners(member)) {
-            PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
-                    .memberId(partner.getId())
-                    .name(partner.getName())
-                    .mbti(partner.getMbti())
-                    .gender(partner.getGender())
-                    .nationality(partner.getNationality().getNationalityText())
-                    .countryImage(partner.getNationality().getCountryImageUrl())
-                    .profileImage(partner.getProfileImageUrl())
-                    .build();
-            partnersResponse.getPartners().add(partnerDto);
+        for (Member partner : getPartners(member)) {
+            if (partner.getStatus() == Member.Status.WITHDRAWN) {
+                PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
+                        .memberId(-1)
+                        .name("탈퇴한 사용자")
+                        .mbti("")
+                        .gender("")
+                        .nationality("")
+                        .countryImage("")
+                        .profileImage("")
+                        .build();
+                partnersResponse.getPartners().add(partnerDto);
+            } else {
+                PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
+                        .memberId(partner.getId())
+                        .name(partner.getName())
+                        .mbti(partner.getMbti())
+                        .gender(partner.getGender())
+                        .nationality(partner.getNationality().getNationalityText())
+                        .countryImage(partner.getNationality().getCountryImageUrl())
+                        .profileImage(partner.getProfileImageUrl())
+                        .build();
+                partnersResponse.getPartners().add(partnerDto);
+            }
         }
         return partnersResponse;
     }
@@ -141,10 +154,10 @@ public class MatchingInfoService {
 
     private void validateApplied(Member member) {
         boolean ApplicantPresent = applicantRepository.findById(member.getId()).isPresent();
-        if (member.getIsApplied().equals(Member.Status.NOT_APPLIED) && !ApplicantPresent) {
+        if (member.getStatus().equals(Member.Status.NOT_APPLIED) && !ApplicantPresent) {
             throw new IllegalArgumentException("매칭 신청을 하지 않은 사용자입니다.");
         }
-        if(member.getIsApplied().equals(Member.Status.APPLIED) && !ApplicantPresent) {
+        if (member.getStatus().equals(Member.Status.APPLIED) && !ApplicantPresent) {
             throw new IllegalArgumentException("매칭 신청자의 정보가 없습니다.");
         }
     }

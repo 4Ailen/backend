@@ -32,4 +32,7 @@ public class Matching {
     @JoinColumn(name = COLUMN_CHATTINGROOM_NAME, nullable = false)
     private ChattingRoom chattingRoom;
 
+    public void updateApplicant(Applicant applicant) {
+        this.applicant = applicant;
+    }
 }

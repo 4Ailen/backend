@@ -6,6 +6,7 @@ import com.aliens.friendship.domain.matching.repository.LanguageRepository;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 import java.util.stream.Collectors;
 

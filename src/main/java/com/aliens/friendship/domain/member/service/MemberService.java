@@ -30,8 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.NoSuchElementException;
-import java.util.Random;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -67,11 +68,24 @@ public class MemberService {
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new InvalidMemberPasswordException();
         }
+        member.updateStatus(Member.Status.WITHDRAWN);
+        member.updateWithdrawalDate(getCurrentDate());
+    }
+
+    private String getCurrentDate() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return currentDate.format(formatter);
+    }
+
+    // TODO: 탈퇴 일주일 후 삭제
+    public void deleteWithdrawnMember(Member member) {
         memberRepository.delete(member);
     }
 
-    public TokenDto login(LoginDto loginDto) {
+    public TokenDto login(LoginDto loginDto) throws Exception {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(MemberNotFoundException::new);
+        checkWithdrawn(member.getStatus());
         checkPassword(loginDto.getPassword(), member.getPassword());
         String email = member.getEmail();
         String accessToken = jwtTokenUtil.generateAccessToken(email);
@@ -81,6 +95,12 @@ public class MemberService {
 
     public boolean isJoinedEmail(String email) {
         return memberRepository.findByEmail(email).isPresent();
+    }
+
+    private void checkWithdrawn(Member.Status status) throws Exception {
+        if (status == Member.Status.WITHDRAWN) {
+            throw new MemberNotFoundException();
+        }
     }
 
     private void checkPassword(String rawPassword, String findMemberPassword) {

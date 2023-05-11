@@ -70,7 +70,7 @@ class MatchingRepositoryImplTest {
                     .joinDate(Instant.now())
                     .profileImageUrl("/testUrl")
                     .build();
-            member.updateIsApplied(Member.Status.APPLIED);
+            member.updateStatus(Member.Status.APPLIED);
             memberRepository.save(member);
             members.add(member);
         }
