@@ -1,16 +1,13 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
-import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
-import com.aliens.friendship.matching.domain.BlockingInfo;
-import com.aliens.friendship.matching.repository.BlockingInfoRepository;
-import com.aliens.friendship.matching.service.BlockingInfoService;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.repository.MemberRepository;
-import com.aliens.friendship.member.repository.NationalityRepository;
-import com.aliens.friendship.member.service.MemberService;
+import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.matching.domain.BlockingInfo;
+import com.aliens.friendship.domain.matching.repository.BlockingInfoRepository;
+import com.aliens.friendship.domain.matching.service.BlockingInfoService;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.repository.NationalityRepository;
+import com.aliens.friendship.domain.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,11 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.repository.LanguageRepository;
-import com.aliens.friendship.matching.repository.ApplicantRepository;
-import com.aliens.friendship.matching.service.model.Matching;
-import com.aliens.friendship.matching.service.model.Participant;
+import com.aliens.friendship.domain.matching.repository.LanguageRepository;
+import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
+import com.aliens.friendship.domain.matching.service.MatchingResultSaveService;
+import com.aliens.friendship.domain.matching.service.MatchingService;
+import com.aliens.friendship.domain.matching.service.model.Matching;
+import com.aliens.friendship.domain.matching.service.model.Participant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

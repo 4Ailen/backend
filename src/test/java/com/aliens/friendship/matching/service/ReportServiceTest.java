@@ -1,12 +1,13 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.controller.dto.ReportRequest;
-import com.aliens.friendship.matching.domain.Report;
-import com.aliens.friendship.matching.domain.ReportCategory;
-import com.aliens.friendship.matching.repository.ReportRepository;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.exception.MemberNotFoundException;
-import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.domain.matching.service.ReportService;
+import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
+import com.aliens.friendship.domain.matching.domain.Report;
+import com.aliens.friendship.domain.matching.domain.ReportCategory;
+import com.aliens.friendship.domain.matching.repository.ReportRepository;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

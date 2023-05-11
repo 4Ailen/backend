@@ -1,15 +1,16 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
-import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
-import com.aliens.friendship.matching.controller.dto.PartnersResponse;
-import com.aliens.friendship.matching.domain.Applicant;
-import com.aliens.friendship.matching.domain.Language;
-import com.aliens.friendship.matching.repository.ApplicantRepository;
-import com.aliens.friendship.matching.repository.LanguageRepository;
-import com.aliens.friendship.matching.repository.MatchingRepository;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
+import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
+import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.domain.matching.domain.Applicant;
+import com.aliens.friendship.domain.matching.domain.Language;
+import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
+import com.aliens.friendship.domain.matching.repository.LanguageRepository;
+import com.aliens.friendship.domain.matching.repository.MatchingRepository;
+import com.aliens.friendship.domain.matching.service.MatchingInfoService;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

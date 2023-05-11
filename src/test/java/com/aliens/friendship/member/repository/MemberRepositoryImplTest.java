@@ -1,9 +1,11 @@
 package com.aliens.friendship.member.repository;
 
-import com.aliens.friendship.jwt.domain.Authority;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
+import com.aliens.friendship.domain.jwt.domain.Authority;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

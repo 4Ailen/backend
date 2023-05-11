@@ -1,6 +1,6 @@
 package com.aliens.friendship.global.config.security;
 
-import com.aliens.friendship.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

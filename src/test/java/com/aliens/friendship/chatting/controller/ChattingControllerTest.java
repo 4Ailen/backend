@@ -1,6 +1,6 @@
 package com.aliens.friendship.chatting.controller;
 
-import com.aliens.friendship.chatting.domain.ChatMessage;
+import com.aliens.friendship.domain.chatting.domain.ChatMessage;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Type;
@@ -22,8 +22,6 @@ import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;

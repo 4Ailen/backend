@@ -9,5 +9,4 @@ class FriendshipApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

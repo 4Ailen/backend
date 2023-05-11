@@ -1,16 +1,18 @@
 package com.aliens.friendship.member.service;
 
-import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
-import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.member.service.MemberService;
+import com.aliens.friendship.domain.member.service.ProfileImageService;
 import com.aliens.friendship.global.config.security.CustomUserDetails;
-import com.aliens.friendship.member.controller.dto.MemberInfoDto;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.exception.EmailVerificationException;
-import com.aliens.friendship.member.exception.PasswordChangeFailedException;
-import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.exception.EmailVerificationException;
+import com.aliens.friendship.domain.member.exception.PasswordChangeFailedException;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,8 +34,8 @@ import javax.transaction.Transactional;
 
 import java.util.Optional;
 
-import static com.aliens.friendship.member.exception.MemberExceptionCode.EMAIL_VERIFICATION_NOT_COMPLETED;
-import static com.aliens.friendship.member.exception.MemberExceptionCode.PASSWORD_CHANGE_FAILED_EXCEPTION;
+import static com.aliens.friendship.domain.member.exception.MemberExceptionCode.EMAIL_VERIFICATION_NOT_COMPLETED;
+import static com.aliens.friendship.domain.member.exception.MemberExceptionCode.PASSWORD_CHANGE_FAILED_EXCEPTION;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -78,6 +80,36 @@ class MemberServiceTest {
         verify(memberRepository, times(1)).save(any(Member.class));
         verify(emailAuthenticationRepository, times(1)).findByEmail(anyString());
         verify(profileImageService, times(1)).uploadProfileImage(any(MultipartFile.class));
+    }
+
+    @Test
+    @DisplayName("회원가입 성공: 프로필 이미지가 없는 경우")
+    void CreateMember_Success_When_ProfileImageIsNull() throws Exception {
+        //given: 프로필 이미지가 없는 회원가입 정보
+        JoinDto mockJoinDto = JoinDto.builder()
+                        .email("test@case.com")
+                        .password("TestPassword")
+                        .name("Ryan")
+                        .mbti("ENFJ")
+                        .gender("MALE")
+                        .nationality(new Nationality(1, "South Korea"))
+                        .birthday("1998-12-31")
+                        .profileImage(null)
+                        .build();
+        String DEFAULT_PROFILE_IMAGE_PATH = "/files/default_profile_image.png";
+        EmailAuthentication mockEmailAuthentication = EmailAuthentication.createEmailAuthentication(mockJoinDto.getEmail());
+        mockEmailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
+        when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.empty());
+        when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
+        when(profileImageService.uploadProfileImage(mockJoinDto.getProfileImage())).thenReturn(DEFAULT_PROFILE_IMAGE_PATH);
+
+        //when: 회원가입
+        memberService.join(mockJoinDto);
+
+        //then: 회원가입 성공
+        verify(memberRepository, times(1)).save(any(Member.class));
+        verify(emailAuthenticationRepository, times(1)).findByEmail(anyString());
+        verify(profileImageService, times(1)).uploadProfileImage(null);
     }
 
     @Test

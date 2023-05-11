@@ -1,8 +1,8 @@
 package com.aliens.friendship.global.config.security;
 
 import com.aliens.friendship.global.config.cache.CacheKey;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,6 @@
 package com.aliens.friendship.matching.controller;
 
-import com.aliens.friendship.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
 
 import java.util.ArrayList;
 import java.util.List;
