@@ -1,14 +1,15 @@
 package com.aliens.friendship.chatting.repository;
 
-import com.aliens.friendship.matching.domain.Applicant;
-import com.aliens.friendship.matching.domain.Matching;
-import com.aliens.friendship.chatting.domain.ChattingRoom;
-import com.aliens.friendship.matching.domain.Language;
-import com.aliens.friendship.matching.repository.MatchingRepository;
-import com.aliens.friendship.matching.repository.ApplicantRepository;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.domain.chatting.repository.ChattingRoomRepository;
+import com.aliens.friendship.domain.matching.domain.Applicant;
+import com.aliens.friendship.domain.matching.domain.Matching;
+import com.aliens.friendship.domain.chatting.domain.ChattingRoom;
+import com.aliens.friendship.domain.matching.domain.Language;
+import com.aliens.friendship.domain.matching.repository.MatchingRepository;
+import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

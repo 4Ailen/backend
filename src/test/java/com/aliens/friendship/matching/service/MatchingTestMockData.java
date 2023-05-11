@@ -1,6 +1,6 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.service.model.Participant;
+import com.aliens.friendship.domain.matching.service.model.Participant;
 import lombok.Getter;
 
 import java.util.ArrayList;

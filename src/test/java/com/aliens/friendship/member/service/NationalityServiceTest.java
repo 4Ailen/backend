@@ -1,7 +1,8 @@
 package com.aliens.friendship.member.service;
 
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.repository.NationalityRepository;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.repository.NationalityRepository;
+import com.aliens.friendship.domain.member.service.NationalityService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +57,6 @@ class NationalityServiceTest {
         });
 
         //then: 국적 목록 조회 실패
-        assertEquals("국적 목록이 데이터베이스에 없습니다.", exception.getMessage());
+        assertEquals("국적 목록이 존재하지 않습니다.", exception.getMessage());
     }
 }

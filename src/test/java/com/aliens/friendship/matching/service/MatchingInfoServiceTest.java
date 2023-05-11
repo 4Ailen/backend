@@ -1,15 +1,16 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
-import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
-import com.aliens.friendship.matching.controller.dto.PartnersResponse;
-import com.aliens.friendship.matching.domain.Applicant;
-import com.aliens.friendship.matching.domain.Language;
-import com.aliens.friendship.matching.repository.ApplicantRepository;
-import com.aliens.friendship.matching.repository.LanguageRepository;
-import com.aliens.friendship.matching.repository.MatchingRepository;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
+import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
+import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.domain.matching.domain.Applicant;
+import com.aliens.friendship.domain.matching.domain.Language;
+import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
+import com.aliens.friendship.domain.matching.repository.LanguageRepository;
+import com.aliens.friendship.domain.matching.repository.MatchingRepository;
+import com.aliens.friendship.domain.matching.service.MatchingInfoService;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -194,7 +195,7 @@ class MatchingInfoServiceTest {
                     assertEquals(partner.getName(), partnerResponse.getName());
                     assertEquals(partner.getMbti(), partnerResponse.getMbti());
                     assertEquals(partner.getGender(), partnerResponse.getGender());
-                    assertEquals(partner.getNationality().getNatinalityText(), partnerResponse.getNationality());
+                    assertEquals(partner.getNationality().getNationalityText(), partnerResponse.getNationality());
                     assertEquals(partner.getNationality().getCountryImageUrl(), partnerResponse.getCountryImage());
                     assertEquals(partner.getProfileImageUrl(), partnerResponse.getProfileImage());
                 }
@@ -303,7 +304,7 @@ class MatchingInfoServiceTest {
                 assertEquals(member.getName(), applicantResponse.getMember().getName());
                 assertEquals(member.getGender(), applicantResponse.getMember().getGender());
                 assertEquals(member.getMbti(), applicantResponse.getMember().getMbti());
-                assertEquals(member.getNationality().getNatinalityText(), applicantResponse.getMember().getNationality());
+                assertEquals(member.getNationality().getNationalityText(), applicantResponse.getMember().getNationality());
                 assertEquals(member.getAge(), applicantResponse.getMember().getAge());
                 assertEquals(member.getNationality().getCountryImageUrl(), applicantResponse.getMember().getCountryImage());
                 assertEquals(member.getProfileImageUrl(), applicantResponse.getMember().getProfileImage());

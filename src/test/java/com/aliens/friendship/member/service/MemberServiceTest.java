@@ -1,17 +1,19 @@
 package com.aliens.friendship.member.service;
 
-import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
-import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.member.exception.InvalidMemberPasswordException;
+import com.aliens.friendship.domain.member.service.MemberService;
+import com.aliens.friendship.domain.member.service.ProfileImageService;
 import com.aliens.friendship.global.config.security.CustomUserDetails;
-import com.aliens.friendship.matching.repository.ApplicantRepository;
-import com.aliens.friendship.matching.repository.BlockingInfoRepository;
-import com.aliens.friendship.matching.repository.MatchingRepository;
-import com.aliens.friendship.member.controller.dto.MemberInfoDto;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.controller.dto.PasswordUpdateRequestDto;
-import com.aliens.friendship.member.domain.Member;
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
+import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.exception.EmailVerificationException;
+import com.aliens.friendship.domain.member.exception.PasswordChangeFailedException;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import static com.aliens.friendship.domain.member.exception.MemberExceptionCode.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -48,15 +51,6 @@ class MemberServiceTest {
 
     @Mock
     EmailAuthenticationRepository emailAuthenticationRepository;
-
-    @Mock
-    BlockingInfoRepository blockingInfoRepository;
-
-    @Mock
-    ApplicantRepository applicantRepository;
-
-    @Mock
-    MatchingRepository matchingRepository;
 
     @Spy
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -118,13 +112,13 @@ class MemberServiceTest {
         when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
 
         //when: 회원가입
-        Exception exception = assertThrows(Exception.class, () -> {
+        EmailVerificationException exception = assertThrows(EmailVerificationException.class, () -> {
             memberService.join(mockJoinDto);
         });
 
         //then: 예외 발생
         verify(memberRepository, times(0)).save(any(Member.class));
-        assertEquals("이메일 인증이 완료되지 않았습니다.", exception.getMessage());
+        assertEquals(EMAIL_VERIFICATION_NOT_COMPLETED.getMessage(), exception.getExceptionCode().getMessage());
     }
 
     @Test
@@ -159,12 +153,13 @@ class MemberServiceTest {
         setAuthenticationWithSpyMember(spyMember);
 
         //when: 회원탈퇴
-        Exception exception = assertThrows(Exception.class, () -> {
+        InvalidMemberPasswordException exception = assertThrows(InvalidMemberPasswordException.class, () -> {
             memberService.withdraw("NotMatchPassword");
         });
 
+
         //then: 예외 발생
-        assertEquals("비밀번호가 일치하지 않습니다.", exception.getMessage());
+        assertEquals(INVALID_MEMBER_PASSWORD.getMessage(), exception.getExceptionCode().getMessage());
         assertEquals(spyMember.getStatus(), Member.Status.NOT_APPLIED);
         assertEquals(spyMember.getWithdrawalDate(), null);
     }
@@ -195,14 +190,14 @@ class MemberServiceTest {
         // given: 가입 및 로그인 된 회원
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         Member spyMember = createSpyMember(mockJoinDto);
-        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
+        when(memberRepository.findByEmailAndName(spyMember.getEmail(), spyMember.getName())).thenReturn(Optional.of(spyMember));
         doNothing().when(javaMailSender).send(any(SimpleMailMessage.class));
 
         // when: 임시 비밀번호 발급
         memberService.issueTemporaryPassword(spyMember.getEmail(), spyMember.getName());
 
         // then: 임시 비밀번호 발급 요청 성공
-        verify(memberRepository, times(1)).findByEmail(anyString());
+        verify(memberRepository, times(1)).findByEmailAndName(anyString(), anyString());
         verify(memberRepository, times(1)).save(any(Member.class));
         verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
     }
@@ -212,7 +207,6 @@ class MemberServiceTest {
     void IssueTemporaryPassword_ThrowException_When_GivenNotJoinedEmail() throws Exception {
         // given: 회원가입 되지 않은 이메일
         String email = "test@case.com", name = "test";
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         // when: 임시 비밀번호 발급
         Exception exception = assertThrows(Exception.class, () -> {
@@ -231,7 +225,6 @@ class MemberServiceTest {
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         Member spyMember = createSpyMember(mockJoinDto);
         String email = spyMember.getEmail(), invalidName = spyMember.getName() + "invalid";
-        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
 
         // when: 임시 비밀번호 발급
         Exception exception = assertThrows(Exception.class, () -> {
@@ -240,7 +233,7 @@ class MemberServiceTest {
 
         // then: 예외 발생
         verify(javaMailSender, times(0)).send(any(SimpleMailMessage.class));
-        assertEquals("잘못된 이름입니다.", exception.getMessage());
+        assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
     }
 
     @Test
@@ -287,7 +280,7 @@ class MemberServiceTest {
 
         //then: 예외 발생
         verify(memberRepository, times(0)).save(any(Member.class));
-        assertEquals("현재 비밀번호가 일치하지 않습니다.", exception.getMessage());
+        assertEquals("비밀번호가 일치하지 않습니다.", exception.getMessage());
     }
 
     @Test
@@ -305,13 +298,13 @@ class MemberServiceTest {
         setAuthenticationWithSpyMember(spyMember);
 
         //when: 비밀번호 변경
-        Exception exception = assertThrows(Exception.class, () -> {
+        PasswordChangeFailedException exception = assertThrows(PasswordChangeFailedException.class, () -> {
             memberService.changePassword(passwordUpdateRequestDto);
         });
 
         //then: 예외 발생
         verify(memberRepository, times(0)).save(any(Member.class));
-        assertEquals("새 비밀번호가 현재 비밀번호와 일치합니다.", exception.getMessage());
+        assertEquals(PASSWORD_CHANGE_FAILED_EXCEPTION.getMessage(), exception.getExceptionCode().getMessage());
     }
 
     @Test

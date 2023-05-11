@@ -1,9 +1,10 @@
 package com.aliens.friendship.chatting.service;
 
-import com.aliens.friendship.chatting.domain.ChatMessage;
-import com.aliens.friendship.chatting.domain.ChattingRoom;
-import com.aliens.friendship.chatting.repository.ChatMessageRepository;
-import com.aliens.friendship.chatting.repository.ChattingRoomRepository;
+import com.aliens.friendship.domain.chatting.domain.ChatMessage;
+import com.aliens.friendship.domain.chatting.domain.ChattingRoom;
+import com.aliens.friendship.domain.chatting.repository.ChatMessageRepository;
+import com.aliens.friendship.domain.chatting.repository.ChattingRoomRepository;
+import com.aliens.friendship.domain.chatting.service.ChattingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
