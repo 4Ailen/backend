@@ -1,13 +1,13 @@
 package com.aliens.friendship.jwt;
 
-import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
-import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
-import com.aliens.friendship.jwt.domain.dto.LoginDto;
-import com.aliens.friendship.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.repository.NationalityRepository;
-import com.aliens.friendship.member.service.MemberService;
+import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.jwt.domain.dto.LoginDto;
+import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.repository.NationalityRepository;
+import com.aliens.friendship.domain.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +52,7 @@ public class JwtAPITest {
     @BeforeEach
     public void setupMember() throws Exception {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        Nationality nationality = Nationality.builder().id(1).natinalityText("Korean").build();
+        Nationality nationality = Nationality.builder().id(1).nationalityText("Korean").build();
         JoinDto memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
                 .email("test@case.com")

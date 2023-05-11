@@ -1,16 +1,16 @@
 package com.aliens.friendship.jwt;
 
-import com.aliens.friendship.emailAuthentication.domain.EmailAuthentication;
-import com.aliens.friendship.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.global.config.security.CustomUserDetailService;
-import com.aliens.friendship.jwt.domain.dto.LoginDto;
-import com.aliens.friendship.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.jwt.util.JwtTokenUtil;
-import com.aliens.friendship.member.controller.dto.JoinDto;
-import com.aliens.friendship.member.domain.Nationality;
-import com.aliens.friendship.member.repository.MemberRepository;
-import com.aliens.friendship.member.repository.NationalityRepository;
-import com.aliens.friendship.member.service.MemberService;
+import com.aliens.friendship.domain.jwt.domain.dto.LoginDto;
+import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
+import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.domain.Nationality;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.repository.NationalityRepository;
+import com.aliens.friendship.domain.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ public class JwtUtilTest {
     @BeforeEach
     public void setupMember() throws Exception {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        Nationality nationality = Nationality.builder().id(1).natinalityText("korean").build();
+        Nationality nationality = Nationality.builder().id(1).nationalityText("korean").build();
         memberJoinRequest = JoinDto.builder()
                 .password("1q2w3e4r")
                 .email("test@case.com")

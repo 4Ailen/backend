@@ -1,8 +1,8 @@
 package com.aliens.friendship.matching.service;
 
-import com.aliens.friendship.matching.domain.Applicant;
-import com.aliens.friendship.matching.domain.Language;
-import com.aliens.friendship.member.domain.Member;
+import com.aliens.friendship.domain.matching.domain.Applicant;
+import com.aliens.friendship.domain.matching.domain.Language;
+import com.aliens.friendship.domain.member.domain.Member;
 
 public class ApplicantFixture {
     private static Applicant createApplicant(Member member, Language firstLanguage, Language secondLanguage) {

@@ -1,17 +1,20 @@
 package com.aliens.friendship.matching.controller;
 
-import com.aliens.friendship.chatting.service.ChattingService;
+import com.aliens.friendship.domain.chatting.service.ChattingService;
+import com.aliens.friendship.domain.matching.controller.MatchingController;
+import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
+import com.aliens.friendship.domain.matching.service.ReportService;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
-import com.aliens.friendship.matching.controller.dto.ApplicantRequest;
-import com.aliens.friendship.matching.controller.dto.ApplicantResponse;
-import com.aliens.friendship.matching.controller.dto.PartnersResponse;
-import com.aliens.friendship.matching.domain.Language;
-import com.aliens.friendship.matching.service.BlockingInfoService;
-import com.aliens.friendship.matching.service.MatchingInfoService;
-import com.aliens.friendship.matching.service.MatchingService;
-import com.aliens.friendship.member.repository.MemberRepository;
-import com.aliens.friendship.member.repository.NationalityRepository;
-import com.aliens.friendship.member.service.MemberService;
+import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
+import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
+import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.domain.matching.domain.Language;
+import com.aliens.friendship.domain.matching.service.BlockingInfoService;
+import com.aliens.friendship.domain.matching.service.MatchingInfoService;
+import com.aliens.friendship.domain.matching.service.MatchingService;
+import com.aliens.friendship.domain.member.repository.MemberRepository;
+import com.aliens.friendship.domain.member.repository.NationalityRepository;
+import com.aliens.friendship.domain.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,6 +70,9 @@ class MatchingControllerTest {
 
     @MockBean
     private NationalityRepository nationalityRepository;
+
+    @MockBean
+    private ReportService reportService;
 
     @Test
     @DisplayName("언어 목록 조회 성공")
@@ -216,6 +222,28 @@ class MatchingControllerTest {
         resultActions.andExpect(status().isOk());
         verify(chattingService, times(1)).blockChattingRoom(roomId);
         verify(blockingInfoService, times(1)).block(memberId);
+    }
+
+    @Test
+    @DisplayName("신고 성공")
+    void Report_Success() throws Exception {
+        //given
+        String ReportCategory = "VIOLENCE";
+        String ReportContent = "테스트 신고 내용입니다.";
+        Integer memberId = 1;
+
+        Map<String, String> reportRequest = new HashMap<>();
+        reportRequest.put("reportCategory", ReportCategory);
+        reportRequest.put("reportContent", ReportContent);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(post("/api/v1/matching/partner/{memberId}/report",memberId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(reportRequest)));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        verify(reportService, times(1)).report(any(Integer.class), any(ReportRequest.class));
     }
 }
 

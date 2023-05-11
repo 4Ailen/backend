@@ -5,5 +5,4 @@ spring:
   profiles:
     include: mysql
   jwt:
-    secret: 4aliens'stempsecretkeysecretsecretsecretsecret
-
+    secret:
