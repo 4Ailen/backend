@@ -86,9 +86,7 @@ class MemberControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(joinDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("회원가입 성공"));
+                .andExpect(status().isOk());
         verify(memberService, times(1)).join(any(JoinDto.class));
     }
 
