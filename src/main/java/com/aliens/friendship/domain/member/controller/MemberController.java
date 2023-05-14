@@ -54,8 +54,10 @@ public class MemberController {
     }
 
     @DeleteMapping("/authentication")
-    public CommonResult logout(@RequestHeader("Authorization") String accessToken,
-                               @RequestHeader("RefreshToken") String refreshToken) {
+    public CommonResult logout(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestHeader("RefreshToken") String refreshToken
+    ) {
         String email = jwtTokenUtil.getEmail(memberService.resolveToken(accessToken));
         memberService.logout(TokenDto.of(accessToken, refreshToken), email);
         return responseService.getSuccessResult(
@@ -74,9 +76,11 @@ public class MemberController {
     }
 
     @PostMapping("/withdraw")
-    public CommonResult withdraw(@RequestBody Map<String, String> password,
-                                 @RequestHeader("Authorization") String accessToken,
-                                 @RequestHeader("RefreshToken") String refreshToken) throws Exception {
+    public CommonResult withdraw(
+            @RequestBody Map<String, String> password,
+            @RequestHeader("Authorization") String accessToken,
+            @RequestHeader("RefreshToken") String refreshToken
+    ) throws Exception {
         memberService.withdraw(password.get("password"));
         String email = jwtTokenUtil.getEmail(memberService.resolveToken(accessToken));
         memberService.logout(TokenDto.of(accessToken, refreshToken), email);
@@ -98,7 +102,10 @@ public class MemberController {
     }
 
     @PostMapping("/{email}/password/temp")
-    public CommonResult issueTemporaryPassword(@PathVariable String email, @RequestBody Map<String, String> nameMap) throws Exception {
+    public CommonResult issueTemporaryPassword(
+            @PathVariable String email,
+            @RequestBody Map<String, String> nameMap
+    ) throws Exception {
         memberService.issueTemporaryPassword(email, nameMap.get("name"));
         return responseService.getSuccessResult(
                 OK.value(),
