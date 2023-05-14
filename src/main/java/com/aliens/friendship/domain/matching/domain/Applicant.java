@@ -26,7 +26,7 @@ public class Applicant {
     private Integer id;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.REMOVE)
+    @OneToOne(optional = false, cascade = CascadeType.REMOVE)
     @JoinColumn(name = COLUMN_ID_NAME, nullable = false)
     private Member member;
 

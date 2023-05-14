@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Builder
@@ -24,7 +25,7 @@ public class Matching {
     @Column(name = COLUMN_ID_NAME, nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.REMOVE)
     @JoinColumn(name = COLUMN_APPLICANT_NAME, nullable = false)
     private Applicant applicant;
 
