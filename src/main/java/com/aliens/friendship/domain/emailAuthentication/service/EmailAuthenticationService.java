@@ -1,7 +1,10 @@
 package com.aliens.friendship.domain.emailAuthentication.service;
 
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
+import com.aliens.friendship.domain.emailAuthentication.exception.EmailAlreadyRegisteredException;
+import com.aliens.friendship.domain.emailAuthentication.exception.EmailVerificationTimeOutException;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.jwt.exception.TokenException;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+
+import static com.aliens.friendship.domain.jwt.exception.JWTExceptionCode.INVALID_TOKEN;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +53,7 @@ public class EmailAuthenticationService {
 
     private void checkJoinedEmail(String email) throws Exception {
         if (memberRepository.existsByEmail(email)) {
-            throw new Exception("이미 회원가입된 이메일입니다.");
+            throw new EmailAlreadyRegisteredException();
         }
     }
 
@@ -62,13 +67,13 @@ public class EmailAuthenticationService {
 
     private void checkValidToken(String savedToken, String givenToken) throws Exception {
         if (!savedToken.equals(givenToken)) {
-            throw new Exception("유효하지 않은 토큰입니다.");
+            throw new TokenException(INVALID_TOKEN);
         }
     }
 
     private void checkExpirationTime(EmailAuthentication emailAuthentication) throws Exception {
         if (Instant.now().isAfter(emailAuthentication.getExpirationTime())) {
-            throw new Exception("이메일 인증 시간이 초과되었습니다.");
+            throw new EmailVerificationTimeOutException();
         }
     }
 }
