@@ -3,6 +3,7 @@ package com.aliens.friendship.member.service;
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.domain.member.exception.InvalidMemberPasswordException;
+import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.domain.member.service.ProfileImageService;
 import com.aliens.friendship.global.config.security.CustomUserDetails;
@@ -382,7 +383,7 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("인증 상태 반환 성공")
-    void GetMeberAuthenticationStatus_Success() throws Exception {
+    void GetMemberAuthenticationStatus_Success() throws Exception {
         // given
         String email = "test@case.com";
         EmailAuthentication emailAuthentication = EmailAuthentication.createEmailAuthentication(email);
@@ -394,6 +395,40 @@ class MemberServiceTest {
         // then
         verify(emailAuthenticationRepository, times(1)).findByEmail(anyString());
         assertEquals(status, "NOT_AUTHENTICATED");
+    }
+
+    @Test
+    @DisplayName("멤버 관련 정보 삭제 성공")
+    void deleteMemberInfoByAdmin_Success() throws Exception {
+        // given
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        Integer spyMemberId = 17;
+        when(memberRepository.findById(spyMemberId)).thenReturn(Optional.ofNullable(spyMember));
+        doNothing().when(memberRepository).deleteById(spyMemberId);
+
+        // when:
+        memberService.deleteMemberInfoByAdmin(spyMemberId);
+
+        // then
+        verify(memberRepository, times(1)).findById(anyInt());
+        verify(memberRepository, times(1)).deleteById(anyInt());
+    }
+
+    @Test
+    @DisplayName("멤버 관련 정보 삭제 예외: 존재하지 않는 회원인 경우")
+    void deleteMemberInfoByAdmin_ThrowException_When_GivenNotJoinedMember() throws Exception {
+        // given
+        Integer memberId = 17;
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        MemberNotFoundException exception = assertThrows(MemberNotFoundException.class, () -> memberService.deleteMemberInfoByAdmin(memberId));
+
+        // then
+        assertEquals(MEMBER_NOT_FOUND.getMessage(), exception.getExceptionCode().getMessage());
+        verify(memberRepository, times(1)).findById(memberId);
+        verify(memberRepository, times(0)).deleteById(memberId);
     }
 
     private JoinDto createMockJoinDto(String email, String password) {

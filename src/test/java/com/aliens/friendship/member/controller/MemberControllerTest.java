@@ -285,4 +285,17 @@ class MemberControllerTest {
         verify(memberService, times(1)).getMemberAuthenticationStatus(anyString());
     }
 
+    @Test
+    @DisplayName("멤버 관련 정보 삭제 성공")
+    void deleteMemberInfoByAdmin_Success() throws Exception {
+        // given
+        Integer memberId = 17;
+        doNothing().when(memberService).deleteMemberInfoByAdmin(memberId);
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/member/" + memberId))
+                .andExpect(status().isOk());
+        verify(memberService, times(1)).deleteMemberInfoByAdmin(anyInt());
+    }
+
 }
