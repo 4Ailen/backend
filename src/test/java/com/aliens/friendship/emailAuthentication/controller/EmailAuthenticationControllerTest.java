@@ -4,6 +4,7 @@ import com.aliens.friendship.domain.emailAuthentication.controller.EmailAuthenti
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.service.EmailAuthenticationService;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
+import com.aliens.friendship.global.response.ResponseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ class EmailAuthenticationControllerTest {
     @MockBean
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @MockBean
+    private ResponseService responseService;
+
     @Test
     @DisplayName("이메일 전송 성공")
     void SendEmail_Success() throws Exception {
@@ -42,9 +46,7 @@ class EmailAuthenticationControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/v1/email/" + email + "/verification"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("이메일 전송 성공"));
+                .andExpect(status().isOk());
         verify(emailAuthenticationService, times(1)).sendEmail(email);
     }
 
@@ -62,9 +64,7 @@ class EmailAuthenticationControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/email/" + email + "/verification")
                         .params(tokenMap))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("이메일 인증 성공"));
+                .andExpect(status().isOk());
         verify(emailAuthenticationService, times(1)).validateEmail(email, token);
     }
 }

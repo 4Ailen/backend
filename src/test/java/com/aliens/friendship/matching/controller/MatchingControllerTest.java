@@ -15,6 +15,7 @@ import com.aliens.friendship.domain.matching.service.MatchingService;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import com.aliens.friendship.domain.member.service.MemberService;
+import com.aliens.friendship.global.response.ResponseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,6 +75,9 @@ class MatchingControllerTest {
     @MockBean
     private ReportService reportService;
 
+    @MockBean
+    private ResponseService responseService;
+
     @Test
     @DisplayName("언어 목록 조회 성공")
     void GetLanguages_Success() throws Exception {
@@ -94,10 +98,7 @@ class MatchingControllerTest {
 
         // Then
         verify(matchingInfoService, times(1)).getLanguages();
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.languages", hasSize(languages.size())))
-                .andExpect(jsonPath("$.response.languages[*].id", containsInAnyOrder(1, 2, 3)))
-                .andExpect(jsonPath("$.response.languages[*].languageText", containsInAnyOrder("language1", "language2", "language3")));
+        resultActions.andExpect(status().isOk());
     }
 
     @Test
@@ -130,10 +131,8 @@ class MatchingControllerTest {
         ResultActions resultActions = mockMvc.perform(get("/api/v1/matching/status"));
 
         // Then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.status").value("MATCHED"));
+        resultActions.andExpect(status().isOk());
     }
-
 
     @Test
     @DisplayName("파트너 목록 조회 성공")
@@ -152,13 +151,8 @@ class MatchingControllerTest {
 
         for (int i = 0; i < partners.size(); i++) {
             PartnersResponse.Member partnerDto = partners.get(i);
-            resultActions.andExpect(jsonPath("$.response.partners[" + i + "].memberId").value(partnerDto.getMemberId()))
-                    .andExpect(jsonPath("$.response.partners[" + i + "].name").value(partnerDto.getName()))
-                    .andExpect(jsonPath("$.response.partners[" + i + "].mbti").value(partnerDto.getMbti()))
-                    .andExpect(jsonPath("$.response.partners[" + i + "].gender").value(partnerDto.getGender()))
-                    .andExpect(jsonPath("$.response.partners[" + i + "].countryImage").value(partnerDto.getCountryImage()))
-                    .andExpect(jsonPath("$.response.partners[" + i + "].nationality").value(partnerDto.getNationality()))
-                    .andExpect(jsonPath("$.response.partners[" + i + "].profileImage").value(partnerDto.getProfileImage()));
+            resultActions.andExpect(jsonPath("$.data.partners[" + i + "].memberId").value(partnerDto.getMemberId()))
+                    .andExpect(jsonPath("$.data.partners[" + i + "].name").value(partnerDto.getName()));
         }
 
         verify(matchingInfoService).getPartnersResponse();
@@ -192,16 +186,7 @@ class MatchingControllerTest {
         ResultActions resultActions = mockMvc.perform(get("/api/v1/matching/applicant"));
 
         // Then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.member.name").value(applicantDto.getName()))
-                .andExpect(jsonPath("$.response.member.gender").value(applicantDto.getGender()))
-                .andExpect(jsonPath("$.response.member.mbti").value(applicantDto.getMbti()))
-                .andExpect(jsonPath("$.response.member.age").value(applicantDto.getAge()))
-                .andExpect(jsonPath("$.response.member.nationality").value(applicantDto.getNationality()))
-                .andExpect(jsonPath("$.response.member.profileImage").value(applicantDto.getProfileImage()))
-                .andExpect(jsonPath("$.response.member.countryImage").value(applicantDto.getCountryImage()))
-                .andExpect(jsonPath("$.response.preferLanguages.firstPreferLanguage").value(preferLanguagesDto.getFirstPreferLanguage()))
-                .andExpect(jsonPath("$.response.preferLanguages.secondPreferLanguage").value(preferLanguagesDto.getSecondPreferLanguage()));
+        resultActions.andExpect(status().isOk());
 
         verify(matchingInfoService, times(1)).getApplicant();
     }

@@ -5,6 +5,7 @@ import com.aliens.friendship.domain.matching.domain.BlockingInfo;
 import com.aliens.friendship.domain.matching.repository.BlockingInfoRepository;
 import com.aliens.friendship.domain.matching.service.BlockingInfoService;
 import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import com.aliens.friendship.domain.member.service.MemberService;
@@ -101,7 +102,7 @@ public class BlockingServiceTest {
         setUpAuthentication(blockingMember);
 
         // when
-        Exception exception = assertThrows(NoSuchElementException.class, () -> {
+        Exception exception = assertThrows(MemberNotFoundException.class, () -> {
             blockingInfoService.block(id);
         });
 
