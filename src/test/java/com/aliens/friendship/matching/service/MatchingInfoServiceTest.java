@@ -5,6 +5,7 @@ import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
 import com.aliens.friendship.domain.matching.domain.Applicant;
 import com.aliens.friendship.domain.matching.domain.Language;
+import com.aliens.friendship.domain.matching.exception.LanguageNotFoundException;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
 import com.aliens.friendship.domain.matching.repository.LanguageRepository;
 import com.aliens.friendship.domain.matching.repository.MatchingRepository;
@@ -137,12 +138,12 @@ class MatchingInfoServiceTest {
         applicantRequest.setSecondPreferLanguage(secondPreferLanguage.getId());
 
         // when
-        Exception exception = assertThrows(Exception.class, () -> {
+        Exception exception = assertThrows(LanguageNotFoundException.class, () -> {
             matchingInfoService.applyMatching(applicantRequest);
         });
 
         // then
-        assertEquals("잘못된 언어값입니다.", exception.getMessage());
+        assertEquals("존재하지 않는 언어입니다.", exception.getMessage());
     }
 
     @Test

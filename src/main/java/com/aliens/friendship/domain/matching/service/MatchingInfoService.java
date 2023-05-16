@@ -4,6 +4,10 @@ package com.aliens.friendship.domain.matching.service;
 import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
 import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
 import com.aliens.friendship.domain.matching.domain.Language;
+import com.aliens.friendship.domain.matching.exception.ApplicantNotFoundException;
+import com.aliens.friendship.domain.matching.exception.DuplicatedMatchException;
+import com.aliens.friendship.domain.matching.exception.LanguageNotFoundException;
+import com.aliens.friendship.domain.matching.exception.MatchingNotFoundException;
 import com.aliens.friendship.domain.matching.repository.LanguageRepository;
 import com.aliens.friendship.domain.matching.domain.Applicant;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
@@ -18,6 +22,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static com.aliens.friendship.domain.matching.exception.MatchingExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +54,7 @@ public class MatchingInfoService {
     }
 
     private Language getLanguageById(Integer languageId) {
-        return languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("잘못된 언어값입니다."));
+        return languageRepository.findById(languageId).orElseThrow(LanguageNotFoundException::new);
     }
 
     public Map<String, String> getMatchingStatus() {
@@ -141,33 +147,30 @@ public class MatchingInfoService {
     private List<Integer> getPartnerIdsByApplicant(Member member) {
         List<Integer> partnerIds = matchingRepository.findPartnerIdsByApplicantId(member.getId());
         if (partnerIds.isEmpty()) {
-            throw new IllegalStateException("매칭된 파트너가 없습니다.");
+            throw new MatchingNotFoundException(MATCHED_PARTNER_NOT_FOUND);
         }
         return partnerIds;
     }
 
     private void validateMatched(Member member) {
         if (applicantRepository.findById(member.getId()).get().getIsMatched() == Applicant.Status.NOT_MATCHED) {
-            throw new IllegalArgumentException("매칭이 완료되지 않은 사용자입니다.");
+            throw new ApplicantNotFoundException(MATCH_NOT_COMPLETED);
         }
     }
 
     private void validateApplied(Member member) {
         boolean ApplicantPresent = applicantRepository.findById(member.getId()).isPresent();
         if (member.getStatus().equals(Member.Status.NOT_APPLIED) && !ApplicantPresent) {
-            throw new IllegalArgumentException("매칭 신청을 하지 않은 사용자입니다.");
+            throw new ApplicantNotFoundException(MATCH_REQUEST_NOT_SUBMITTED);
         }
         if (member.getStatus().equals(Member.Status.APPLIED) && !ApplicantPresent) {
-            throw new IllegalArgumentException("매칭 신청자의 정보가 없습니다.");
+            throw new ApplicantNotFoundException();
         }
     }
 
     private void validateNotApplied(Member member) {
         if (applicantRepository.findById(member.getId()).isPresent()) {
-            throw new IllegalArgumentException("이미 매칭을 신청한 사용자입니다.");
+            throw new DuplicatedMatchException();
         }
     }
 }
-
-
-

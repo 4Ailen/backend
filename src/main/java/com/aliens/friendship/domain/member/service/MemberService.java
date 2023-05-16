@@ -2,21 +2,23 @@ package com.aliens.friendship.domain.member.service;
 
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
-import com.aliens.friendship.domain.jwt.repository.LogoutAccessTokenRedisRepository;
-import com.aliens.friendship.domain.jwt.repository.RefreshTokenRedisRepository;
-import com.aliens.friendship.domain.member.controller.dto.JoinDto;
-import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
-import com.aliens.friendship.domain.member.exception.*;
-import com.aliens.friendship.global.config.cache.CacheKey;
-import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import com.aliens.friendship.domain.jwt.domain.LogoutAccessToken;
 import com.aliens.friendship.domain.jwt.domain.RefreshToken;
 import com.aliens.friendship.domain.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
+import com.aliens.friendship.domain.jwt.exception.RefreshTokenNotFoundException;
+import com.aliens.friendship.domain.jwt.exception.TokenException;
+import com.aliens.friendship.domain.jwt.repository.LogoutAccessTokenRedisRepository;
+import com.aliens.friendship.domain.jwt.repository.RefreshTokenRedisRepository;
 import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.domain.Member;
+import com.aliens.friendship.domain.member.exception.*;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
+import com.aliens.friendship.global.config.cache.CacheKey;
+import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,7 +34,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Random;
+
+import static com.aliens.friendship.domain.jwt.exception.JWTExceptionCode.INVALID_REFRESH_TOKEN;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +50,7 @@ public class MemberService {
     private final ProfileImageService profileImageService;
     private final EmailAuthenticationRepository emailAuthenticationRepository;
     private final JavaMailSender javaMailSender;
+
     @Value("${spring.domain}")
     private String domainUrl;
 
@@ -150,12 +155,12 @@ public class MemberService {
     public TokenDto reissue(String refreshToken) {
         refreshToken = resolveToken(refreshToken);
         String email = getCurrentMemberEmail();
-        RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(email).orElseThrow(NoSuchElementException::new);
+        RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(email).orElseThrow(RefreshTokenNotFoundException::new);
 
         if (refreshToken.equals(redisRefreshToken.getRefreshToken())) {
             return reissueRefreshToken(refreshToken, email);
         }
-        throw new IllegalArgumentException("토큰이 일치하지 않습니다.");
+        throw new TokenException(INVALID_REFRESH_TOKEN);
     }
 
     private TokenDto reissueRefreshToken(String refreshToken, String email) {

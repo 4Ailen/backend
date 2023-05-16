@@ -1,19 +1,23 @@
 package com.aliens.friendship.domain.matching.controller;
 
 import com.aliens.friendship.domain.chatting.service.ChattingService;
-import com.aliens.friendship.global.common.Response;
+import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
 import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
 import com.aliens.friendship.domain.matching.service.BlockingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingInfoService;
-import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.domain.matching.service.MatchingService;
 import com.aliens.friendship.domain.matching.service.ReportService;
-import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
-import org.springframework.web.bind.annotation.*;
+import com.aliens.friendship.global.response.CommonResult;
+import com.aliens.friendship.global.response.ResponseService;
+import com.aliens.friendship.global.response.SingleResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("api/v1/matching")
@@ -26,43 +30,77 @@ public class MatchingController {
     private final MatchingService matchingService;
 
     private final ReportService reportService;
+    private final ResponseService responseService;
 
     @GetMapping("/languages")
-    public Response<Map<String, Object>> getLanguages() {
-        return Response.SUCCESS(matchingInfoService.getLanguages());
+    public SingleResult<Map<String, Object>> getLanguages() {
+        return responseService.getSingleResult(
+                OK.value(),
+                "성공적으로 언어리스트를 조회하였습니다.",
+                matchingInfoService.getLanguages()
+        );
     }
 
     @PostMapping("/applicant")
-    public void applyMatching(@RequestBody ApplicantRequest applicantRequest) {
+    public CommonResult applyMatching(@RequestBody ApplicantRequest applicantRequest) {
         matchingInfoService.applyMatching(applicantRequest);
+
+        return responseService.getSuccessResult(
+                OK.value(),
+                "성공적으로 매칭 신청이 완료되었습니다."
+        );
     }
 
     @GetMapping("/status")
-    public Response<Map<String, String>> getStatus() {
-        return Response.SUCCESS(matchingInfoService.getMatchingStatus());
+    public SingleResult<Map<String, String>> getStatus() {
+        return responseService.getSingleResult(
+                OK.value(),
+                "성공적으로 매칭상태가 조회되었습니다.",
+                matchingInfoService.getMatchingStatus()
+        );
     }
 
     @GetMapping("/partners")
-    public Response<PartnersResponse> getPartners() {
-        return Response.SUCCESS(matchingInfoService.getPartnersResponse());
+    public SingleResult<PartnersResponse> getPartners() {
+        return responseService.getSingleResult(
+                OK.value(),
+                "성공적으로 파트너가 조회되었습니다.",
+                matchingInfoService.getPartnersResponse()
+        );
     }
 
     @GetMapping("/applicant")
-    public Response<ApplicantResponse> getApplicant() throws Exception {
-        return Response.SUCCESS(matchingInfoService.getApplicant());
+    public SingleResult<ApplicantResponse> getApplicant() throws Exception {
+        return responseService.getSingleResult(
+                OK.value(),
+                "성공적으로 매칭 신청자가 조회되었습니다.",
+                matchingInfoService.getApplicant()
+        );
     }
 
     @PostMapping("/partner/{memberId}/block")
-    public Response<String> blocking(@PathVariable Integer memberId, @RequestBody Long roomId) {
+    public CommonResult blocking(
+            @PathVariable Integer memberId,
+            @RequestBody Long roomId
+    ) {
         blockingInfoService.block(memberId);
         chattingService.blockChattingRoom(roomId);
-        return Response.SUCCESS("차단 완료");
+        return responseService.getSuccessResult(
+                OK.value(),
+                "차단 완료"
+        );
     }
 
     @PostMapping("/partner/{memberId}/report")
-    public Response<String> report(@PathVariable Integer memberId, @RequestBody ReportRequest reportRequest) {
+    public CommonResult report(
+            @PathVariable Integer memberId,
+            @RequestBody ReportRequest reportRequest
+    ) {
         reportService.report(memberId, reportRequest);
-        return Response.SUCCESS("신고 완료");
+        return responseService.getSuccessResult(
+                OK.value(),
+                "신고 완료"
+        );
     }
 
     @PostMapping()
