@@ -40,7 +40,6 @@ public class Report {
     @JoinColumn(name = COLUMN_REPORTERMEMBER_NAME, nullable = false)
     private Member reporterMember;
 
-    @Size(max = 15)
     @NotNull
     @Column(name = COLUMN_REPORTCATEGORY_NAME, nullable = false)
     private ReportCategory reportCategory;
