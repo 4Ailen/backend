@@ -31,12 +31,12 @@ public class Report {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.REMOVE)
     @JoinColumn(name = COLUMN_REPORTEDMEMBER_NAME, nullable = false)
     private Member reportedMember;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.REMOVE)
     @JoinColumn(name = COLUMN_REPORTERMEMBER_NAME, nullable = false)
     private Member reporterMember;
 

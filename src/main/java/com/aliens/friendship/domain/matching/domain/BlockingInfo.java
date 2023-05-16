@@ -25,11 +25,11 @@ public class BlockingInfo {
     private Integer id;
 
     @ManyToOne( optional = false, cascade=CascadeType.REMOVE)
-    @JoinColumn(name = "blocked_member_id", nullable = false)
+    @JoinColumn(name = "blocked_member_id")
     private Member blockedMember;
 
     @ManyToOne( optional = false, cascade=CascadeType.REMOVE)
-    @JoinColumn(name = "blocking_member_id", nullable = false)
+    @JoinColumn(name = "blocking_member_id")
     private Member blockingMember;
 
 }

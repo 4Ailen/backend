@@ -143,4 +143,14 @@ public class MemberController {
                 status
         );
     }
+
+    // TODO: 관리자 권한 추가
+    @DeleteMapping("/{memberId}")
+    public CommonResult deleteMemberInfoByAdmin(@PathVariable Integer memberId){
+        memberService.deleteMemberInfoByAdmin(memberId);
+        return responseService.getSuccessResult(
+                OK.value(),
+                "회원 관련 정보 삭제에 성공하였습니다."
+        );
+    }
 }

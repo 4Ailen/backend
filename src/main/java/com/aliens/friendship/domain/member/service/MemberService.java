@@ -83,6 +83,11 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
+    public void deleteMemberInfoByAdmin(Integer memberId) {
+        memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+        memberRepository.deleteById(memberId);
+    }
+
     public TokenDto login(LoginDto loginDto) throws Exception {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(MemberNotFoundException::new);
         checkWithdrawn(member.getStatus());
