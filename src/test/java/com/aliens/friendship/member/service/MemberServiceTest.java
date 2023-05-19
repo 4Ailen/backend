@@ -2,8 +2,7 @@ package com.aliens.friendship.member.service;
 
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
-import com.aliens.friendship.domain.member.exception.InvalidMemberPasswordException;
-import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
+import com.aliens.friendship.domain.member.exception.*;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.domain.member.service.ProfileImageService;
 import com.aliens.friendship.global.config.security.CustomUserDetails;
@@ -12,8 +11,6 @@ import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.domain.Nationality;
-import com.aliens.friendship.domain.member.exception.EmailVerificationException;
-import com.aliens.friendship.domain.member.exception.PasswordChangeFailedException;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -150,6 +147,25 @@ class MemberServiceTest {
         //then: 예외 발생
         verify(memberRepository, times(0)).save(any(Member.class));
         assertEquals(EMAIL_VERIFICATION_NOT_COMPLETED.getMessage(), exception.getExceptionCode().getMessage());
+    }
+
+    @Test
+    @DisplayName("회원가입 예외: 일주일 내에 탈퇴한 회원인 경우")
+    void CreateMember_ThrowException_When_GivenWithdrawnMemberInAWeek() {
+        //given: 일주일 내에 탈퇴한 회원의 이메일
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member mockMember = createSpyMember(mockJoinDto);
+        mockMember.updateStatus(Member.Status.WITHDRAWN);
+        when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.of(mockMember));
+
+        //when: 회원가입
+        WithdrawnMemberWithinAWeekException exception = assertThrows(WithdrawnMemberWithinAWeekException.class, () -> {
+            memberService.join(mockJoinDto);
+        });
+
+        //then: 예외 발생
+        verify(memberRepository, times(0)).save(any(Member.class));
+        assertEquals(WITHDRAWN_MEMBER_WITHIN_A_WEEK.getMessage(), exception.getExceptionCode().getMessage());
     }
 
     @Test
