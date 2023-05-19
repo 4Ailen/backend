@@ -133,7 +133,7 @@ public class MemberService {
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getCountryImageUrl())
+                .nationality(member.getNationality().getNationalityText())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
