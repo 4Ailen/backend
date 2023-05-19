@@ -129,6 +129,7 @@ public class MemberService {
         String email = getCurrentMemberEmail();
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         return MemberInfoDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
