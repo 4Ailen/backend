@@ -55,7 +55,7 @@ public class MemberService {
     private String domainUrl;
 
     public void join(JoinDto joinDto) throws Exception {
-        checkDuplicatedEmail(joinDto.getEmail());
+        checkDuplicatedAndWithdrawnInAWeekEmail(joinDto.getEmail());
         checkEmailAuthentication(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
         joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getProfileImage()));
@@ -182,9 +182,13 @@ public class MemberService {
         return userDetails.getUsername();
     }
 
-    private void checkDuplicatedEmail(String email) throws Exception {
+    private void checkDuplicatedAndWithdrawnInAWeekEmail(String email) throws Exception {
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new DuplicateMemberEmailException();
+            if (memberRepository.findByEmail(email).get().getStatus() == Member.Status.WITHDRAWN) {
+                throw new WithdrawnMemberWithinAWeekException();
+            } else {
+                throw new DuplicateMemberEmailException();
+            }
         }
     }
 
