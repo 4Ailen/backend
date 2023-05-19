@@ -2,6 +2,7 @@ package com.aliens.friendship.jwt;
 
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.global.config.security.CustomUserDetailService;
 import com.aliens.friendship.domain.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
@@ -56,7 +57,7 @@ public class JwtUtilTest {
                 .password("1q2w3e4r")
                 .email("test@case.com")
                 .name("김명준")
-                .mbti("INTJ")
+                .mbti(Member.Mbti.INTJ)
                 .birthday("1998-09-21")
                 .profileImage(mockMultipartFile)
                 .gender("MALE")

@@ -244,9 +244,8 @@ public class MemberService {
         }
     }
 
-    public void changeProfileNameAndMbti(String name, String mbti) {
+    public void changeProfileNameAndMbti(Member.Mbti mbti) {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        member.updateName(name);
         member.updateMbti(mbti);
         memberRepository.save(member);
     }

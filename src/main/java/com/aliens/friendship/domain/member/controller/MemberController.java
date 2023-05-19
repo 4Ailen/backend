@@ -7,6 +7,7 @@ import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.controller.dto.ProfileImageRequest;
+import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ResponseService;
@@ -123,8 +124,8 @@ public class MemberController {
     }
 
     @PatchMapping()
-    public CommonResult changeProfileNameAndMbti(@RequestBody Map<String, String> nameAndMbti) {
-        memberService.changeProfileNameAndMbti(nameAndMbti.get("name"), nameAndMbti.get("mbti"));
+    public CommonResult changeProfileMbti(@RequestBody Map<String, Member.Mbti> mbti) {
+        memberService.changeProfileNameAndMbti(mbti.get("mbti"));
         return responseService.getSuccessResult(
                 OK.value(),
                 "프로필 이름과 mbti 값 변경 성공"

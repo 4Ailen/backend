@@ -44,7 +44,7 @@ class MemberRepositoryImplTest {
         //member의 정보와 mockJoinDto의 정보 일치 확인
         assertThat(member.toString()).contains(mockJoinDto.getEmail())
                 .contains(mockJoinDto.getPassword())
-                .contains(mockJoinDto.getMbti())
+                .contains(mockJoinDto.getMbti().toString())
                 .contains(mockJoinDto.getNationality().toString())
                 .contains(mockJoinDto.getBirthday())
                 .contains(mockJoinDto.getName())
@@ -67,7 +67,7 @@ class MemberRepositoryImplTest {
                 .email(email)
                 .password(password)
                 .name("Joy")
-                .mbti("ISFJ")
+                .mbti(Member.Mbti.ISFJ)
                 .gender("FEMALE")
                 .nationality(nationality)
                 .birthday("1993-12-31")

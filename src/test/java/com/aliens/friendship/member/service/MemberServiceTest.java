@@ -93,7 +93,7 @@ class MemberServiceTest {
                         .email("test@case.com")
                         .password("TestPassword")
                         .name("Ryan")
-                        .mbti("ENFJ")
+                        .mbti(Member.Mbti.ENFJ)
                         .gender("MALE")
                         .nationality(new Nationality(1, "South Korea"))
                         .birthday("1998-12-31")
@@ -344,14 +344,13 @@ class MemberServiceTest {
         // given
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         Member spyMember = createSpyMember(mockJoinDto);
-        String newName = "test";
-        String newMbti = "ISFJ";
+        Member.Mbti newMbti = Member.Mbti.ISFJ;
         when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
 
         setAuthenticationWithSpyMember(spyMember);
 
         // when
-        memberService.changeProfileNameAndMbti(newName, newMbti);
+        memberService.changeProfileNameAndMbti(newMbti);
 
         // then
         verify(memberRepository, times(1)).findByEmail(anyString());
@@ -437,7 +436,7 @@ class MemberServiceTest {
                 .email(email)
                 .password(password)
                 .name("Ryan")
-                .mbti("ENFJ")
+                .mbti(Member.Mbti.ENFJ)
                 .gender("MALE")
                 .nationality(new Nationality(1, "South Korea"))
                 .birthday("1998-12-31")

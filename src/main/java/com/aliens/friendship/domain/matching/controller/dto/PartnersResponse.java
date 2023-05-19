@@ -1,5 +1,6 @@
 package com.aliens.friendship.domain.matching.controller.dto;
 
+import com.aliens.friendship.domain.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,7 @@ public class PartnersResponse {
     public static class Member {
         private Integer memberId;
         private String name;
-        private String mbti;
+        private com.aliens.friendship.domain.member.domain.Member.Mbti mbti;
         private String gender;
         private String nationality;
         private String profileImage;

@@ -49,8 +49,9 @@ public class Member {
     @Column(name = COLUMN_PASSWORD_NAME, nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = COLUMN_MBTI_NAME, nullable = false, length = 45)
-    private String mbti;
+    private Mbti mbti;
 
     @Column(name = COLUMN_GENDER_NAME, nullable = false, length = 45)
     private String gender;
@@ -100,7 +101,7 @@ public class Member {
         this.name = name;
     }
 
-    public void updateMbti(String mbti) {
+    public void updateMbti(Mbti mbti) {
         this.mbti = mbti;
     }
 
@@ -178,4 +179,7 @@ public class Member {
         APPLIED, NOT_APPLIED, WITHDRAWN;
     }
 
+    public enum Mbti {
+        ISTJ, ISFJ, INFJ, INTJ, ISTP, ISFP, INFP, INTP, ESTP, ESFP, ENFP, ENTP, ESTJ, ESFJ, ENFJ, ENTJ
+    }
 }

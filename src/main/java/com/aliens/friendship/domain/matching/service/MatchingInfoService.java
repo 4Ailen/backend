@@ -80,7 +80,7 @@ public class MatchingInfoService {
                 PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
                         .memberId(-1)
                         .name("탈퇴한 사용자")
-                        .mbti("")
+                        .mbti(null)
                         .gender("")
                         .nationality("")
                         .countryImage("")

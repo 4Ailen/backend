@@ -1,6 +1,7 @@
 package com.aliens.friendship.matching.controller;
 
 import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
+import com.aliens.friendship.domain.member.domain.Member;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class PartnersFixture {
             PartnersResponse.Member partner = PartnersResponse.Member.builder()
                     .memberId(i)
                     .name("Partner" + i)
-                    .mbti("MBTI" + i)
+                    .mbti(Member.Mbti.INTJ)
                     .gender("GENDER" + i)
                     .nationality("Nationality" + i)
                     .countryImage("CountryImageURL" + i)

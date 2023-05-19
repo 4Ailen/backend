@@ -62,7 +62,7 @@ class MatchingRepositoryImplTest {
             Member member = Member.builder()
                     .email("member" + i + "@test.com")
                     .password("1234567")
-                    .mbti("ISFJ")
+                    .mbti(Member.Mbti.ISFJ)
                     .gender("FEMALE")
                     .birthday("2002-01-17")
                     .name("최정은")
