@@ -57,6 +57,7 @@ public class MemberService {
     public void join(JoinDto joinDto) throws Exception {
         checkDuplicatedAndWithdrawnInAWeekEmail(joinDto.getEmail());
         checkEmailAuthentication(joinDto.getEmail());
+        emailAuthenticationRepository.deleteByEmail(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
         joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getProfileImage()));
         memberRepository.save(Member.ofUser(joinDto));

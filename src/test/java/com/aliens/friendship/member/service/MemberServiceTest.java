@@ -71,6 +71,7 @@ class MemberServiceTest {
         mockEmailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.empty());
         when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
+        doNothing().when(emailAuthenticationRepository).deleteByEmail(mockJoinDto.getEmail());
         when(profileImageService.uploadProfileImage(mockJoinDto.getProfileImage())).thenReturn("/testUrl");
 
         //when: 회원가입
@@ -101,6 +102,7 @@ class MemberServiceTest {
         mockEmailAuthentication.updateStatus(EmailAuthentication.Status.VERIFIED);
         when(memberRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(Optional.empty());
         when(emailAuthenticationRepository.findByEmail(mockJoinDto.getEmail())).thenReturn(mockEmailAuthentication);
+        doNothing().when(emailAuthenticationRepository).deleteByEmail(mockJoinDto.getEmail());
         when(profileImageService.uploadProfileImage(mockJoinDto.getProfileImage())).thenReturn(DEFAULT_PROFILE_IMAGE_PATH);
 
         //when: 회원가입
