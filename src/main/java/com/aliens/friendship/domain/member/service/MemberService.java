@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
@@ -273,11 +274,23 @@ public class MemberService {
 
     public String getMemberAuthenticationStatus(String email) {
         EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
+        if (emailAuthentication == null) {
+            if (isJoinedEmail(email)) {
+                return "JOINED"; // 이메일 인증 후 회원가입된 상태
+            } else {
+                return "EMAIL_SENDING_REQUEST_REQUIRED"; // 이메일 전송 요청 필요
+            }
+        }
         String status = emailAuthentication.getStatus().toString();
         if (status.equals("VERIFIED")) {
-            return "AUTHENTICATED";
+            if (Instant.now().isAfter(emailAuthentication.getExpirationTime())) {
+                emailAuthenticationRepository.deleteByEmail(email);
+                return "REAUTHENTICATION_REQUIRED"; // 이메일 인증이 되었으나, 기간 만료로 재인증이 필요
+            } else {
+                return "AUTHENTICATED"; // 이메일 인증 완료
+            }
         } else {
-            return "NOT_AUTHENTICATED";
+            return "NOT_AUTHENTICATED"; // 이메일 인증 미완료
         }
     }
 
