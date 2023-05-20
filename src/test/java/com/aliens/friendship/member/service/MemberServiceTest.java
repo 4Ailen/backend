@@ -244,7 +244,7 @@ class MemberServiceTest {
         memberService.issueTemporaryPassword(spyMember.getEmail(), spyMember.getName());
 
         // then: 임시 비밀번호 발급 요청 성공
-        verify(memberRepository, times(1)).findByEmailAndName(anyString(), anyString());
+        verify(memberRepository, times(2)).findByEmailAndName(anyString(), anyString());
         verify(memberRepository, times(1)).save(any(Member.class));
         verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
     }
@@ -254,15 +254,17 @@ class MemberServiceTest {
     void IssueTemporaryPassword_ThrowException_When_GivenNotJoinedEmail() throws Exception {
         // given: 회원가입 되지 않은 이메일
         String email = "test@case.com", name = "test";
+        when(memberRepository.findByEmailAndName(email, name)).thenReturn(Optional.empty());
 
         // when: 임시 비밀번호 발급
-        Exception exception = assertThrows(Exception.class, () -> {
+        MemberNotFoundException exception = assertThrows(MemberNotFoundException.class, () -> {
             memberService.issueTemporaryPassword(email, name);
         });
 
         // then: 예외 발생
+        verify(memberRepository, times(1)).findByEmailAndName(anyString(), anyString());
         verify(javaMailSender, times(0)).send(any(SimpleMailMessage.class));
-        assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
+        assertEquals(MEMBER_NOT_FOUND.getMessage(), exception.getExceptionCode().getMessage());
     }
 
     @Test
@@ -271,16 +273,20 @@ class MemberServiceTest {
         // given: 회원가입 된 정보와 다른 이름
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
         Member spyMember = createSpyMember(mockJoinDto);
-        String email = spyMember.getEmail(), invalidName = spyMember.getName() + "invalid";
+        String invalidName = spyMember.getName() + "invalid";
+        when(memberRepository.findByEmailAndName(spyMember.getEmail(), invalidName)).thenReturn(Optional.empty());
+        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
 
         // when: 임시 비밀번호 발급
-        Exception exception = assertThrows(Exception.class, () -> {
-            memberService.issueTemporaryPassword(email, invalidName);
+        InvalidMemberNameException exception = assertThrows(InvalidMemberNameException.class, () -> {
+            memberService.issueTemporaryPassword(spyMember.getEmail(), invalidName);
         });
 
         // then: 예외 발생
+        verify(memberRepository, times(1)).findByEmailAndName(anyString(), anyString());
+        verify(memberRepository, times(1)).findByEmail(anyString());
         verify(javaMailSender, times(0)).send(any(SimpleMailMessage.class));
-        assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
+        assertEquals(INVALID_MEMBER_NAME.getMessage(), exception.getExceptionCode().getMessage());
     }
 
     @Test
