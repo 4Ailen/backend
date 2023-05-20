@@ -200,13 +200,20 @@ public class MemberService {
     }
 
     public void issueTemporaryPassword(String email, String name) throws Exception {
-        Member member = memberRepository.findByEmailAndName(email, name)
-                .orElseThrow(MemberNotFoundException::new);
-        String temporaryPassword = createTemporaryPassword();
-        member.updatePassword(passwordEncoder.encode(temporaryPassword));
-        memberRepository.save(member);
-        SimpleMailMessage authenticationMail = createAuthenticationMail(member.getEmail(), member.getName(), temporaryPassword);
-        javaMailSender.send(authenticationMail);
+        if (memberRepository.findByEmailAndName(email, name).isEmpty()) {
+            if (memberRepository.findByEmail(email).isEmpty()) {
+                throw new MemberNotFoundException();
+            } else {
+                throw new InvalidMemberNameException();
+            }
+        } else {
+            Member member = memberRepository.findByEmailAndName(email, name).get();
+            String temporaryPassword = createTemporaryPassword();
+            member.updatePassword(passwordEncoder.encode(temporaryPassword));
+            memberRepository.save(member);
+            SimpleMailMessage authenticationMail = createAuthenticationMail(member.getEmail(), member.getName(), temporaryPassword);
+            javaMailSender.send(authenticationMail);
+        }
     }
 
     private String createTemporaryPassword() {
