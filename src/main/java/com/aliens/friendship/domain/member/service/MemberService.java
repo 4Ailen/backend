@@ -278,7 +278,7 @@ public class MemberService {
             if (isJoinedEmail(email)) {
                 return "JOINED"; // 이메일 인증 후 회원가입된 상태
             } else {
-                return "EMAIL_SENDING_REQUEST_REQUIRED"; // 이메일 전송 요청 필요
+                return "EMAIL_NOT_SENT"; // 이메일 전송 요청 필요
             }
         }
         String status = emailAuthentication.getStatus().toString();
@@ -290,7 +290,7 @@ public class MemberService {
                 return "AUTHENTICATED"; // 이메일 인증 완료
             }
         } else {
-            return "NOT_AUTHENTICATED"; // 이메일 인증 미완료
+            return "EMAIL_SENT_NOT_AUTHENTICATED"; // 이메일 인증 미완료
         }
     }
 
