@@ -5,6 +5,7 @@ import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenti
 import com.aliens.friendship.domain.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.domain.Nationality;
 import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import com.aliens.friendship.domain.member.service.MemberService;
@@ -57,7 +58,7 @@ public class JwtAPITest {
                 .password("1q2w3e4r")
                 .email("test@case.com")
                 .name("김명준")
-                .mbti("INTJ")
+                .mbti(Member.Mbti.INTJ)
                 .birthday("1998-01-01")
                 .gender("male")
                 .nationality(nationality)

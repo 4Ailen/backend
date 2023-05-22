@@ -57,6 +57,36 @@ public class MemberExceptionHandler {
     }
 
     /**
+     * WithdrawnWithinAWeekException 핸들링
+     * Custom Exception
+     */
+    @ExceptionHandler(WithdrawnMemberWithinAWeekException.class)
+    protected ResponseEntity<ErrorResponse> handlingWithdrawnWithinAWeekException(
+            WithdrawnMemberWithinAWeekException e
+    ) {
+        log.error("[handling WithdrawnWithinAWeekException] {}", e.getExceptionCode().getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(e.getExceptionCode()),
+                HttpStatus.valueOf(e.getExceptionCode().getHttpStatus().value())
+        );
+    }
+
+    /**
+     * InvalidMemberNameException 핸들링
+     * Custom Exception
+     */
+    @ExceptionHandler(InvalidMemberNameException.class)
+    protected ResponseEntity<ErrorResponse> handlingInvalidMemberNameException(
+            InvalidMemberNameException e
+    ) {
+        log.error("[handling InvalidMemberNameException] {}", e.getExceptionCode().getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(e.getExceptionCode()),
+                HttpStatus.valueOf(e.getExceptionCode().getHttpStatus().value())
+        );
+    }
+
+    /**
      * EmailVerificationException 핸들링
      * Custom Exception
      */

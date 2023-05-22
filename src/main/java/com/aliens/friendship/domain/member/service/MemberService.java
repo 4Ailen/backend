@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
@@ -55,8 +56,9 @@ public class MemberService {
     private String domainUrl;
 
     public void join(JoinDto joinDto) throws Exception {
-        checkDuplicatedEmail(joinDto.getEmail());
+        checkDuplicatedAndWithdrawnInAWeekEmail(joinDto.getEmail());
         checkEmailAuthentication(joinDto.getEmail());
+        emailAuthenticationRepository.deleteByEmail(joinDto.getEmail());
         joinDto.setPassword(passwordEncoder.encode(joinDto.getPassword()));
         joinDto.setImageUrl(profileImageService.uploadProfileImage(joinDto.getProfileImage()));
         memberRepository.save(Member.ofUser(joinDto));
@@ -129,10 +131,11 @@ public class MemberService {
         String email = getCurrentMemberEmail();
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         return MemberInfoDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getCountryImageUrl())
+                .nationality(member.getNationality().getNationalityText())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
@@ -181,9 +184,13 @@ public class MemberService {
         return userDetails.getUsername();
     }
 
-    private void checkDuplicatedEmail(String email) throws Exception {
+    private void checkDuplicatedAndWithdrawnInAWeekEmail(String email) throws Exception {
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new DuplicateMemberEmailException();
+            if (memberRepository.findByEmail(email).get().getStatus() == Member.Status.WITHDRAWN) {
+                throw new WithdrawnMemberWithinAWeekException();
+            } else {
+                throw new DuplicateMemberEmailException();
+            }
         }
     }
 
@@ -195,13 +202,20 @@ public class MemberService {
     }
 
     public void issueTemporaryPassword(String email, String name) throws Exception {
-        Member member = memberRepository.findByEmailAndName(email, name)
-                .orElseThrow(MemberNotFoundException::new);
-        String temporaryPassword = createTemporaryPassword();
-        member.updatePassword(passwordEncoder.encode(temporaryPassword));
-        memberRepository.save(member);
-        SimpleMailMessage authenticationMail = createAuthenticationMail(member.getEmail(), member.getName(), temporaryPassword);
-        javaMailSender.send(authenticationMail);
+        if (memberRepository.findByEmailAndName(email, name).isEmpty()) {
+            if (memberRepository.findByEmail(email).isEmpty()) {
+                throw new MemberNotFoundException();
+            } else {
+                throw new InvalidMemberNameException();
+            }
+        } else {
+            Member member = memberRepository.findByEmailAndName(email, name).get();
+            String temporaryPassword = createTemporaryPassword();
+            member.updatePassword(passwordEncoder.encode(temporaryPassword));
+            memberRepository.save(member);
+            SimpleMailMessage authenticationMail = createAuthenticationMail(member.getEmail(), member.getName(), temporaryPassword);
+            javaMailSender.send(authenticationMail);
+        }
     }
 
     private String createTemporaryPassword() {
@@ -243,9 +257,8 @@ public class MemberService {
         }
     }
 
-    public void changeProfileNameAndMbti(String name, String mbti) {
+    public void changeProfileNameAndMbti(Member.Mbti mbti) {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        member.updateName(name);
         member.updateMbti(mbti);
         memberRepository.save(member);
     }
@@ -261,11 +274,23 @@ public class MemberService {
 
     public String getMemberAuthenticationStatus(String email) {
         EmailAuthentication emailAuthentication = emailAuthenticationRepository.findByEmail(email);
+        if (emailAuthentication == null) {
+            if (isJoinedEmail(email)) {
+                return "JOINED"; // 이메일 인증 후 회원가입된 상태
+            } else {
+                return "EMAIL_NOT_SENT"; // 이메일 전송 요청 필요
+            }
+        }
         String status = emailAuthentication.getStatus().toString();
         if (status.equals("VERIFIED")) {
-            return "AUTHENTICATED";
+            if (Instant.now().isAfter(emailAuthentication.getExpirationTime())) {
+                emailAuthenticationRepository.deleteByEmail(email);
+                return "REAUTHENTICATION_REQUIRED"; // 이메일 인증이 되었으나, 기간 만료로 재인증이 필요
+            } else {
+                return "AUTHENTICATED"; // 이메일 인증 완료
+            }
         } else {
-            return "NOT_AUTHENTICATED";
+            return "EMAIL_SENT_NOT_AUTHENTICATED"; // 이메일 인증 미완료
         }
     }
 

@@ -1,5 +1,6 @@
 package com.aliens.friendship.domain.member.controller.dto;
 
+import com.aliens.friendship.domain.member.domain.Member;
 import lombok.*;
 
 @Getter
@@ -10,7 +11,7 @@ import lombok.*;
 public class MemberInfoDto {
     private Integer memberId;
     private String email;
-    private String mbti;
+    private Member.Mbti mbti;
     private String gender;
     private String nationality;
     private String birthday;

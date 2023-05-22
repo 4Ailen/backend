@@ -1,6 +1,7 @@
 package com.aliens.friendship.member.controller;
 
 import com.aliens.friendship.domain.member.controller.MemberController;
+import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
@@ -111,7 +112,7 @@ class MemberControllerTest {
         // given
         MemberInfoDto expectedMemberInfoDto = MemberInfoDto.builder()
                 .email("test@example.com")
-                .mbti("ENFP")
+                .mbti(Member.Mbti.ENFP)
                 .gender("남성")
                 .nationality("South Korea")
                 .age(24)
@@ -201,17 +202,16 @@ class MemberControllerTest {
     @DisplayName("프로필 이름과 mbti 값 변경 요청 성공")
     void ChangeProfileNameAndMbti_Success() throws Exception {
         // given
-        Map<String, String> nameAndMbti = new HashMap<>();
-        nameAndMbti.put("name", "test");
-        nameAndMbti.put("mbti", "ISFJ");
-        doNothing().when(memberService).changeProfileNameAndMbti(nameAndMbti.get("name"), nameAndMbti.get("mbti"));
+        Map<String, Member.Mbti> mbti = new HashMap<>();
+        mbti.put("mbti", Member.Mbti.ISFJ);
+        doNothing().when(memberService).changeProfileNameAndMbti(mbti.get("mbti"));
 
         // when & then
         mockMvc.perform(patch("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(nameAndMbti)))
+                        .content(new ObjectMapper().writeValueAsString(mbti)))
                 .andExpect(status().isOk());
-        verify(memberService, times(1)).changeProfileNameAndMbti(anyString(), anyString());
+        verify(memberService, times(1)).changeProfileNameAndMbti(any(Member.Mbti.class));
     }
 
     @Test

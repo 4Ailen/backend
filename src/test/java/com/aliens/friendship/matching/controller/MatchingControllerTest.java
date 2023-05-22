@@ -4,6 +4,7 @@ import com.aliens.friendship.domain.chatting.service.ChattingService;
 import com.aliens.friendship.domain.matching.controller.MatchingController;
 import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
 import com.aliens.friendship.domain.matching.service.ReportService;
+import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
@@ -166,7 +167,7 @@ class MatchingControllerTest {
         ApplicantResponse.Member applicantDto = ApplicantResponse.Member.builder()
                 .name("Ryan")
                 .gender("MALE")
-                .mbti("INTJ")
+                .mbti(Member.Mbti.INTJ)
                 .age(25)
                 .nationality("American")
                 .profileImage("Profile_URL")
