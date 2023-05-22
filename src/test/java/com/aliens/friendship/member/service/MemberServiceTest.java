@@ -152,7 +152,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원가입 예외: 일주일 내에 탈퇴한 회원인 경우")
+    @DisplayName("회원가입 예외: 탈퇴한지 일주일이 되지 않은 이메일인 경우")
     void CreateMember_ThrowException_When_GivenWithdrawnMemberInAWeek() {
         //given: 일주일 내에 탈퇴한 회원의 이메일
         JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
