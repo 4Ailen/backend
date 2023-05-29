@@ -52,7 +52,7 @@ public class MemberService {
     private final EmailAuthenticationRepository emailAuthenticationRepository;
     private final JavaMailSender javaMailSender;
 
-    @Value("${spring.domain}")
+    @Value("${file-server.domain}")
     private String domainUrl;
 
     public void join(JoinDto joinDto) throws Exception {
@@ -139,7 +139,7 @@ public class MemberService {
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
-                .profileImage(domainUrl + System.getProperty("user.dir") + member.getProfileImageUrl())
+                .profileImage(domainUrl + member.getProfileImageUrl())
                 .build();
     }
 
