@@ -37,3 +37,6 @@ out/
 .vscode/
 src/main/resources/application-mysql.properties
 /src/main/resources/application-mysql.yml
+
+### application.yml dev
+src/main/resources/application-dev.yml
