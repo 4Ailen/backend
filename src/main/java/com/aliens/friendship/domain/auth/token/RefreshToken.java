@@ -3,13 +3,12 @@ package com.aliens.friendship.domain.auth.token;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Document(collation = "refresh_token")
+@Document(collection = "refresh_token")
 public class RefreshToken {
 
     @Id

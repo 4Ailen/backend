@@ -1,6 +1,5 @@
 package com.aliens.friendship.domain.member.controller;
 
-import com.aliens.friendship.domain.jwt.domain.dto.LoginDto;
 import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
 import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
@@ -38,15 +37,6 @@ public class APIController {
         return responseService.getSuccessResult(
                 OK.value(),
                 "회원가입 완료"
-        );
-    }
-
-    @PostMapping("/login")
-    public SingleResult<TokenDto> login(@RequestBody LoginDto loginDto) throws Exception {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 로그인되었습니다.",
-                memberService.login(loginDto)
         );
     }
 

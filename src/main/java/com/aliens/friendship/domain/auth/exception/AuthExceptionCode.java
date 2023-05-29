@@ -28,6 +28,7 @@ public enum AuthExceptionCode
      */
     INVALID_MEMBER_ROLE(FORBIDDEN, "AT-C-100", "유효하지 않은 사용자 권한입니다."),
     NOT_AUTHORIZATION_USER(NOT_FOUND, "AT-C-101", "인가된 사용자가 아닙니다."),
+    MEMBER_PASSWORD_MISMATCH(UNAUTHORIZED, "AT-C-102", "일치하지 않는 패스워드입니다."),
 
     /**
      * Common Exception
