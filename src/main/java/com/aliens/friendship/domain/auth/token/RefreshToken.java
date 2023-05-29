@@ -15,15 +15,15 @@ public class RefreshToken {
     @Id
     private String id;
 
-    private String memberPersonalId;
+    private String email;
 
     private String value;
 
     private RefreshToken(
-            String memberPersonalId,
+            String email,
             String value
     ) {
-        this.memberPersonalId = memberPersonalId;
+        this.email = email;
         this.value = value;
     }
 
