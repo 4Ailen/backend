@@ -20,4 +20,14 @@ public class HeaderUtil {
 
         return null;
     }
+
+    public static String getRefreshToken(HttpServletRequest request) {
+        String headerValue = request.getHeader("RefreshToken");
+
+        if (headerValue == null) {
+            return null;
+        }
+
+        return headerValue;
+    }
 }
