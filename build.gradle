@@ -48,6 +48,9 @@ dependencies {
 //	implementation 'org.webjars:bootstrap:3.3.7'
 //	implementation 'org.webjars:jquery:3.1.1-1'
 
+	// Gson
+	implementation 'com.google.code.gson:gson:2.10.1'
+
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-redis:1.4.6.RELEASE'
 
