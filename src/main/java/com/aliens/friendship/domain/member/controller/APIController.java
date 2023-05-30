@@ -6,12 +6,10 @@ import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ResponseService;
-import com.aliens.friendship.global.response.SingleResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.OK;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -37,15 +35,6 @@ public class APIController {
         return responseService.getSuccessResult(
                 OK.value(),
                 "회원가입 완료"
-        );
-    }
-
-    @PostMapping("/reissue")
-    public SingleResult<TokenDto> reissue(@RequestHeader("RefreshToken") String refreshToken) {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 토큰이 재발급되었습니다.",
-                memberService.reissue(refreshToken)
         );
     }
 

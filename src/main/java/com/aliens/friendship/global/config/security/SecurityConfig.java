@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/ws-stomp/**","/send/**","/room/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/api/v1/auth/authentication", "/api/v1/member", "/api/v1/member/{email}/password/temp", "/api/v1/email/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/api/v1/auth/authentication", "/api/v1/member", "/api/v1/auth/reissue", "/api/v1/member/{email}/password/temp", "/api/v1/email/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/member/email/{email}/existence", "/api/v1/member/{email}/authentication-status", "/api/v1/member/nationalities", "/api/v1/email/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/api/v1/member/{memberId}").permitAll()
                 .antMatchers("/matching/**", "/health", "/logout").authenticated()
