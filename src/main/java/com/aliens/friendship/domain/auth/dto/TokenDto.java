@@ -1,4 +1,4 @@
-package com.aliens.friendship.domain.jwt.domain.dto;
+package com.aliens.friendship.domain.auth.dto;
 
 import lombok.*;
 

@@ -1,6 +1,6 @@
 package com.aliens.friendship.member.repository;
 
-import com.aliens.friendship.domain.jwt.domain.Authority;
+import com.aliens.friendship.domain.auth.model.entity.Authority;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.domain.Nationality;

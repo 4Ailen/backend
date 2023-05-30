@@ -1,4 +1,4 @@
-package com.aliens.friendship.domain.jwt.domain;
+package com.aliens.friendship.domain.auth.model.entity;
 
 import com.aliens.friendship.domain.member.domain.Member;
 import lombok.AllArgsConstructor;

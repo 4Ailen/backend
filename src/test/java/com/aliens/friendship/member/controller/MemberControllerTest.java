@@ -1,9 +1,9 @@
 package com.aliens.friendship.member.controller;
 
+import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
+import com.aliens.friendship.domain.auth.service.AuthService;
 import com.aliens.friendship.domain.member.controller.MemberController;
 import com.aliens.friendship.domain.member.domain.Member;
-import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
-import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
@@ -49,7 +49,7 @@ class MemberControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @MockBean
-    private JwtTokenUtil jwtTokenUtil;
+    private AuthService authService;
 
     @MockBean
     private ResponseService responseService;

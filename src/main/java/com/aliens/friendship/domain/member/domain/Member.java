@@ -1,6 +1,6 @@
 package com.aliens.friendship.domain.member.domain;
 
-import com.aliens.friendship.domain.jwt.domain.Authority;
+import com.aliens.friendship.domain.auth.model.entity.Authority;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import lombok.*;
 

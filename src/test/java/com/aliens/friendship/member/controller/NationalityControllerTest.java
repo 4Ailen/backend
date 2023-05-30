@@ -1,9 +1,9 @@
 package com.aliens.friendship.member.controller;
 
+import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.member.controller.NationalityController;
 import com.aliens.friendship.domain.member.domain.Nationality;
 import com.aliens.friendship.domain.member.service.NationalityService;
-import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
 import com.aliens.friendship.global.response.ResponseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc(addFilters = false)

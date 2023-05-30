@@ -1,7 +1,6 @@
 package com.aliens.friendship.domain.member.controller;
 
-import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
+import com.aliens.friendship.domain.auth.service.AuthService;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
@@ -26,7 +25,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class MemberController {
 
     private final MemberService memberService;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final AuthService authService;
     private final ResponseService responseService;
 
     /**
@@ -38,19 +37,6 @@ public class MemberController {
         return responseService.getSuccessResult(
                 OK.value(),
                 "회원가입 성공"
-        );
-    }
-
-    @DeleteMapping("/authentication")
-    public CommonResult logout(
-            @RequestHeader("Authorization") String accessToken,
-            @RequestHeader("RefreshToken") String refreshToken
-    ) {
-        String email = jwtTokenUtil.getEmail(memberService.resolveToken(accessToken));
-        memberService.logout(TokenDto.of(accessToken, refreshToken), email);
-        return responseService.getSuccessResult(
-                OK.value(),
-                "로그아웃 성공"
         );
     }
 
@@ -66,12 +52,10 @@ public class MemberController {
     @PostMapping("/withdraw")
     public CommonResult withdraw(
             @RequestBody Map<String, String> password,
-            @RequestHeader("Authorization") String accessToken,
-            @RequestHeader("RefreshToken") String refreshToken
+            @RequestHeader("Authorization") String accessToken
     ) throws Exception {
         memberService.withdraw(password.get("password"));
-        String email = jwtTokenUtil.getEmail(memberService.resolveToken(accessToken));
-        memberService.logout(TokenDto.of(accessToken, refreshToken), email);
+        authService.logout(accessToken);
         return responseService.getSuccessResult(
                 OK.value(),
                 "회원탈퇴 성공"
@@ -141,7 +125,7 @@ public class MemberController {
 
     // TODO: 관리자 권한 추가
     @DeleteMapping("/{memberId}")
-    public CommonResult deleteMemberInfoByAdmin(@PathVariable Integer memberId){
+    public CommonResult deleteMemberInfoByAdmin(@PathVariable Integer memberId) {
         memberService.deleteMemberInfoByAdmin(memberId);
         return responseService.getSuccessResult(
                 OK.value(),

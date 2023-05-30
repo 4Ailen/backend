@@ -1,10 +1,10 @@
 package com.aliens.friendship.domain.emailAuthentication.service;
 
+import com.aliens.friendship.domain.auth.exception.TokenException;
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.exception.EmailAlreadyRegisteredException;
 import com.aliens.friendship.domain.emailAuthentication.exception.EmailVerificationTimeOutException;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
-import com.aliens.friendship.domain.jwt.exception.TokenException;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
-import static com.aliens.friendship.domain.jwt.exception.JWTExceptionCode.INVALID_TOKEN;
+import static com.aliens.friendship.domain.auth.exception.AuthExceptionCode.INVALID_TOKEN;
 
 @Service
 @RequiredArgsConstructor
