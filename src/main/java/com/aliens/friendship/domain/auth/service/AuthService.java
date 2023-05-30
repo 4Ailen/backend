@@ -167,10 +167,6 @@ public class AuthService {
         Member savedMember = memberRepository.findByEmail((String) claims.get("email"))
                 .orElseThrow(MemberNotFoundException::new);
 
-        // claims 값을 기반으로 사용자의 권한 조회
-        Collection<? extends GrantedAuthority> roles = getMemberAuthority(
-                claims.get("roles", String.class)
-        );
         UserPrincipal userPrincipal = UserPrincipal.from(savedMember);
 
         return new UsernamePasswordAuthenticationToken(
