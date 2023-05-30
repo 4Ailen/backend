@@ -4,6 +4,7 @@ import com.aliens.friendship.domain.auth.dto.request.LoginRequest;
 import com.aliens.friendship.domain.auth.exception.MemberPasswordMisMatchException;
 import com.aliens.friendship.domain.auth.exception.RefreshTokenNotFoundException;
 import com.aliens.friendship.domain.auth.exception.TokenException;
+import com.aliens.friendship.domain.auth.principal.UserPrincipal;
 import com.aliens.friendship.domain.auth.repository.RefreshTokenRepository;
 import com.aliens.friendship.domain.auth.token.AuthToken;
 import com.aliens.friendship.domain.auth.token.AuthTokenProvider;
@@ -14,6 +15,8 @@ import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -89,8 +92,7 @@ public class AuthService {
     }
 
     private void checkMemberPassword(String requestPassword, String savedPassword) {
-//        if (!passwordEncoder.matches(requestPassword, savedPassword))
-        if (!requestPassword.equals(savedPassword))
+        if (!passwordEncoder.matches(requestPassword, savedPassword))
             throw new MemberPasswordMisMatchException();
     }
 
@@ -119,8 +121,10 @@ public class AuthService {
         return generateRefreshToken;
     }
 
-    // Access Token Value -> AuthToken
-    private AuthToken createAuthTokenOfAccessToken(String accessToken) {
+    /**
+     * Access Token Value -> AuthToken
+     */
+    public AuthToken createAuthTokenOfAccessToken(String accessToken) {
         return tokenProvider.createAuthTokenOfAccessToken(accessToken);
     }
 
@@ -147,5 +151,32 @@ public class AuthService {
 
         if (!refreshTokenRepository.existsByEmail((String) tokenClaims.get("email")))
             throw new TokenException(LOGGED_OUT_TOKEN);
+    }
+
+    /**
+     * 인가된 사용자 인증 정보 조회
+     */
+    public Authentication getAuthentication(AuthToken accessToken) {
+        // access token 검증
+        tokenValidate(accessToken);
+
+        // access token claims 조회
+        Claims claims = accessToken.getTokenClaims();
+
+        // claims 값을 기반으로 Member Entity 조회
+        Member savedMember = memberRepository.findByEmail((String) claims.get("email"))
+                .orElseThrow(MemberNotFoundException::new);
+
+        // claims 값을 기반으로 사용자의 권한 조회
+        Collection<? extends GrantedAuthority> roles = getMemberAuthority(
+                claims.get("roles", String.class)
+        );
+        UserPrincipal userPrincipal = UserPrincipal.from(savedMember);
+
+        return new UsernamePasswordAuthenticationToken(
+                userPrincipal,
+                accessToken,
+                userPrincipal.getAuthorities()
+        );
     }
 }

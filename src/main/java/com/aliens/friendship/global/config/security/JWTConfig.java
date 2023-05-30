@@ -1,5 +1,6 @@
 package com.aliens.friendship.global.config.security;
 
+import com.aliens.friendship.domain.auth.filter.JwtEntryPoint;
 import com.aliens.friendship.domain.auth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,5 +31,13 @@ public class JWTConfig {
                 refreshTokenSecretKey,
                 refreshTokenExpiry
         );
+    }
+
+    /**
+     * Authentication Entry Point
+     */
+    @Bean
+    public JwtEntryPoint jwtEntryPoint() {
+        return new JwtEntryPoint();
     }
 }
