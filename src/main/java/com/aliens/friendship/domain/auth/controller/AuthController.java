@@ -2,15 +2,13 @@ package com.aliens.friendship.domain.auth.controller;
 
 import com.aliens.friendship.domain.auth.dto.request.LoginRequest;
 import com.aliens.friendship.domain.auth.service.AuthService;
-import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
+import com.aliens.friendship.domain.auth.dto.TokenDto;
+import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ResponseService;
 import com.aliens.friendship.global.response.SingleResult;
 import com.aliens.friendship.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,6 +42,19 @@ public class AuthController {
                 OK.value(),
                 "성공적으로 토큰이 재발급되었습니다.",
                 authService.reissueToken(expiredAccessToken, refreshToken)
+        );
+    }
+
+    @DeleteMapping("/logout")
+    public CommonResult logout(
+            HttpServletRequest request
+    ) {
+        String accessToken = HeaderUtil.getAccessToken(request);
+        authService.logout(accessToken);
+
+        return responseService.getSuccessResult(
+                OK.value(),
+                "성공적으로 로그아웃되었습니다."
         );
     }
 }

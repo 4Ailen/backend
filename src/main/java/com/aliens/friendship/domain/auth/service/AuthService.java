@@ -4,12 +4,12 @@ import com.aliens.friendship.domain.auth.dto.request.LoginRequest;
 import com.aliens.friendship.domain.auth.exception.MemberPasswordMisMatchException;
 import com.aliens.friendship.domain.auth.exception.RefreshTokenNotFoundException;
 import com.aliens.friendship.domain.auth.exception.TokenException;
-import com.aliens.friendship.domain.auth.principal.UserPrincipal;
+import com.aliens.friendship.domain.auth.model.principal.UserPrincipal;
 import com.aliens.friendship.domain.auth.repository.RefreshTokenRepository;
 import com.aliens.friendship.domain.auth.token.AuthToken;
 import com.aliens.friendship.domain.auth.token.AuthTokenProvider;
 import com.aliens.friendship.domain.auth.token.RefreshToken;
-import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
+import com.aliens.friendship.domain.auth.dto.TokenDto;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
@@ -19,8 +19,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,7 +37,8 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
     private final AuthTokenProvider tokenProvider;
-    private final PasswordEncoder passwordEncoder;
+
+    private final static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
      * 로그인 비즈니스
@@ -56,6 +59,7 @@ public class AuthService {
     /**
      * 토큰 재발급 비즈니스
      */
+    @Transactional
     public TokenDto reissueToken(String expiredAccessToken, String refreshToken) {
         AuthToken authTokenOfExpiredAccessToken = createAuthTokenOfAccessToken(expiredAccessToken);
         Claims expiredTokenClaims = authTokenOfExpiredAccessToken.getExpiredTokenClaims();
@@ -85,6 +89,16 @@ public class AuthService {
         );
     }
 
+    /**
+     * 로그아웃 비즈니스
+     */
+    @Transactional
+    public void logout(String accessToken) {
+        String email = (String) createAuthTokenOfAccessToken(accessToken).getTokenClaims().get("email");
+
+        refreshTokenRepository.deleteAllByEmail(email);
+    }
+
     private void validateMemberStatus(Member.Status status) {
         if (status == Member.Status.WITHDRAWN) {
             throw new MemberNotFoundException();
@@ -105,7 +119,8 @@ public class AuthService {
     }
 
     // Refresh Token 생성
-    private AuthToken createRefreshToken(
+    @Transactional
+    public AuthToken createRefreshToken(
             String email,
             Collection<? extends GrantedAuthority> memberRoles
     ) {
