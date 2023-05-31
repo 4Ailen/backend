@@ -8,10 +8,22 @@ import lombok.Getter;
 @Getter
 public class SingleResult<T> extends CommonResult {
 
-    private T data;
+    private final T data;
 
-    public SingleResult(Integer status, String message, T data) {
+    private SingleResult(
+            Integer status,
+            String message,
+            T data
+    ) {
         super(status, message);
         this.data = data;
+    }
+
+    public static <T> SingleResult<T> of(
+            Integer status,
+            String message,
+            T data
+    ) {
+        return new SingleResult<>(status, message, data);
     }
 }

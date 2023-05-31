@@ -10,10 +10,14 @@ import java.util.List;
 @Getter
 public class ListResult<T> extends CommonResult {
 
-    private List<T> data;
+    private final List<T> data;
 
-    public ListResult(Integer status, String message, List<T> data) {
+    private ListResult(Integer status, String message, List<T> data) {
         super(status, message);
         this.data = data;
+    }
+
+    public static <T> ListResult<T> of(Integer status, String message, List<T> data) {
+        return new ListResult<>(status, message, data);
     }
 }
