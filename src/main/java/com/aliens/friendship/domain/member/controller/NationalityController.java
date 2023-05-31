@@ -1,7 +1,6 @@
 package com.aliens.friendship.domain.member.controller;
 
 import com.aliens.friendship.domain.member.service.NationalityService;
-import com.aliens.friendship.global.response.ResponseService;
 import com.aliens.friendship.global.response.SingleResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +17,10 @@ import static org.springframework.http.HttpStatus.OK;
 public class NationalityController {
 
     private final NationalityService nationalityService;
-    private final ResponseService responseService;
 
     @GetMapping("/nationalities")
     public SingleResult<Map<String, Object>> getNationalities() {
-        return responseService.getSingleResult(
+        return SingleResult.of(
                 OK.value(),
                 "성공적으로 국가 리스트를 조회하였습니다.",
                 nationalityService.getNationalities()

@@ -10,7 +10,6 @@ import com.aliens.friendship.domain.matching.service.MatchingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingService;
 import com.aliens.friendship.domain.matching.service.ReportService;
 import com.aliens.friendship.global.response.CommonResult;
-import com.aliens.friendship.global.response.ResponseService;
 import com.aliens.friendship.global.response.SingleResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +29,10 @@ public class MatchingController {
     private final MatchingService matchingService;
 
     private final ReportService reportService;
-    private final ResponseService responseService;
 
     @GetMapping("/languages")
     public SingleResult<Map<String, Object>> getLanguages() {
-        return responseService.getSingleResult(
+        return SingleResult.of(
                 OK.value(),
                 "성공적으로 언어리스트를 조회하였습니다.",
                 matchingInfoService.getLanguages()
@@ -45,7 +43,7 @@ public class MatchingController {
     public CommonResult applyMatching(@RequestBody ApplicantRequest applicantRequest) {
         matchingInfoService.applyMatching(applicantRequest);
 
-        return responseService.getSuccessResult(
+        return CommonResult.of(
                 OK.value(),
                 "성공적으로 매칭 신청이 완료되었습니다."
         );
@@ -53,7 +51,7 @@ public class MatchingController {
 
     @GetMapping("/status")
     public SingleResult<Map<String, String>> getStatus() {
-        return responseService.getSingleResult(
+        return SingleResult.of(
                 OK.value(),
                 "성공적으로 매칭상태가 조회되었습니다.",
                 matchingInfoService.getMatchingStatus()
@@ -62,7 +60,7 @@ public class MatchingController {
 
     @GetMapping("/partners")
     public SingleResult<PartnersResponse> getPartners() {
-        return responseService.getSingleResult(
+        return SingleResult.of(
                 OK.value(),
                 "성공적으로 파트너가 조회되었습니다.",
                 matchingInfoService.getPartnersResponse()
@@ -71,7 +69,7 @@ public class MatchingController {
 
     @GetMapping("/applicant")
     public SingleResult<ApplicantResponse> getApplicant() throws Exception {
-        return responseService.getSingleResult(
+        return SingleResult.of(
                 OK.value(),
                 "성공적으로 매칭 신청자가 조회되었습니다.",
                 matchingInfoService.getApplicant()
@@ -85,7 +83,7 @@ public class MatchingController {
     ) {
         blockingInfoService.block(memberId);
         chattingService.blockChattingRoom(roomId);
-        return responseService.getSuccessResult(
+        return CommonResult.of(
                 OK.value(),
                 "차단 완료"
         );
@@ -97,7 +95,7 @@ public class MatchingController {
             @RequestBody ReportRequest reportRequest
     ) {
         reportService.report(memberId, reportRequest);
-        return responseService.getSuccessResult(
+        return CommonResult.of(
                 OK.value(),
                 "신고 완료"
         );
