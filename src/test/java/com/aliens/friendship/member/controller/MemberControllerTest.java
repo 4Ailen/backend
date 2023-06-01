@@ -8,7 +8,6 @@ import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.service.MemberService;
-import com.aliens.friendship.global.response.ResponseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,9 +50,6 @@ class MemberControllerTest {
     @MockBean
     private AuthService authService;
 
-    @MockBean
-    private ResponseService responseService;
-
     @Value("${spring.domain}")
     private String domainUrl;
 
@@ -70,8 +66,10 @@ class MemberControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(joinDto)))
-                .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("회원가입 성공"))
+                .andDo(print());
+
         verify(memberService, times(1)).join(any(JoinDto.class));
     }
 
@@ -87,7 +85,9 @@ class MemberControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(joinDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("회원가입 성공"))
+                .andDo(print());
         verify(memberService, times(1)).join(any(JoinDto.class));
     }
 
@@ -125,7 +125,18 @@ class MemberControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("성공적으로 사용자 정보를 조회하였습니다."))
+                .andExpect(jsonPath("$.data.email").value(expectedMemberInfoDto.getEmail()))
+                .andExpect(jsonPath("$.data.mbti").value(expectedMemberInfoDto.getMbti().name()))
+                .andExpect(jsonPath("$.data.gender").value(expectedMemberInfoDto.getGender()))
+                .andExpect(jsonPath("$.data.nationality").value(expectedMemberInfoDto.getNationality()))
+                .andExpect(jsonPath("$.data.birthday").value(expectedMemberInfoDto.getBirthday()))
+                .andExpect(jsonPath("$.data.name").value(expectedMemberInfoDto.getName()))
+                .andExpect(jsonPath("$.data.profileImage").value(expectedMemberInfoDto.getProfileImage()))
+                .andExpect(jsonPath("$.data.age").value(expectedMemberInfoDto.getAge()))
+                .andDo(print());
+
         verify(memberService, times(1)).getMemberInfo();
     }
 
@@ -146,7 +157,10 @@ class MemberControllerTest {
                         .content(new ObjectMapper().writeValueAsString(passwordMap))
                         .header("Authorization", "Bearer " + accessToken)
                         .header("RefreshToken", refreshToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("회원탈퇴 성공"))
+                .andDo(print());
+
         verify(memberService, times(1)).withdraw(password);
     }
 
@@ -159,7 +173,11 @@ class MemberControllerTest {
 
         // when & then
         mockMvc.perform(get("/api/v1/member/email/" + email + "/existence"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("성공적으로 조회하였습니다."))
+                .andExpect(jsonPath("$.data.existence").value(true))
+                .andDo(print());
+
         verify(memberService, times(1)).isJoinedEmail(email);
     }
 
@@ -177,7 +195,10 @@ class MemberControllerTest {
         mockMvc.perform(post("/api/v1/member/" + email + "/password/temp")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(nameMap)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("임시 비밀번호 발급 성공"))
+                .andDo(print());
+
         verify(memberService, times(1)).issueTemporaryPassword(anyString(), anyString());
     }
 
@@ -194,7 +215,10 @@ class MemberControllerTest {
         mockMvc.perform(put("/api/v1/member/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(passwordUpdateRequestDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("비밀번호 변경 성공"))
+                .andDo(print());
+
         verify(memberService, times(1)).changePassword(any(PasswordUpdateRequestDto.class));
     }
 
@@ -210,7 +234,10 @@ class MemberControllerTest {
         mockMvc.perform(patch("/api/v1/member")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(mbti)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("프로필 이름과 mbti 값 변경 성공"))
+                .andDo(print());
+
         verify(memberService, times(1)).changeProfileNameAndMbti(any(Member.Mbti.class));
     }
 
@@ -225,7 +252,10 @@ class MemberControllerTest {
         mockMvc.perform(multipart(PUT, "/api/v1/member/profile-image")
                         .file(newProfileImage)
                         .contentType("multipart/form-data"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("프로필 이미지 수정에 성공하였습니다."))
+                .andDo(print());
+
         verify(memberService, times(1)).changeProfileImage(any(MultipartFile.class));
     }
 
@@ -249,7 +279,8 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.errors[0].field").value("profileImage"))
                 .andExpect(jsonPath("$.errors[0].value").isNotEmpty())
                 .andExpect(jsonPath("$.errors[0].reason").value("회원 프로필 이미지는 10MB 이하여야 합니다."))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andDo(print());
     }
 
     @DisplayName("프로필 이미지 검증 실패 - 유효하지 않은 이미지 확장자인 경우")
@@ -268,7 +299,8 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.errors[0].field").value("profileImage"))
                 .andExpect(jsonPath("$.errors[0].value").isNotEmpty())
                 .andExpect(jsonPath("$.errors[0].reason").value("회원 프로필 이미지는 [jpg, jpeg, png] 확장자만 가능합니다."))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andDo(print());
     }
 
     @Test
@@ -281,7 +313,11 @@ class MemberControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/member/" + email + "/authentication-status")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("성공적으로 조회하였습니다."))
+                .andExpect(jsonPath("$.data.status").value("AUTHENTICATED"))
+                .andDo(print());
+
         verify(memberService, times(1)).getMemberAuthenticationStatus(anyString());
     }
 
@@ -294,8 +330,10 @@ class MemberControllerTest {
 
         // when & then
         mockMvc.perform(delete("/api/v1/member/" + memberId))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("회원 관련 정보 삭제에 성공하였습니다."))
+                .andDo(print());
+
         verify(memberService, times(1)).deleteMemberInfoByAdmin(anyInt());
     }
-
 }

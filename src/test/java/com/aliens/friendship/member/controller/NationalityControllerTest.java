@@ -4,7 +4,6 @@ import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.member.controller.NationalityController;
 import com.aliens.friendship.domain.member.domain.Nationality;
 import com.aliens.friendship.domain.member.service.NationalityService;
-import com.aliens.friendship.global.response.ResponseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,8 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc(addFilters = false)
@@ -36,9 +37,6 @@ class NationalityControllerTest {
     @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @MockBean
-    private ResponseService responseService;
-
     @Test
     @DisplayName("국적 목록 요청 성공")
     void GetNationalities_Success() throws Exception {
@@ -53,7 +51,13 @@ class NationalityControllerTest {
         // when & then
         mockMvc.perform(get("/api/v1/member/nationalities")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("성공적으로 국가 리스트를 조회하였습니다."))
+                .andExpect(jsonPath("$.data.nationalities").isArray())
+                .andExpect(jsonPath("$.data.nationalities[0].id").value(nationalities.get(0).getId()))
+                .andExpect(jsonPath("$.data.nationalities[0].nationalityText").value(nationalities.get(0).getNationalityText()))
+                .andDo(print());
+
         verify(nationalityService, times(1)).getNationalities();
     }
 }
