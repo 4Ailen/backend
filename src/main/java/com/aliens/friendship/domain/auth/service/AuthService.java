@@ -48,7 +48,7 @@ public class AuthService {
                 .orElseThrow(MemberNotFoundException::new);
 
         validateMemberStatus(savedMember.getStatus());
-        checkMemberPassword(savedMember.getPassword(), request.getPassword());
+        checkMemberPassword(request.getPassword(), savedMember.getPassword());
 
         return TokenDto.of(
                 createAccessToken(request.getEmail(), savedMember.getAuthorities()).getValue(),
@@ -105,8 +105,8 @@ public class AuthService {
         }
     }
 
-    private void checkMemberPassword(String requestPassword, String savedPassword) {
-        if (!passwordEncoder.matches(requestPassword, savedPassword))
+    private void checkMemberPassword(String savedPassword, String requestPassword) {
+        if (!passwordEncoder.matches(savedPassword, requestPassword))
             throw new MemberPasswordMisMatchException();
     }
 
