@@ -1,8 +1,57 @@
 spring:
-  redis:
-    host: 127.0.0.1
-    port: '6379'
   profiles:
-    include: mysql
+    default: dev
+
+  datasource:
+    driver-class-name:
+    url:
+    username:
+    password:
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql:
+    show-sql:
+    hibernate:
+      ddl-auto:
+
+  data:
+    mongodb:
+      host:
+      port:
+      authentication-database:
+      database:
+      username:
+      password:
+
+  mail:
+    host:
+    port:
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable:
+            required:
+          auth:
+          connectiontimeout:
+          timeout:
+          writetimeout:
+
+  domain:
+
+  redis:
+    host:
+    port:
+
+app:
   jwt:
     secret:
+      access-token-secret-key:
+      refresh-token-secret-key:
+    expiry:
+      access-token-expiry:
+      refresh-token-expiry:

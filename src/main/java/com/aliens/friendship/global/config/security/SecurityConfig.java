@@ -1,7 +1,8 @@
 package com.aliens.friendship.global.config.security;
 
-import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
-import com.aliens.friendship.global.config.jwt.JwtEntryPoint;
+import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
+import com.aliens.friendship.domain.auth.filter.JwtEntryPoint;
+import com.aliens.friendship.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,9 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtEntryPoint jwtEntryPoint;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailService customUserDetailService;
+    private final AuthService authService;
+    private final JwtEntryPoint jwtEntryPoint;
 
     @Bean
     public AuthenticationManager authenticationManagerBean(HttpSecurity http) throws Exception {
@@ -41,8 +42,8 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/ws-stomp/**","/send/**","/room/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/api/v1/member/authentication", "/api/v1/member", "/api/v1/member/{email}/password/temp", "/api/v1/email/**").permitAll()
+                .antMatchers("/ws-stomp/**", "/send/**", "/room/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/", "/join/**", "/login", "/api/v1/auth/authentication", "/api/v1/member", "/api/v1/auth/reissue", "/api/v1/member/{email}/password/temp", "/api/v1/email/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/member/email/{email}/existence", "/api/v1/member/{email}/authentication-status", "/api/v1/member/nationalities", "/api/v1/email/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/api/v1/member/{memberId}").permitAll()
                 .antMatchers("/matching/**", "/health", "/logout").authenticated()
@@ -50,7 +51,6 @@ public class SecurityConfig {
 
                 .and()
                 .exceptionHandling().
-                authenticationEntryPoint(jwtEntryPoint).
 
                 and()
                 .logout()
@@ -59,7 +59,9 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).
 
                 and()// Add a filter to validate the tokens with every request
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(authService), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtEntryPoint);
 
 //        // 필터 해제
 //        http.authorizeRequests()
@@ -77,11 +79,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers("/h2-console/**", "/favicon.ico");
     }
-
-
 }

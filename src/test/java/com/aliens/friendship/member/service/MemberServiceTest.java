@@ -417,7 +417,7 @@ class MemberServiceTest {
 
         // then
         verify(emailAuthenticationRepository, times(1)).findByEmail(anyString());
-        assertEquals(status, "NOT_AUTHENTICATED");
+        assertEquals(status, "EMAIL_SENT_NOT_AUTHENTICATED");
     }
 
     @Test

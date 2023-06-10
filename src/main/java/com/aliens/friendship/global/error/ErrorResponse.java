@@ -1,5 +1,6 @@
 package com.aliens.friendship.global.error;
 
+import com.aliens.friendship.global.util.GsonUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -82,9 +83,9 @@ public class ErrorResponse {
     /**
      * Object -> Json (필터에서 사용)
      */
-//    public String convertJson() {
-//        return new GsonUtil().toJson(this);
-//    }
+    public String convertJson() {
+        return new GsonUtil().toJson(this);
+    }
 
     /**
      * 입력 값 검증 에러를 상세하게 표현하는 Inner Class

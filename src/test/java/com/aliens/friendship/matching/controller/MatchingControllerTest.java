@@ -1,11 +1,11 @@
 package com.aliens.friendship.matching.controller;
 
+import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.chatting.service.ChattingService;
 import com.aliens.friendship.domain.matching.controller.MatchingController;
 import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
 import com.aliens.friendship.domain.matching.service.ReportService;
 import com.aliens.friendship.domain.member.domain.Member;
-import com.aliens.friendship.global.config.jwt.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
 import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
 import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
@@ -33,8 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

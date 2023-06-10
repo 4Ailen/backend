@@ -6,7 +6,7 @@ import com.aliens.friendship.domain.chatting.repository.ChatMessageRepository;
 import com.aliens.friendship.domain.chatting.repository.ChattingRoomRepository;
 import com.aliens.friendship.domain.matching.domain.Applicant;
 import com.aliens.friendship.domain.matching.domain.Matching;
-import com.aliens.friendship.domain.jwt.domain.dto.RoomInfoDto;
+import com.aliens.friendship.domain.auth.dto.RoomInfoDto;
 import com.aliens.friendship.domain.matching.repository.MatchingRepository;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
 import lombok.RequiredArgsConstructor;

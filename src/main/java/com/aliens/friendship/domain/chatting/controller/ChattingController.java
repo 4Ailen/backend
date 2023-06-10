@@ -1,6 +1,6 @@
 package com.aliens.friendship.domain.chatting.controller;
 
-import com.aliens.friendship.domain.jwt.domain.dto.RoomInfoDto;
+import com.aliens.friendship.domain.auth.dto.RoomInfoDto;
 import com.aliens.friendship.global.common.Response;
 import com.aliens.friendship.domain.chatting.service.ChattingService;
 import com.aliens.friendship.domain.member.domain.Member;

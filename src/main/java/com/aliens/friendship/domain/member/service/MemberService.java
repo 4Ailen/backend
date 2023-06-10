@@ -2,26 +2,14 @@ package com.aliens.friendship.domain.member.service;
 
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
-import com.aliens.friendship.domain.jwt.domain.LogoutAccessToken;
-import com.aliens.friendship.domain.jwt.domain.RefreshToken;
-import com.aliens.friendship.domain.jwt.domain.dto.LoginDto;
-import com.aliens.friendship.domain.jwt.domain.dto.TokenDto;
-import com.aliens.friendship.domain.jwt.exception.RefreshTokenNotFoundException;
-import com.aliens.friendship.domain.jwt.exception.TokenException;
-import com.aliens.friendship.domain.jwt.repository.LogoutAccessTokenRedisRepository;
-import com.aliens.friendship.domain.jwt.repository.RefreshTokenRedisRepository;
-import com.aliens.friendship.domain.jwt.util.JwtTokenUtil;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.exception.*;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
-import com.aliens.friendship.global.config.cache.CacheKey;
-import com.aliens.friendship.global.config.jwt.JwtExpirationEnums;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
@@ -37,17 +25,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
-import static com.aliens.friendship.domain.jwt.exception.JWTExceptionCode.INVALID_REFRESH_TOKEN;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
-    private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
-    private final JwtTokenUtil jwtTokenUtil;
     private final ProfileImageService profileImageService;
     private final EmailAuthenticationRepository emailAuthenticationRepository;
     private final JavaMailSender javaMailSender;
@@ -95,35 +78,8 @@ public class MemberService {
         memberRepository.deleteById(memberId);
     }
 
-    public TokenDto login(LoginDto loginDto) throws Exception {
-        Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(MemberNotFoundException::new);
-        checkWithdrawn(member.getStatus());
-        checkPassword(loginDto.getPassword(), member.getPassword());
-        String email = member.getEmail();
-        String accessToken = jwtTokenUtil.generateAccessToken(email);
-        RefreshToken refreshToken = saveRefreshToken(email);
-        return TokenDto.of(accessToken, refreshToken.getRefreshToken());
-    }
-
     public boolean isJoinedEmail(String email) {
         return memberRepository.findByEmail(email).isPresent();
-    }
-
-    private void checkWithdrawn(Member.Status status) throws Exception {
-        if (status == Member.Status.WITHDRAWN) {
-            throw new MemberNotFoundException();
-        }
-    }
-
-    private void checkPassword(String rawPassword, String findMemberPassword) {
-        if (!passwordEncoder.matches(rawPassword, findMemberPassword)) {
-            throw new InvalidMemberPasswordException();
-        }
-    }
-
-    private RefreshToken saveRefreshToken(String email) {
-        return refreshTokenRedisRepository.save(RefreshToken.createRefreshToken(email,
-                jwtTokenUtil.generateRefreshToken(email), JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
     @Transactional(readOnly = true)
@@ -141,41 +97,6 @@ public class MemberService {
                 .name(member.getName())
                 .profileImage(domainUrl + member.getProfileImageUrl())
                 .build();
-    }
-
-    @CacheEvict(value = CacheKey.USER, key = "#username")
-    public void logout(TokenDto tokenDto, String username) {
-        String accessToken = resolveToken(tokenDto.getAccessToken());
-        long remainMilliSeconds = jwtTokenUtil.getRemainMilliSeconds(accessToken);
-        refreshTokenRedisRepository.deleteById(username);
-        logoutAccessTokenRedisRepository.save(LogoutAccessToken.of(accessToken, username, remainMilliSeconds));
-    }
-
-    public String resolveToken(String token) {
-        return token.substring(7);
-    }
-
-    public TokenDto reissue(String refreshToken) {
-        refreshToken = resolveToken(refreshToken);
-        String email = getCurrentMemberEmail();
-        RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(email).orElseThrow(RefreshTokenNotFoundException::new);
-
-        if (refreshToken.equals(redisRefreshToken.getRefreshToken())) {
-            return reissueRefreshToken(refreshToken, email);
-        }
-        throw new TokenException(INVALID_REFRESH_TOKEN);
-    }
-
-    private TokenDto reissueRefreshToken(String refreshToken, String email) {
-        if (lessThanReissueExpirationTimesLeft(refreshToken)) {
-            String accessToken = jwtTokenUtil.generateAccessToken(email);
-            return TokenDto.of(accessToken, saveRefreshToken(email).getRefreshToken());
-        }
-        return TokenDto.of(jwtTokenUtil.generateAccessToken(email), refreshToken);
-    }
-
-    private boolean lessThanReissueExpirationTimesLeft(String refreshToken) {
-        return jwtTokenUtil.getRemainMilliSeconds(refreshToken) < JwtExpirationEnums.REISSUE_EXPIRATION_TIME.getValue();
     }
 
     private String getCurrentMemberEmail() {
