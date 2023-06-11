@@ -105,8 +105,8 @@ public class AuthService {
         }
     }
 
-    private void checkMemberPassword(String savedPassword, String requestPassword) {
-        if (!passwordEncoder.matches(savedPassword, requestPassword))
+    private void checkMemberPassword(String requestPassword, String savedPassword) {
+        if (!passwordEncoder.matches(requestPassword, savedPassword))
             throw new MemberPasswordMisMatchException();
     }
 
