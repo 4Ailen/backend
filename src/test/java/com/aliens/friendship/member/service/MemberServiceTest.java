@@ -10,7 +10,6 @@ import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.domain.Member;
-import com.aliens.friendship.domain.member.domain.Nationality;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -93,7 +92,7 @@ class MemberServiceTest {
                         .name("Ryan")
                         .mbti(Member.Mbti.ENFJ)
                         .gender("MALE")
-                        .nationality(new Nationality(1, "South Korea"))
+                        .nationality("South Korea")
                         .birthday("1998-12-31")
                         .profileImage(null)
                         .build();
@@ -462,7 +461,7 @@ class MemberServiceTest {
                 .name("Ryan")
                 .mbti(Member.Mbti.ENFJ)
                 .gender("MALE")
-                .nationality(new Nationality(1, "South Korea"))
+                .nationality("South Korea")
                 .birthday("1998-12-31")
                 .profileImage(mockMultipartFile)
                 .build();
