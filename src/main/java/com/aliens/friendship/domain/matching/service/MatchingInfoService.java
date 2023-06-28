@@ -87,18 +87,21 @@ public class MatchingInfoService {
                         .mbti(null)
                         .gender("")
                         .nationality("")
-                        .countryImage("")
+                        .firstPreferLanguage("")
+                        .secondPreferLanguage("")
                         .profileImage("")
                         .build();
                 partnersResponse.getPartners().add(partnerDto);
             } else {
+                Applicant applicant = applicantRepository.findById(partner.getId()).get();
                 PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
                         .memberId(partner.getId())
                         .name(partner.getName())
                         .mbti(partner.getMbti())
                         .gender(partner.getGender())
                         .nationality(partner.getNationality())
-                        .countryImage(partner.getNationality())
+                        .firstPreferLanguage(applicant.getFirstPreferLanguage().getLanguageText())
+                        .secondPreferLanguage(applicant.getSecondPreferLanguage().getLanguageText())
                         .profileImage(domainUrl + partner.getProfileImageUrl())
                         .build();
                 partnersResponse.getPartners().add(partnerDto);

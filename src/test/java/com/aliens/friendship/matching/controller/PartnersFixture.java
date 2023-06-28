@@ -18,7 +18,8 @@ public class PartnersFixture {
                     .mbti(Member.Mbti.INTJ)
                     .gender("GENDER" + i)
                     .nationality("Nationality" + i)
-                    .countryImage("CountryImageURL" + i)
+                    .firstPreferLanguage("Korean")
+                    .secondPreferLanguage("Chinese")
                     .profileImage("ProfileImageURL" + i)
                     .build();
             partners.add(partner);
