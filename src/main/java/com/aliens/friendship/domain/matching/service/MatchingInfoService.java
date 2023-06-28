@@ -16,6 +16,7 @@ import com.aliens.friendship.domain.matching.repository.MatchingRepository;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +34,9 @@ public class MatchingInfoService {
     private final MemberRepository memberRepository;
     private final ApplicantRepository applicantRepository;
     private final MatchingRepository matchingRepository;
+
+    @Value("${file-server.domain}")
+    private String domainUrl;
 
     public Map<String, Object> getLanguages() {
         return Collections.singletonMap("languages", languageRepository.findAll());
@@ -95,7 +99,7 @@ public class MatchingInfoService {
                         .gender(partner.getGender())
                         .nationality(partner.getNationality())
                         .countryImage(partner.getNationality())
-                        .profileImage(partner.getProfileImageUrl())
+                        .profileImage(domainUrl + partner.getProfileImageUrl())
                         .build();
                 partnersResponse.getPartners().add(partnerDto);
             }
