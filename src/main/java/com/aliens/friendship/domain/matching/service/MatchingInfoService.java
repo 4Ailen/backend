@@ -93,8 +93,8 @@ public class MatchingInfoService {
                         .name(partner.getName())
                         .mbti(partner.getMbti())
                         .gender(partner.getGender())
-                        .nationality(partner.getNationality().getNationalityText())
-                        .countryImage(partner.getNationality().getNationalityText())
+                        .nationality(partner.getNationality())
+                        .countryImage(partner.getNationality())
                         .profileImage(partner.getProfileImageUrl())
                         .build();
                 partnersResponse.getPartners().add(partnerDto);
@@ -119,9 +119,9 @@ public class MatchingInfoService {
                 .gender(member.getGender())
                 .mbti(member.getMbti())
                 .age(member.getAge())
-                .nationality(member.getNationality().getNationalityText())
+                .nationality(member.getNationality())
                 .profileImage(member.getProfileImageUrl())
-                .countryImage(member.getNationality().getNationalityText())
+                .countryImage(member.getNationality())
                 .build();
         ApplicantResponse.PreferLanguages preferLanguagesDto = ApplicantResponse.PreferLanguages.builder()
                 .firstPreferLanguage(applicant.getFirstPreferLanguage().getLanguageText())
