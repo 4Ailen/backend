@@ -63,6 +63,6 @@ public class MatchingResultSaveService {
     }
 
     private void deleteAllMatchings(){
-        matchingRepository.deleteAll();
+        matchingRepository.deleteAllInBatch();
     }
 }
