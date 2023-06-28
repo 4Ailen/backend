@@ -85,7 +85,7 @@ public class Member {
     @Column(name = COLUMN_WITHDRAWALDATE_NAME)
     private String withdrawalDate;
 
-    @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 

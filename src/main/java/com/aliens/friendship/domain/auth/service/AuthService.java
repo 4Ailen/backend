@@ -48,7 +48,7 @@ public class AuthService {
                 .orElseThrow(MemberNotFoundException::new);
 
         validateMemberStatus(savedMember.getStatus());
-        checkMemberPassword(savedMember.getPassword(), request.getPassword());
+        checkMemberPassword(request.getPassword(), savedMember.getPassword());
 
         return TokenDto.of(
                 createAccessToken(request.getEmail(), savedMember.getAuthorities()).getValue(),
