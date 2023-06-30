@@ -69,8 +69,7 @@ public class UserPrincipal implements UserDetails {
         );
     }
 
-    public static UserPrincipal of(
-            String email,
+    public static UserPrincipal of(String email,
             Member.Status memberStatus,
             Collection<? extends GrantedAuthority> authorities
     ) {
