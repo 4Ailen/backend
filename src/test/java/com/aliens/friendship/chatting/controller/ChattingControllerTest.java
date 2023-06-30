@@ -1,130 +1,82 @@
 package com.aliens.friendship.chatting.controller;
 
-import com.aliens.friendship.domain.chatting.domain.ChatMessage;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.BeforeEach;
+import com.aliens.friendship.domain.auth.dto.RoomInfoDto;
+import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
+import com.aliens.friendship.domain.auth.service.AuthService;
+import com.aliens.friendship.domain.chatting.controller.ChattingController;
+import com.aliens.friendship.domain.chatting.service.ChattingService;
+import com.aliens.friendship.domain.member.service.MemberService;
+import com.aliens.friendship.global.response.ResponseService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import java.util.*;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompFrameHandler;
-import org.springframework.messaging.simp.stomp.StompHeaders;
-import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandler;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.Transport;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ChattingControllerTest {
+@AutoConfigureMockMvc(addFilters = false)
+@WebMvcTest(ChattingController.class)
+class ChattingControllerTest {
 
-    @LocalServerPort
-    private int port;
 
-    private SockJsClient sockJsClient;
+    @Autowired
+    private MockMvc mockMvc;
 
-    private WebSocketStompClient stompClient;
+    @MockBean
+    private MemberService memberService;
 
-    private final WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+    @MockBean
+    private ChattingService chattingService;
 
-    private Long roomId;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @BeforeEach
-    public void setup() {
-        List<Transport> transports = new ArrayList<>();
-        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-        this.sockJsClient = new SockJsClient(transports);
-        this.stompClient = new WebSocketStompClient(sockJsClient);
-        this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        roomId = Long.valueOf(1);
+    @MockBean
+    private AuthService authService;
+
+    @MockBean
+    private ResponseService responseService;
+
+
+    @Test
+    @DisplayName("채팅토큰 발급 컨트롤러 요청 성공")
+    void getJWTTokenForChatting_Success() throws Exception {
+        // given
+        String testToken= "gdasgasgdasg";
+        when(chattingService.getJWTTokenForChatting()).thenReturn(testToken);
+
+        // when & then
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/chat/token")
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        resultActions.andExpect(status().isOk());
+        verify(chattingService, times(1)).getJWTTokenForChatting();
     }
 
     @Test
-    public void getMessageThroughWebSocketTest() throws Exception {
+    @DisplayName("채팅토큰 발급 컨트롤러 요청 성공")
+    void getRooms_Success() throws Exception {
+        // given
+        RoomInfoDto roomInfoDto1 = new RoomInfoDto(1L,"OPEN",1);
+        RoomInfoDto roomInfoDto2 = new RoomInfoDto(2L,"OPEN",2);
+        List<RoomInfoDto> roomInfoDtos = Arrays.asList(roomInfoDto1,roomInfoDto2);
+        when(chattingService.getRoomInfoDtoListByMatchingCurrentMemberId()).thenReturn(roomInfoDtos);
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference<Throwable> failure = new AtomicReference<>();
+        // when & then
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/chat/room")
+                .contentType(MediaType.APPLICATION_JSON));
 
-        StompSessionHandler handler = new TestSessionHandler(failure) {
-
-            @Override
-            public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
-                session.subscribe("/room/"+roomId, new StompFrameHandler() {
-                    @Override
-                    public Type getPayloadType(StompHeaders headers) {
-                        return ChatMessage.class;
-                    }
-
-                    @Override
-                    public void handleFrame(StompHeaders headers, Object payload) {
-                        ChatMessage chatMessage = (ChatMessage) payload;
-                        try {
-                            assertEquals("Hello Alien", chatMessage.getMessage());
-                        } catch (Throwable t) {
-                            failure.set(t);
-                        } finally {
-                            session.disconnect();
-                            latch.countDown();
-                        }
-                    }
-                });
-                try {
-                    session.send("/send/"+roomId, new ChatMessage(roomId, "Aden", 0, "Hello Alien"));
-                } catch (Throwable t) {
-                    failure.set(t);
-                    latch.countDown();
-                }
-            }
-        };
-
-        this.stompClient.connect("ws://localhost:{port}/ws-stomp", this.headers, handler, this.port);
-
-        if (latch.await(3, TimeUnit.SECONDS)) {
-            if (failure.get() != null) {
-                throw new AssertionError("", failure.get());
-            }
-        }
-        else {
-            fail("Message not received");
-        }
-
+        resultActions.andExpect(status().isOk());
+        verify(chattingService, times(1)).getRoomInfoDtoListByMatchingCurrentMemberId();
     }
 
-    private class TestSessionHandler extends StompSessionHandlerAdapter {
 
-        private final AtomicReference<Throwable> failure;
-
-        public TestSessionHandler(AtomicReference<Throwable> failure) {
-            this.failure = failure;
-        }
-
-        @Override
-        public void handleFrame(StompHeaders headers, Object payload) {
-            this.failure.set(new Exception(headers.toString()));
-        }
-
-        @Override
-        public void handleException(StompSession s, StompCommand c, StompHeaders h, byte[] p, Throwable ex) {
-            this.failure.set(ex);
-        }
-
-        @Override
-        public void handleTransportError(StompSession session, Throwable ex) {
-            this.failure.set(ex);
-        }
-    }
 }
