@@ -12,21 +12,21 @@ public class Participant {
     private int id;
     private String firstPreferLanguage;
     private String secondPreferLanguage;
-    private List<Matching> matchingList;
+    private List<ServiceModelMatching> serviceModelMatchingList;
 
     public Participant(int id, String firstPreferLanguage, String secondPreferLanguage) {
         this.id = id;
         this.firstPreferLanguage = firstPreferLanguage;
         this.secondPreferLanguage = secondPreferLanguage;
-        this.matchingList = new ArrayList<>();
+        this.serviceModelMatchingList = new ArrayList<>();
     }
 
-    public void addToMatchingList(Matching matching) {
-        matchingList.add(matching);
+    public void addToMatchingList(ServiceModelMatching serviceModelMatching) {
+        serviceModelMatchingList.add(serviceModelMatching);
     }
 
     public int getNumberOfMatches() {
-        return matchingList.size();
+        return serviceModelMatchingList.size();
     }
 
     public String toString() {
