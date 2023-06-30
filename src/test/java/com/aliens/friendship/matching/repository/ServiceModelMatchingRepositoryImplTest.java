@@ -1,4 +1,4 @@
-package com.aliens.friendship.chatting.repository;
+package com.aliens.friendship.matching.repository;
 
 import com.aliens.friendship.domain.chatting.repository.ChattingRoomRepository;
 import com.aliens.friendship.domain.matching.domain.Applicant;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MatchingRepositoryImplTest {
+class ServiceModelMatchingRepositoryImplTest {
 
     @Autowired
     MatchingRepository matchingRepository;
