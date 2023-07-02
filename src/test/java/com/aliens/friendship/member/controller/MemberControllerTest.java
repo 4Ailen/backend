@@ -118,6 +118,7 @@ class MemberControllerTest {
                 .age(24)
                 .birthday("1998-12-31")
                 .name("Ryan")
+                .selfIntroduction("반가워요")
                 .profileImage(domainUrl + System.getProperty("user.dir") + "test")
                 .build();
         when(memberService.getMemberInfo()).thenReturn(expectedMemberInfoDto);
@@ -212,6 +213,21 @@ class MemberControllerTest {
                         .content(new ObjectMapper().writeValueAsString(mbti)))
                 .andExpect(status().isOk());
         verify(memberService, times(1)).changeProfileNameAndMbti(any(Member.Mbti.class));
+    }
+
+    @Test
+    @DisplayName("프로필 자기소개 변경 요청 성공")
+    void ChangeSelfIntroduction_Success() throws Exception {
+        // given
+        String selfIntroductionChangeRequest = "반가워요!";
+        doNothing().when(memberService).changeSelfIntroduction(selfIntroductionChangeRequest);
+
+        // when & then
+        mockMvc.perform(put("/api/v1/member/self-introduction")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(selfIntroductionChangeRequest)))
+                .andExpect(status().isOk());
+        verify(memberService, times(1)).changeSelfIntroduction(any(String.class));
     }
 
     @Test

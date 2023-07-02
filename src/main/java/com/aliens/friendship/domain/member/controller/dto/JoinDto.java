@@ -16,6 +16,7 @@ public class JoinDto {
     private String gender;
     private Nationality nationality;
     private String birthday;
+    private String selfIntroduction;
     @ProfileImageValidate
     private MultipartFile profileImage;
     @Builder.Default
