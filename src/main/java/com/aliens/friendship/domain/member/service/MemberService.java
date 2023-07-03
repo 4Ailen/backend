@@ -95,6 +95,7 @@ public class MemberService {
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
+                .selfIntroduction(member.getSelfIntroduction())
                 .profileImage(domainUrl + member.getProfileImageUrl())
                 .build();
     }
@@ -163,6 +164,12 @@ public class MemberService {
         checkCurrentPassword(passwordUpdateRequestDto.getCurrentPassword(), member);
         checkNewPassword(passwordUpdateRequestDto);
         member.updatePassword(passwordEncoder.encode(passwordUpdateRequestDto.getNewPassword()));
+        memberRepository.save(member);
+    }
+
+    public void changeSelfIntroduction(String selfIntroductionChangeRequest) throws Exception {
+        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+        member.updateSelfIntroduction(selfIntroductionChangeRequest);
         memberRepository.save(member);
     }
 

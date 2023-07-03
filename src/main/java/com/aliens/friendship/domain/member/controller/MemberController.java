@@ -112,6 +112,15 @@ public class MemberController {
         );
     }
 
+    @PutMapping("/self-introduction")
+    public CommonResult changeSelfIntroduction(@ModelAttribute @Valid String selfIntroductionChangeRequest) throws Exception {
+        memberService.changeSelfIntroduction(selfIntroductionChangeRequest);
+        return responseService.getSuccessResult(
+                OK.value(),
+                "프로필 자기소개 수정에 성공하였습니다."
+        );
+    }
+
     @GetMapping("/{email}/authentication-status")
     public SingleResult<Map<String, String>> getMemberAuthenticationStatus(@PathVariable String email) {
         Map<String, String> status = new HashMap<>();

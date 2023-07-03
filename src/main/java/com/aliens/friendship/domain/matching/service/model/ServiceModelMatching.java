@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Matching{
+public class ServiceModelMatching {
     private Participant partner;
     private Long chattingRoomId;
 }

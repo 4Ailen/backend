@@ -17,5 +17,6 @@ public class MemberInfoDto {
     private String birthday;
     private String name;
     private String profileImage;
+    private String selfIntroduction;
     private int age;
 }

@@ -382,6 +382,25 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("프로필 자기소개 변경 성공")
+    void ChangeSelfIntroduction_Success() throws Exception {
+        // given
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        String newSelfIntroduction = "새로운 자기소개입니다.";
+        when(memberRepository.findByEmail(spyMember.getEmail())).thenReturn(Optional.of(spyMember));
+
+        setAuthenticationWithSpyMember(spyMember);
+
+        // when
+        memberService.changeSelfIntroduction(newSelfIntroduction);
+
+        // then
+        verify(memberRepository, times(1)).findByEmail(anyString());
+        verify(memberRepository, times(1)).save(any(Member.class));
+    }
+
+    @Test
     @DisplayName("프로필 이미지 수정 성공")
     void ChangeProfileImage_Success() throws Exception {
         // given

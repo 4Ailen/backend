@@ -4,7 +4,7 @@ import com.aliens.friendship.domain.matching.repository.LanguageRepository;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
 import com.aliens.friendship.domain.matching.service.MatchingResultSaveService;
 import com.aliens.friendship.domain.matching.service.MatchingService;
-import com.aliens.friendship.domain.matching.service.model.Matching;
+import com.aliens.friendship.domain.matching.service.model.ServiceModelMatching;
 import com.aliens.friendship.domain.matching.service.model.Participant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MatchingServiceTest {
+public class ServiceModelMatchingServiceTest {
 
     @Mock
     LanguageRepository languageRepository;
@@ -50,9 +50,9 @@ public class MatchingServiceTest {
             // 모든 참가자가 적어도 3명의 참가자와 매칭되었는지 확인
             assertThat(applicant.getNumberOfMatches()).isGreaterThanOrEqualTo(3);
             // 참가자의 matchingList에 중복된 매칭이 없는지 확인
-            assertThat(applicant.getMatchingList()).doesNotHaveDuplicates();
+            assertThat(applicant.getServiceModelMatchingList()).doesNotHaveDuplicates();
             // 참가자의 matchingList에 자기 자신이 없는지 확인
-            assertThat(applicant.getMatchingList()).extracting(Matching::getPartner).doesNotContain(applicant);
+            assertThat(applicant.getServiceModelMatchingList()).extracting(ServiceModelMatching::getPartner).doesNotContain(applicant);
         }
     }
 }
