@@ -2,8 +2,6 @@ package com.aliens.friendship.domain.matching.domain;
 
 import com.aliens.friendship.domain.member.domain.Member;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -20,6 +18,7 @@ public class Applicant {
     public static final String COLUMN_ISMATCHED_NAME = "is_matched";
     public static final String COLUMN_FIRSTPREFERLANGUAGE_NAME = "first_prefer_language";
     public static final String COLUMN_SECONDPREFERLANGUAGE_NAME = "second_prefer_language";
+    public static final String COLUMN_APPLICATIONDATE_NAME = "application_date";
 
     @Id
     @Column(name = COLUMN_ID_NAME, nullable = false)
@@ -42,6 +41,9 @@ public class Applicant {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = COLUMN_SECONDPREFERLANGUAGE_NAME, nullable = false)
     private Language secondPreferLanguage;
+
+    @JoinColumn(name = COLUMN_APPLICATIONDATE_NAME, nullable = false)
+    private String applicationDate;
 
     public void updateIsMatched(Status isMatched) {
         this.isMatched = isMatched;
