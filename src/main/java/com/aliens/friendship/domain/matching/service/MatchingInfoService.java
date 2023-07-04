@@ -21,6 +21,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
 import java.util.*;
 
 import static com.aliens.friendship.domain.matching.exception.MatchingExceptionCode.*;
@@ -41,12 +46,12 @@ public class MatchingInfoService {
     public void applyMatching(ApplicantRequest applicantRequest) {
         Member member = memberRepository.findById(getCurrentMemberId()).get();
         validateNotApplied(member);
-
         Applicant applicant = Applicant.builder()
                 .member(member)
                 .firstPreferLanguage(getLanguageById(applicantRequest.getFirstPreferLanguage()))
                 .secondPreferLanguage(getLanguageById(applicantRequest.getSecondPreferLanguage()))
                 .isMatched(Applicant.Status.NOT_MATCHED)
+                .applicationDate(getCurrentKoreanDateAsString())
                 .build();
         member.updateStatus(Member.Status.APPLIED);
 
@@ -133,6 +138,52 @@ public class MatchingInfoService {
                 .build();
     }
 
+    public Map<String, String> getMatchingRemainingPeroid() throws ParseException {
+        Applicant applicant = applicantRepository.findById(getCurrentMemberId()).get();
+        String remainingPeriod = "";
+        if (applicant.getIsMatched() == Applicant.Status.NOT_MATCHED) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Timestamp applicationDate = new Timestamp(sdf.parse(applicant.getApplicationDate()).getTime());
+
+            Timestamp currentDate = getCurrentKoreanDateToAsTimestamp();
+            DayOfWeek currentDayOfWeek = currentDate.toLocalDateTime().getDayOfWeek();
+
+            // 현재로부터 월요일과 목요일까지의 일 수 계산
+            int daysUntilMonday = (DayOfWeek.MONDAY.getValue() - currentDayOfWeek.getValue() + 7) % 7;
+            int daysUntilThursday = (DayOfWeek.THURSDAY.getValue() - currentDayOfWeek.getValue() + 7) % 7;
+
+            // 월요일과 목요일 계산
+            LocalDateTime nextMonday = currentDate.toLocalDateTime().plusDays(daysUntilMonday);
+            LocalDateTime nextThursday = currentDate.toLocalDateTime().plusDays(daysUntilThursday);
+
+            // 매칭이 완료되는 월요일과 목요일의 20시 설정
+            Timestamp nextMonday20 = Timestamp.valueOf(nextMonday.withHour(20).withMinute(0).withSecond(0));
+            Timestamp nextThursday20 = Timestamp.valueOf(nextThursday.withHour(20).withMinute(0).withSecond(0));
+
+            // 매칭 신청 마감시간인 월요일과 목요일의 18시 설정
+            Timestamp nextMonday18 = Timestamp.valueOf(nextMonday.withHour(18).withMinute(0).withSecond(0));
+            Timestamp nextThursday18 = Timestamp.valueOf(nextThursday.withHour(18).withMinute(0).withSecond(0));
+
+            if (applicationDate.before(nextMonday18) && applicationDate.before(nextThursday18)) {
+                if (nextMonday18.before(nextThursday18)) {
+                    // 월요일 20시 기준으로 남은 시간 계산
+                    remainingPeriod = getRemainingPeriod(currentDate, nextMonday20);
+                } else {
+                    // 목요일 20시 기준으로 남은 시간 계산
+                    remainingPeriod = getRemainingPeriod(currentDate, nextThursday20);
+                }
+            } else if (applicationDate.before(nextMonday18)) {
+                // 월요일 20시 기준으로 남은 시간 계산
+                remainingPeriod = getRemainingPeriod(currentDate, nextMonday20);
+            } else if (applicationDate.before(nextThursday18)) {
+                // 목요일 20시 기준으로 남은 시간 계산
+                remainingPeriod = getRemainingPeriod(currentDate, nextThursday20);
+            }
+        }
+
+        return Collections.singletonMap("remainingPeriod", remainingPeriod);
+    }
+
     protected Integer getCurrentMemberId() {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).get();
         return member.getId();
@@ -172,5 +223,29 @@ public class MatchingInfoService {
         if (applicantRepository.findById(member.getId()).isPresent()) {
             throw new DuplicatedMatchException();
         }
+    }
+
+    private String getCurrentKoreanDateAsString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+
+        return sdf.format(new Date());
+    }
+
+    private Timestamp getCurrentKoreanDateToAsTimestamp() {
+        ZoneId seoulZoneId = ZoneId.of("Asia/Seoul");
+        LocalDateTime currentDateTime = LocalDateTime.now(seoulZoneId);
+
+        return Timestamp.valueOf(currentDateTime);
+    }
+
+    private String getRemainingPeriod(Timestamp applicationDate, Timestamp matchingDate) {
+        Duration duration = Duration.between(applicationDate.toInstant(), matchingDate.toInstant());
+        long days = duration.toDays();
+        long hours = duration.toHours() % 24;
+        long minutes = duration.toMinutes() % 60;
+        long seconds = duration.getSeconds() % 60;
+
+        return String.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds);
     }
 }
