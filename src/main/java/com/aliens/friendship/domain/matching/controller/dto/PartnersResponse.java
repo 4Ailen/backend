@@ -26,6 +26,9 @@ public class PartnersResponse {
         private String gender;
         private String nationality;
         private String profileImage;
-        private String countryImage;
+        private String firstPreferLanguage;
+        private String secondPreferLanguage;
+
+        // Todo: 자기소개 추가
     }
 }

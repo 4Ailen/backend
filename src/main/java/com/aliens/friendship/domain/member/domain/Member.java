@@ -57,9 +57,8 @@ public class Member {
     @Column(name = COLUMN_GENDER_NAME, nullable = false, length = 45)
     private String gender;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = COLUNM_NATIONALITY_NAME, nullable = false)
-    private Nationality nationality;
+    private String nationality;
 
     @Column(name = COLUMN_BIRTHDAY_NAME, nullable = false)
     private String birthday;

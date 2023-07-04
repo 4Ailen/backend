@@ -3,9 +3,7 @@ package com.aliens.friendship.member.repository;
 import com.aliens.friendship.domain.auth.model.entity.Authority;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.domain.Member;
-import com.aliens.friendship.domain.member.domain.Nationality;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
-import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +25,6 @@ class MemberRepositoryImplTest {
 
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private NationalityRepository nationalityRepository;
 
     @Test
     @DisplayName("이메일로 멤버와 권한 정보 함께 반환 성공")
@@ -45,7 +41,7 @@ class MemberRepositoryImplTest {
         assertThat(member.toString()).contains(mockJoinDto.getEmail())
                 .contains(mockJoinDto.getPassword())
                 .contains(mockJoinDto.getMbti().toString())
-                .contains(mockJoinDto.getNationality().toString())
+                .contains(mockJoinDto.getNationality())
                 .contains(mockJoinDto.getBirthday())
                 .contains(mockJoinDto.getName())
                 .contains(mockJoinDto.getImageUrl());
@@ -62,14 +58,13 @@ class MemberRepositoryImplTest {
 
     private JoinDto createMockJoinDto(String email, String password) {
         MultipartFile mockMultipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-        Nationality nationality = nationalityRepository.save(new Nationality(1, "South Korea"));
         return JoinDto.builder()
                 .email(email)
                 .password(password)
                 .name("Joy")
                 .mbti(Member.Mbti.ISFJ)
                 .gender("FEMALE")
-                .nationality(nationality)
+                .nationality("South Korea")
                 .birthday("1993-12-31")
                 .profileImage(mockMultipartFile)
                 .build();

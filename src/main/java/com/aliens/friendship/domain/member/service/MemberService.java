@@ -91,7 +91,7 @@ public class MemberService {
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getNationalityText())
+                .nationality(member.getNationality())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
@@ -193,7 +193,7 @@ public class MemberService {
 
     public void changeProfileImage(MultipartFile profileImage) throws Exception {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        if (!member.getProfileImageUrl().equals("/default_image.jpg")) {
+        if (!member.getProfileImageUrl().equals("/files/default_profile_image.png")) {
             profileImageService.deleteProfileImage(member.getProfileImageUrl());
         }
         member.updateImageUrl(profileImageService.uploadProfileImage(profileImage));
@@ -236,7 +236,7 @@ public class MemberService {
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getNationalityText())
+                .nationality(member.getNationality())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
