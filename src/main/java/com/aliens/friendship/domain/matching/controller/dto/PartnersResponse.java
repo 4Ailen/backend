@@ -28,7 +28,6 @@ public class PartnersResponse {
         private String profileImage;
         private String firstPreferLanguage;
         private String secondPreferLanguage;
-
-        // Todo: 자기소개 추가
+        private String selfIntroduction;
     }
 }

@@ -90,6 +90,7 @@ public class MatchingInfoService {
                         .firstPreferLanguage("")
                         .secondPreferLanguage("")
                         .profileImage("")
+                        .selfIntroduction("")
                         .build();
                 partnersResponse.getPartners().add(partnerDto);
             } else {
@@ -103,6 +104,7 @@ public class MatchingInfoService {
                         .firstPreferLanguage(applicant.getFirstPreferLanguage().getLanguageText())
                         .secondPreferLanguage(applicant.getSecondPreferLanguage().getLanguageText())
                         .profileImage(domainUrl + partner.getProfileImageUrl())
+                        .selfIntroduction("")
                         .build();
                 partnersResponse.getPartners().add(partnerDto);
             }
