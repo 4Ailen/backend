@@ -37,6 +37,7 @@ public class Member {
     public static final String COLUMN_NOTIFICATIONSTATUS_NAME = "notification_status";
     public static final String COLUMN_STATUS_NAME = "status";
     public static final String COLUMN_WITHDRAWALDATE_NAME = "withdrawal_date";
+    public static final String COLUMN_SELF_INTRODUCTION = "self_introduction";
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -56,9 +57,8 @@ public class Member {
     @Column(name = COLUMN_GENDER_NAME, nullable = false, length = 45)
     private String gender;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = COLUNM_NATIONALITY_NAME, nullable = false)
-    private Nationality nationality;
+    private String nationality;
 
     @Column(name = COLUMN_BIRTHDAY_NAME, nullable = false)
     private String birthday;
@@ -68,6 +68,10 @@ public class Member {
 
     @Column(name = COLUMN_JOINDATE_NAME, nullable = false)
     private Instant joinDate;
+
+    @Column(name = COLUMN_SELF_INTRODUCTION, nullable = false)
+    @Builder.Default
+    private String selfIntroduction = "Nice to meet you!";
 
     @Column(name = COLUMN_IMAGEURL_NAME, nullable = false)
     @Builder.Default
@@ -109,6 +113,10 @@ public class Member {
         this.profileImageUrl = imageUrl;
     }
 
+    public void updateSelfIntroduction(String selfIntroduction) {
+        this.selfIntroduction = selfIntroduction;
+    }
+
     public void updateWithdrawalDate(String withdrawalDate) {
         this.withdrawalDate = withdrawalDate;
     }
@@ -124,6 +132,7 @@ public class Member {
                 .nationality(joinDto.getNationality())
                 .joinDate(Instant.now())
                 .profileImageUrl(joinDto.getImageUrl())
+                .selfIntroduction(joinDto.getSelfIntroduction())
                 .build();
         member.addAuthority(Authority.ofUser(member));
         return member;

@@ -7,7 +7,6 @@ import com.aliens.friendship.domain.matching.service.BlockingInfoService;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
-import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import com.aliens.friendship.domain.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +23,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,9 +43,6 @@ public class BlockingServiceTest {
 
     @InjectMocks
     BlockingInfoService blockingInfoService;
-
-    @Mock
-    NationalityRepository nationalityRepository;
 
     @Mock
     EmailAuthenticationRepository emailAuthenticationRepository;

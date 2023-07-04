@@ -91,10 +91,11 @@ public class MemberService {
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getNationalityText())
+                .nationality(member.getNationality())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())
+                .selfIntroduction(member.getSelfIntroduction())
                 .profileImage(domainUrl + member.getProfileImageUrl())
                 .build();
     }
@@ -166,6 +167,12 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public void changeSelfIntroduction(String selfIntroductionChangeRequest) throws Exception {
+        Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+        member.updateSelfIntroduction(selfIntroductionChangeRequest);
+        memberRepository.save(member);
+    }
+
     private void checkCurrentPassword(String currentPassword, Member member) throws Exception {
         if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
             throw new InvalidMemberPasswordException();
@@ -186,7 +193,7 @@ public class MemberService {
 
     public void changeProfileImage(MultipartFile profileImage) throws Exception {
         Member member = memberRepository.findByEmail(getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        if (!member.getProfileImageUrl().equals("/default_image.jpg")) {
+        if (!member.getProfileImageUrl().equals("/files/default_profile_image.png")) {
             profileImageService.deleteProfileImage(member.getProfileImageUrl());
         }
         member.updateImageUrl(profileImageService.uploadProfileImage(profileImage));
@@ -229,7 +236,7 @@ public class MemberService {
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
-                .nationality(member.getNationality().getNationalityText())
+                .nationality(member.getNationality())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
                 .name(member.getName())

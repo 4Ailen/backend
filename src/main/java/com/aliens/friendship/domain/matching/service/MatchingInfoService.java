@@ -16,6 +16,7 @@ import com.aliens.friendship.domain.matching.repository.MatchingRepository;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +39,9 @@ public class MatchingInfoService {
     private final MemberRepository memberRepository;
     private final ApplicantRepository applicantRepository;
     private final MatchingRepository matchingRepository;
+
+    @Value("${file-server.domain}")
+    private String domainUrl;
 
     public Map<String, Object> getLanguages() {
         return Collections.singletonMap("languages", languageRepository.findAll());
@@ -88,19 +92,24 @@ public class MatchingInfoService {
                         .mbti(null)
                         .gender("")
                         .nationality("")
-                        .countryImage("")
+                        .firstPreferLanguage("")
+                        .secondPreferLanguage("")
                         .profileImage("")
+                        .selfIntroduction("")
                         .build();
                 partnersResponse.getPartners().add(partnerDto);
             } else {
+                Applicant applicant = applicantRepository.findById(partner.getId()).get();
                 PartnersResponse.Member partnerDto = PartnersResponse.Member.builder()
                         .memberId(partner.getId())
                         .name(partner.getName())
                         .mbti(partner.getMbti())
                         .gender(partner.getGender())
-                        .nationality(partner.getNationality().getNationalityText())
-                        .countryImage(partner.getNationality().getNationalityText())
-                        .profileImage(partner.getProfileImageUrl())
+                        .nationality(partner.getNationality())
+                        .firstPreferLanguage(applicant.getFirstPreferLanguage().getLanguageText())
+                        .secondPreferLanguage(applicant.getSecondPreferLanguage().getLanguageText())
+                        .profileImage(domainUrl + partner.getProfileImageUrl())
+                        .selfIntroduction("")
                         .build();
                 partnersResponse.getPartners().add(partnerDto);
             }
@@ -124,9 +133,9 @@ public class MatchingInfoService {
                 .gender(member.getGender())
                 .mbti(member.getMbti())
                 .age(member.getAge())
-                .nationality(member.getNationality().getNationalityText())
+                .nationality(member.getNationality())
                 .profileImage(member.getProfileImageUrl())
-                .countryImage(member.getNationality().getNationalityText())
+                .countryImage(member.getNationality())
                 .build();
         ApplicantResponse.PreferLanguages preferLanguagesDto = ApplicantResponse.PreferLanguages.builder()
                 .firstPreferLanguage(applicant.getFirstPreferLanguage().getLanguageText())

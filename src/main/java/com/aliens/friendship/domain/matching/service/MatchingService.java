@@ -1,6 +1,6 @@
 package com.aliens.friendship.domain.matching.service;
 
-import com.aliens.friendship.domain.matching.service.model.Matching;
+import com.aliens.friendship.domain.matching.service.model.ServiceModelMatching;
 import com.aliens.friendship.domain.matching.service.model.Participant;
 import com.aliens.friendship.domain.matching.repository.LanguageRepository;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
@@ -84,8 +84,8 @@ public class MatchingService {
     }
 
     private void addMatching(Participant participant, Participant partner) {
-        participant.addToMatchingList(new Matching(partner, matchingIndex));
-        partner.addToMatchingList(new Matching(participant, matchingIndex));
+        participant.addToMatchingList(new ServiceModelMatching(partner, matchingIndex));
+        partner.addToMatchingList(new ServiceModelMatching(participant, matchingIndex));
         matchingIndex++;
     }
 
@@ -127,8 +127,8 @@ public class MatchingService {
 
     private boolean isValidMatching(Participant participant, Participant matchedParticipant) {
         return matchedParticipant != participant &&
-                !participant.getMatchingList().contains(matchedParticipant) &&
-                !matchedParticipant.getMatchingList().contains(participant) &&
+                !participant.getServiceModelMatchingList().contains(matchedParticipant) &&
+                !matchedParticipant.getServiceModelMatchingList().contains(participant) &&
                 matchedParticipant.getNumberOfMatches() < maxMatches;
     }
 

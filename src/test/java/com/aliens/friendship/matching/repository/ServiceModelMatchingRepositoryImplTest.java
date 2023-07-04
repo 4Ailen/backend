@@ -1,4 +1,4 @@
-package com.aliens.friendship.chatting.repository;
+package com.aliens.friendship.matching.repository;
 
 import com.aliens.friendship.domain.chatting.repository.ChattingRoomRepository;
 import com.aliens.friendship.domain.matching.domain.Applicant;
@@ -8,7 +8,6 @@ import com.aliens.friendship.domain.matching.domain.Language;
 import com.aliens.friendship.domain.matching.repository.MatchingRepository;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
 import com.aliens.friendship.domain.member.domain.Member;
-import com.aliens.friendship.domain.member.domain.Nationality;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MatchingRepositoryImplTest {
+class ServiceModelMatchingRepositoryImplTest {
 
     @Autowired
     MatchingRepository matchingRepository;
@@ -66,7 +65,7 @@ class MatchingRepositoryImplTest {
                     .gender("FEMALE")
                     .birthday("2002-01-17")
                     .name("최정은")
-                    .nationality(new Nationality(1, "South Korea"))
+                    .nationality("South Korea")
                     .joinDate(Instant.now())
                     .profileImageUrl("/testUrl")
                     .build();

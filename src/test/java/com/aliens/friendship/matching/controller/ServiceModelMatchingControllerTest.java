@@ -14,7 +14,6 @@ import com.aliens.friendship.domain.matching.service.BlockingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingService;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
-import com.aliens.friendship.domain.member.repository.NationalityRepository;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.response.ResponseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(MatchingController.class)
-class MatchingControllerTest {
+class ServiceModelMatchingControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -67,9 +66,6 @@ class MatchingControllerTest {
 
     @MockBean
     private MemberRepository memberRepository;
-
-    @MockBean
-    private NationalityRepository nationalityRepository;
 
     @MockBean
     private ReportService reportService;

@@ -1,6 +1,6 @@
 package com.aliens.friendship.domain.matching.service;
 
-import com.aliens.friendship.domain.matching.service.model.Matching;
+import com.aliens.friendship.domain.matching.service.model.ServiceModelMatching;
 import com.aliens.friendship.domain.matching.service.model.Participant;
 import com.aliens.friendship.domain.chatting.domain.ChattingRoom;
 import com.aliens.friendship.domain.matching.repository.MatchingRepository;
@@ -33,10 +33,10 @@ public class MatchingResultSaveService {
             applicant.updateIsMatched(Applicant.Status.MATCHED);
             applicantRepository.save(applicant);
 
-            List<Matching> matchings = participant.getMatchingList();
-            for (Matching matching : matchings) {
-                ChattingRoom chattingRoom = chattingRoomRepository.findById(matching.getChattingRoomId()).get();
-                Applicant partner = applicantRepository.findById(matching.getPartner().getId()).get();
+            List<ServiceModelMatching> serviceModelMatchings = participant.getServiceModelMatchingList();
+            for (ServiceModelMatching serviceModelMatching : serviceModelMatchings) {
+                ChattingRoom chattingRoom = chattingRoomRepository.findById(serviceModelMatching.getChattingRoomId()).get();
+                Applicant partner = applicantRepository.findById(serviceModelMatching.getPartner().getId()).get();
                 com.aliens.friendship.domain.matching.domain.Matching chatting = com.aliens.friendship.domain.matching.domain.Matching.builder()
                         .chattingRoom(chattingRoom)
                         .applicant(partner)
