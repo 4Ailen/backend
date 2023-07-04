@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc(addFilters=false)
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(MatchingController.class)
 class MatchingControllerTest {
 
@@ -221,13 +221,26 @@ class MatchingControllerTest {
         reportRequest.put("reportContent", ReportContent);
 
         //when
-        ResultActions resultActions = mockMvc.perform(post("/api/v1/matching/partner/{memberId}/report",memberId)
+        ResultActions resultActions = mockMvc.perform(post("/api/v1/matching/partner/{memberId}/report", memberId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(reportRequest)));
 
         // then
         resultActions.andExpect(status().isOk());
         verify(reportService, times(1)).report(any(Integer.class), any(ReportRequest.class));
+    }
+
+    @Test
+    @DisplayName("매칭 남은 기간 요청 성공")
+    void GetMatchingRemainingPeriod_Success() throws Exception {
+        //given
+
+        //when
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/matching/remaining-period"));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        verify(matchingInfoService, times(1)).getMatchingRemainingPeroid();
     }
 }
 

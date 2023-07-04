@@ -26,6 +26,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.text.ParseException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -284,7 +285,6 @@ class MatchingInfoServiceTest {
     }
 
 
-
     @Test
     @DisplayName("신청자 정보 조회 성공")
     void GetApplicant_Success() throws Exception {
@@ -349,6 +349,25 @@ class MatchingInfoServiceTest {
 
         // then
         assertEquals("매칭 신청자의 정보가 없습니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("매칭 남은 시간 조회 성공")
+    void GetMatchingRemainingPeroid_Success() throws ParseException {
+        // given
+        Member member = MemberFixture.createTestMember(Member.Status.APPLIED);
+        Applicant applicant = ApplicantFixture.createTestApplicant(member);
+        when(applicantRepository.findById(anyInt())).thenReturn(Optional.ofNullable(applicant));
+        setUpAuthentication(member);
+
+        // when
+        Map<String, String> matchingRemainingPeroid = matchingInfoService.getMatchingRemainingPeroid();
+
+        // then
+        String remainingPeriod = matchingRemainingPeroid.get("remainingPeriod");
+        int remainDay = Character.getNumericValue(remainingPeriod.charAt(1));
+        System.out.println("remainDay: " + remainDay);
+        assertTrue(remainDay <= 3);
     }
 
     private void setUpAuthentication(Member member) {
