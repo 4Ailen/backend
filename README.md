@@ -52,7 +52,7 @@
 # 🧑‍💻 기술 스택
 | 언어 | Dart | Java |  |
 | :--------: | :--------: | :------: | :------: |
-| 프론트엔드 | Flutter(Dart) |  React   |  |
+| 프론트엔드 | Flutter(Dart) |     |  |
 | 백엔드 | Spring(Java) |  |  |
 | 데이터베이스 | Redis | MYSQL |  |
 | 배포 | Doker | Server(AWS) | Kubernetes |
