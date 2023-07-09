@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, "/api/v1/member/email/{email}/existence", "/api/v1/member/{email}/authentication-status", "/api/v1/member/nationalities", "/api/v1/email/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/api/v1/member/{memberId}").permitAll()
                 .antMatchers("/matching/**", "/health", "/logout","/api/v1/chat/**").authenticated()
+                .antMatchers("/images/character.png").permitAll() // 이미지 경로 추가
                 .anyRequest().hasRole("USER")
 
                 .and()
