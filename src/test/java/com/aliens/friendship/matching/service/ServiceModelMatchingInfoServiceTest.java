@@ -367,7 +367,6 @@ class ServiceModelMatchingInfoServiceTest {
         // then
         String remainingPeriod = matchingRemainingPeroid.get("remainingPeriod");
         int remainDay = Character.getNumericValue(remainingPeriod.charAt(1));
-        System.out.println("remainDay: " + remainDay);
         assertTrue(remainDay <= 3);
     }
 
