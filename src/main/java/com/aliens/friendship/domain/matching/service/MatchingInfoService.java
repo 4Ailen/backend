@@ -166,12 +166,12 @@ public class MatchingInfoService {
             LocalDateTime nextThursday = currentDate.toLocalDateTime().plusDays(daysUntilThursday);
 
             // 매칭이 완료되는 월요일과 목요일의 20시 설정
-            Timestamp nextMonday20 = Timestamp.valueOf(nextMonday.withHour(20).withMinute(0).withSecond(0));
-            Timestamp nextThursday20 = Timestamp.valueOf(nextThursday.withHour(20).withMinute(0).withSecond(0));
+            Timestamp nextMonday20 = Timestamp.valueOf(nextMonday.withHour(20).withMinute(0));
+            Timestamp nextThursday20 = Timestamp.valueOf(nextThursday.withHour(20).withMinute(0));
 
             // 매칭 신청 마감시간인 월요일과 목요일의 18시 설정
-            Timestamp nextMonday18 = Timestamp.valueOf(nextMonday.withHour(18).withMinute(0).withSecond(0));
-            Timestamp nextThursday18 = Timestamp.valueOf(nextThursday.withHour(18).withMinute(0).withSecond(0));
+            Timestamp nextMonday18 = Timestamp.valueOf(nextMonday.withHour(18).withMinute(0));
+            Timestamp nextThursday18 = Timestamp.valueOf(nextThursday.withHour(18).withMinute(0));
 
             if (applicationDate.before(nextMonday18) && applicationDate.before(nextThursday18)) {
                 if (nextMonday18.before(nextThursday18)) {
