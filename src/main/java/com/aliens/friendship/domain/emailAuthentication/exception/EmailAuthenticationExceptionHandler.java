@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @RestControllerAdvice
@@ -31,14 +32,27 @@ public class EmailAuthenticationExceptionHandler {
      * EmailVerificationTimeOutException handling (Custom Exception)
      */
     @ExceptionHandler(EmailVerificationTimeOutException.class)
-    protected ResponseEntity<ErrorResponse> handleEmailVerificationTimeOutException(
+    protected ModelAndView handleEmailVerificationTimeOutException(
             EmailVerificationTimeOutException e
     ) {
-        ExceptionCode exceptionCode = e.getExceptionCode();
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("emailVerificationTimeOut");
         log.error("{}", e.getMessage());
-        return new ResponseEntity<>(
-                ErrorResponse.of(exceptionCode, exceptionCode.getMessage()),
-                HttpStatus.valueOf(exceptionCode.getHttpStatus().value())
-        );
+
+        return modelAndView;
+    }
+
+    /**
+     * EmailInvalidTokenException handling (Custom Exception)
+     */
+    @ExceptionHandler(EmailInvalidTokenException.class)
+    protected ModelAndView handleEmailInvalidTokenException(
+            EmailInvalidTokenException e
+    ) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("emailVerificationInvalidToken");
+        log.error("{}", e.getMessage());
+
+        return modelAndView;
     }
 }

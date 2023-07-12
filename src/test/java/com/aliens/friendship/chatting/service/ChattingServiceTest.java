@@ -12,7 +12,6 @@ import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
 import com.aliens.friendship.domain.matching.repository.MatchingRepository;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.domain.Member;
-import com.aliens.friendship.domain.member.domain.Nationality;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.config.security.CustomUserDetails;
@@ -182,7 +181,7 @@ class ChattingServiceTest {
                 .name("Ryan")
                 .mbti(Member.Mbti.ENFJ)
                 .gender("MALE")
-                .nationality(new Nationality(1, "South Korea"))
+                .nationality("South Korea")
                 .birthday("1998-12-31")
                 .profileImage(mockMultipartFile)
                 .build();

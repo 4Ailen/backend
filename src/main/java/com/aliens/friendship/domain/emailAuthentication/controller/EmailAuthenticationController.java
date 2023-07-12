@@ -5,6 +5,7 @@ import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ResponseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -26,14 +27,14 @@ public class EmailAuthenticationController {
     }
 
     @GetMapping("/{email}/verification")
-    public CommonResult verifyEmail(
+    public ModelAndView verifyEmail(
             @PathVariable String email,
             @RequestParam("token") String token
     ) throws Exception {
         emailAuthenticationService.validateEmail(email, token);
-        return responseService.getSuccessResult(
-                OK.value(),
-                "이메일 인증에 성공하였습니다."
-        );
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("emailVerificationComplete");
+
+        return modelAndView;
     }
 }
