@@ -2,16 +2,27 @@ package com.aliens.friendship.global.response;
 
 import lombok.Getter;
 
-/**
- * 단건 결과값만 반환하는 응답
- */
 @Getter
-public class SingleResult<T> extends CommonResult {
+public class SingleResult<T>
+        extends CommonResult {
 
-    private T data;
+    private final T data;
 
-    public SingleResult(Integer status, String message, T data) {
-        super(status, message);
+    private SingleResult(
+            final String message,
+            final T data
+    ) {
+        super(message);
         this.data = data;
+    }
+
+    public static <T> SingleResult<T> of(
+            final String message,
+            final T data
+    ) {
+        return new SingleResult<>(
+                message,
+                data
+        );
     }
 }

@@ -4,16 +4,27 @@ import lombok.Getter;
 
 import java.util.List;
 
-/**
- * 여러개의 결과값을 반환하는 응답
- */
 @Getter
-public class ListResult<T> extends CommonResult {
+public class ListResult<T>
+        extends CommonResult {
 
-    private List<T> data;
+    private final List<T> data;
 
-    public ListResult(Integer status, String message, List<T> data) {
-        super(status, message);
+    private ListResult(
+            final String message,
+            final List<T> data
+    ) {
+        super(message);
         this.data = data;
+    }
+
+    public static <T> ListResult<T> of(
+            final String message,
+            final List<T> data
+    ) {
+        return new ListResult<>(
+                message,
+                data
+        );
     }
 }
