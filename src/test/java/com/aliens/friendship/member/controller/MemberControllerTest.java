@@ -8,12 +8,12 @@ import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.service.MemberService;
-import com.aliens.friendship.global.response.ResponseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,8 +27,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpMethod.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -36,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureRestDocs
 @WebMvcTest(MemberController.class)
 class MemberControllerTest {
 
@@ -51,11 +55,10 @@ class MemberControllerTest {
     @MockBean
     private AuthService authService;
 
-    @MockBean
-    private ResponseService responseService;
-
     @Value("${spring.domain}")
     private String domainUrl;
+
+    private static final String BASIC_URL = "/api/v1/member";
 
     @Test
     @DisplayName("회원가입 성공")
@@ -64,14 +67,24 @@ class MemberControllerTest {
         JoinDto joinDto = new JoinDto();
         doNothing().when(memberService).join(joinDto);
 
-        // when & then
-        mockMvc.perform(multipart("/api/v1/member")
+        // When & Then
+        mockMvc.perform(
+                multipart(BASIC_URL)
                         .file((MockMultipartFile) createMockImage())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(joinDto)))
-                .andDo(print())
-                .andExpect(status().isOk());
+                        .content(new ObjectMapper().writeValueAsString(joinDto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(status().isOk())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).join(any(JoinDto.class));
     }
 
@@ -82,12 +95,15 @@ class MemberControllerTest {
         JoinDto joinDto = new JoinDto();
         doNothing().when(memberService).join(joinDto);
 
-        // when & then
-        mockMvc.perform(multipart("/api/v1/member")
+        // When & Then
+        mockMvc.perform(
+                multipart("/api/v1/member")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(joinDto)))
+                        .content(new ObjectMapper().writeValueAsString(joinDto))
+                )
                 .andExpect(status().isOk());
+
         verify(memberService, times(1)).join(any(JoinDto.class));
     }
 
@@ -121,13 +137,57 @@ class MemberControllerTest {
                 .selfIntroduction("반가워요")
                 .profileImage(domainUrl + System.getProperty("user.dir") + "test")
                 .build();
-        when(memberService.getMemberInfo()).thenReturn(expectedMemberInfoDto);
+        given(memberService.getMemberInfo())
+                .willReturn(expectedMemberInfoDto);
+
+        // When & Then
+        mockMvc.perform(get(BASIC_URL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.data.memberId").isEmpty())
+                .andExpect(jsonPath("$.data.email").value("test@example.com"))
+                .andExpect(jsonPath("$.data.mbti").value("ENFP"))
+                .andExpect(jsonPath("$.data.gender").value("남성"))
+                .andExpect(jsonPath("$.data.nationality").value("South Korea"))
+                .andExpect(jsonPath("$.data.birthday").value("1998-12-31"))
+                .andExpect(jsonPath("$.data.name").value("Ryan"))
+                .andExpect(jsonPath("$.data.profileImage").value("/Users/kmo/project/부경대학교 Friendship!/backendtest"))
+                .andExpect(jsonPath("$.data.selfIntroduction").value("반가워요"))
+                .andExpect(jsonPath("$.data.age").value(24))
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
+        verify(memberService, times(1)).getMemberInfo();
+    }
+
+    @Test
+    @DisplayName("프로필 이름과 mbti 값 변경 요청 성공")
+    void ChangeProfileNameAndMbti_Success() throws Exception {
+        // given
+        Map<String, Member.Mbti> mbti = new HashMap<>();
+        mbti.put("mbti", Member.Mbti.ISFJ);
+        doNothing().when(memberService).changeProfileNameAndMbti(mbti.get("mbti"));
 
         // when & then
-        mockMvc.perform(get("/api/v1/member")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        verify(memberService, times(1)).getMemberInfo();
+        mockMvc.perform(
+                        patch(BASIC_URL)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(mbti))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
+        verify(memberService, times(1)).changeProfileNameAndMbti(any(Member.Mbti.class));
     }
 
     @Test
@@ -141,13 +201,23 @@ class MemberControllerTest {
         passwordMap.put("password", password);
         doNothing().when(memberService).withdraw(passwordMap.get("password"));
 
-        // when & then
-        mockMvc.perform(post("/api/v1/member/withdraw")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(passwordMap))
-                        .header("Authorization", "Bearer " + accessToken)
-                        .header("RefreshToken", refreshToken))
-                .andExpect(status().isOk());
+        // When & Then
+        mockMvc.perform(
+                        delete(BASIC_URL + "/withdraw")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(passwordMap))
+                                .header("Authorization", "Bearer " + accessToken)
+                                .header("RefreshToken", refreshToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).withdraw(password);
     }
 
@@ -156,11 +226,23 @@ class MemberControllerTest {
     void IsJoinedEmail_Success() throws Exception {
         // given
         String email = "test@case.com";
-        when(memberService.isJoinedEmail(email)).thenReturn(true);
+        given(memberService.isJoinedEmail(email))
+                .willReturn(true);
 
         // when & then
-        mockMvc.perform(get("/api/v1/member/email/" + email + "/existence"))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        get(BASIC_URL + "/email/{email}/existence", email)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.data.existence").value(true))
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).isJoinedEmail(email);
     }
 
@@ -175,10 +257,20 @@ class MemberControllerTest {
         doNothing().when(memberService).issueTemporaryPassword(email, nameMap.get("name"));
 
         // when & then
-        mockMvc.perform(post("/api/v1/member/" + email + "/password/temp")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(nameMap)))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        post(BASIC_URL + "/{email}/password/temp", email)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(nameMap))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).issueTemporaryPassword(anyString(), anyString());
     }
 
@@ -192,28 +284,22 @@ class MemberControllerTest {
         doNothing().when(memberService).changePassword(passwordUpdateRequestDto);
 
         // when & then
-        mockMvc.perform(put("/api/v1/member/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(passwordUpdateRequestDto)))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        put(BASIC_URL + "/password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(passwordUpdateRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).changePassword(any(PasswordUpdateRequestDto.class));
     }
 
-    @Test
-    @DisplayName("프로필 이름과 mbti 값 변경 요청 성공")
-    void ChangeProfileNameAndMbti_Success() throws Exception {
-        // given
-        Map<String, Member.Mbti> mbti = new HashMap<>();
-        mbti.put("mbti", Member.Mbti.ISFJ);
-        doNothing().when(memberService).changeProfileNameAndMbti(mbti.get("mbti"));
-
-        // when & then
-        mockMvc.perform(patch("/api/v1/member")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(mbti)))
-                .andExpect(status().isOk());
-        verify(memberService, times(1)).changeProfileNameAndMbti(any(Member.Mbti.class));
-    }
 
     @Test
     @DisplayName("프로필 자기소개 변경 요청 성공")
@@ -223,10 +309,20 @@ class MemberControllerTest {
         doNothing().when(memberService).changeSelfIntroduction(selfIntroductionChangeRequest);
 
         // when & then
-        mockMvc.perform(put("/api/v1/member/self-introduction")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(selfIntroductionChangeRequest)))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        put(BASIC_URL + "/self-introduction")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(selfIntroductionChangeRequest))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).changeSelfIntroduction(any(String.class));
     }
 
@@ -238,16 +334,27 @@ class MemberControllerTest {
         doNothing().when(memberService).changeProfileImage(newProfileImage);
 
         // when & then
-        mockMvc.perform(multipart(PUT, "/api/v1/member/profile-image")
-                        .file(newProfileImage)
-                        .contentType("multipart/form-data"))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        multipart(PUT, BASIC_URL + "/profile-image")
+                                .file(newProfileImage)
+                                .contentType("multipart/form-data")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).changeProfileImage(any(MultipartFile.class));
     }
 
     @DisplayName("프로필 이미지 검증 실패 - 유효하지 않은 크기의 이미지인 경우")
     @Test
     void profileImage_validation_invalid_size() throws Exception {
+        // Given
         final String fileName = "bigsize-image"; //파일명
         final String contentType = "png"; //파일타입
         final String filePath = "src/test/resources/testImage/"+fileName+"."+contentType; //파일경로
@@ -256,7 +363,7 @@ class MemberControllerTest {
 
         // When & Then
         mockMvc.perform(
-                        multipart(PUT, "/api/v1/member/profile-image")
+                        multipart(PUT, BASIC_URL + "/profile-image")
                                 .file(newProfileImage)
                                 .contentType("multipart/form-data"))
                 .andExpect(status().is4xxClientError())
@@ -275,7 +382,7 @@ class MemberControllerTest {
 
         // When & Then
         mockMvc.perform(
-                        multipart(PUT, "/api/v1/member/profile-image")
+                        multipart(PUT, BASIC_URL + "/profile-image")
                                 .file(newProfileImage)
                                 .contentType("multipart/form-data"))
                 .andExpect(status().is4xxClientError())
@@ -292,12 +399,23 @@ class MemberControllerTest {
     void GetMemberAuthenticationStatus_Success() throws Exception {
         // given
         String email = "test@case.com";
-        when(memberService.getMemberAuthenticationStatus(email)).thenReturn("AUTHENTICATED");
+        given(memberService.getMemberAuthenticationStatus(email))
+                .willReturn("AUTHENTICATED");
 
         // when & then
-        mockMvc.perform(get("/api/v1/member/" + email + "/authentication-status")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        get(BASIC_URL + "/{email}/authentication-status", email)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.data.status").value("AUTHENTICATED"))
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).getMemberAuthenticationStatus(anyString());
     }
 
@@ -309,9 +427,18 @@ class MemberControllerTest {
         doNothing().when(memberService).deleteMemberInfoByAdmin(memberId);
 
         // when & then
-        mockMvc.perform(delete("/api/v1/member/" + memberId))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                    delete(BASIC_URL + "/{memberId}", memberId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("member/postJoin",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(memberService, times(1)).deleteMemberInfoByAdmin(anyInt());
     }
-
 }

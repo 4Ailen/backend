@@ -4,7 +4,6 @@ import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.emailAuthentication.controller.EmailAuthenticationController;
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.service.EmailAuthenticationService;
-import com.aliens.friendship.global.response.ResponseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,8 @@ import org.springframework.util.MultiValueMap;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc(addFilters = false)
@@ -33,8 +34,7 @@ class EmailAuthenticationControllerTest {
     @MockBean
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @MockBean
-    private ResponseService responseService;
+    private static final String BASIC_URL = "/api/v1/email";
 
     @Test
     @DisplayName("이메일 전송 성공")
@@ -44,8 +44,18 @@ class EmailAuthenticationControllerTest {
         doNothing().when(emailAuthenticationService).sendEmail(email);
 
         // when & then
-        mockMvc.perform(post("/api/v1/email/" + email + "/verification"))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        post(BASIC_URL + "/{email}/verification", email)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(print());
+//                .andDo(document("matching/getApplicant",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint())
+//                ));
+
         verify(emailAuthenticationService, times(1)).sendEmail(email);
     }
 
@@ -61,9 +71,13 @@ class EmailAuthenticationControllerTest {
         doNothing().when(emailAuthenticationService).validateEmail(email, token);
 
         // when & then
-        mockMvc.perform(get("/api/v1/email/" + email + "/verification")
-                        .params(tokenMap))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+                        get(BASIC_URL + "/{email}/verification", email)
+                                .queryParam("token", token)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+
         verify(emailAuthenticationService, times(1)).validateEmail(email, token);
     }
 }
