@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.DELETE, "/api/v1/member/{memberId}").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/v1/member/{memberId}").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/v1/matching/reports").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/v1/matching").hasRole("ADMIN")
                 .anyRequest().hasRole("USER")
 
                 .and()
