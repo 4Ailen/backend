@@ -3,6 +3,7 @@ package com.aliens.friendship.domain.member.service;
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
+import com.aliens.friendship.domain.member.controller.dto.MemberInfoByAdminDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.domain.Member;
@@ -228,18 +229,19 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public MemberInfoDto getMemberInfoByMemberId(Integer memberId) throws Exception {
-        String email = getCurrentMemberEmail();
-        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-        return MemberInfoDto.builder()
-                .memberId(member.getId())
+    public MemberInfoByAdminDto getMemberInfoByAdmin(Integer memberId) throws Exception {
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+        return MemberInfoByAdminDto.builder()
                 .email(member.getEmail())
                 .mbti(member.getMbti())
                 .gender(member.getGender())
                 .nationality(member.getNationality())
+                .joinDate(member.getJoinDate())
+                .status(member.getStatus())
+                .name(member.getName())
+                .withdrawalDate(member.getWithdrawalDate())
                 .birthday(member.getBirthday())
                 .age(member.getAge())
-                .name(member.getName())
                 .build();
     }
 }
