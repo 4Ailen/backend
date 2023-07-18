@@ -27,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -353,8 +354,8 @@ class ServiceModelMatchingInfoServiceTest {
     }
 
     @Test
-    @DisplayName("매칭 남은 시간 조회 성공")
-    void GetMatchingRemainingPeroid_Success() throws ParseException {
+    @DisplayName("매칭 완료 일시 조회 성공")
+    void GetMatchingCompletionDate_Success() throws ParseException {
         // given
         Member member = MemberFixture.createTestMember(Member.Status.APPLIED);
         Applicant applicant = ApplicantFixture.createTestApplicant(member);
@@ -362,12 +363,18 @@ class ServiceModelMatchingInfoServiceTest {
         setUpAuthentication(member);
 
         // when
-        Map<String, String> matchingRemainingPeroid = matchingInfoService.getMatchingRemainingPeroid();
+        Map<String, String> matchingCompletionDate = matchingInfoService.getMatchingCompletionDate();
 
         // then
-        String remainingPeriod = matchingRemainingPeroid.get("remainingPeriod");
-        int remainDay = Character.getNumericValue(remainingPeriod.charAt(1));
-        assertTrue(remainDay <= 3);
+        String completionDate = matchingCompletionDate.get("matchingCompletionDate");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date date = sdf.parse(completionDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+        assertTrue(dayOfWeek == Calendar.MONDAY || dayOfWeek == Calendar.THURSDAY);
+        assertEquals(20, hourOfDay);
     }
 
     private void setUpAuthentication(Member member) {
