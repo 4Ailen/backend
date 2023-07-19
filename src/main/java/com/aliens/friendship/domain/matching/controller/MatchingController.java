@@ -106,11 +106,12 @@ public class MatchingController {
     }
 
     @GetMapping("/reports")
-    public SingleResult<ReportResponse> getReportsByAdmin() {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 신고 목록을 조회하였습니다.",
-                reportService.getReportsByAdmin()
+    public ResponseEntity<SingleResult<ReportResponse>> getReportsByAdmin() {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 신고 목록을 조회하였습니다.",
+                        reportService.getReportsByAdmin()
+                )
         );
     }
 
@@ -123,11 +124,12 @@ public class MatchingController {
     // TODO: 특정 시간이 되면 매칭 로직을 돌린다...
 
     @GetMapping("/completion-date")
-    public SingleResult<Map<String, String>> getMatchingRemainingPeriod() throws ParseException {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 매칭 완료 일시가 조회되었습니다.",
-                matchingInfoService.getMatchingCompletionDate()
+    public ResponseEntity<SingleResult<Map<String, String>>> getMatchingRemainingPeriod() throws ParseException {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 매칭 완료 일시가 조회되었습니다.",
+                        matchingInfoService.getMatchingCompletionDate()
+                )
         );
     }
 }

@@ -142,6 +142,8 @@ class MemberControllerTest {
         given(memberService.getMemberInfo())
                 .willReturn(expectedMemberInfoDto);
 
+        System.out.println("프로필이미지: " + expectedMemberInfoDto.getProfileImage());
+
         // When & Then
         mockMvc.perform(get(BASIC_URL))
                 .andExpect(status().isOk())
@@ -154,7 +156,7 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.data.nationality").value("South Korea"))
                 .andExpect(jsonPath("$.data.birthday").value("1998-12-31"))
                 .andExpect(jsonPath("$.data.name").value("Ryan"))
-                .andExpect(jsonPath("$.data.profileImage").value("/Users/kmo/project/부경대학교 Friendship!/backendtest"))
+                .andExpect(jsonPath("$.data.profileImage").value(domainUrl + System.getProperty("user.dir") + "test"))
                 .andExpect(jsonPath("$.data.selfIntroduction").value("반가워요"))
                 .andExpect(jsonPath("$.data.age").value(24))
                 .andDo(print());
