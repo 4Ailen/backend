@@ -1,10 +1,7 @@
 package com.aliens.friendship.domain.member.controller;
 
 import com.aliens.friendship.domain.auth.service.AuthService;
-import com.aliens.friendship.domain.member.controller.dto.JoinDto;
-import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
-import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
-import com.aliens.friendship.domain.member.controller.dto.ProfileImageRequest;
+import com.aliens.friendship.domain.member.controller.dto.*;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.response.CommonResult;
@@ -139,7 +136,6 @@ public class MemberController {
         );
     }
 
-    // TODO: 관리자 권한 추가
     @DeleteMapping("/{memberId}")
     public ResponseEntity<CommonResult> deleteMemberInfoByAdmin(@PathVariable Integer memberId) {
         memberService.deleteMemberInfoByAdmin(memberId);
@@ -147,6 +143,15 @@ public class MemberController {
                 CommonResult.of(
                         "회원 관련 정보 삭제에 성공하였습니다."
                 )
+        );
+    }
+
+    @GetMapping("/{memberId}")
+    public SingleResult<MemberInfoByAdminDto> getMemberInfoByAdmin(@PathVariable Integer memberId) throws Exception {
+        return responseService.getSingleResult(
+                OK.value(),
+                "성공적으로 사용자 정보를 조회하였습니다.",
+                memberService.getMemberInfoByAdmin(memberId)
         );
     }
 }

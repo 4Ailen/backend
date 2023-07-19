@@ -22,7 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -147,11 +146,11 @@ public class MatchingInfoService {
                 .build();
     }
 
-    public Map<String, String> getMatchingRemainingPeroid() throws ParseException {
+    public Map<String, String> getMatchingCompletionDate() throws ParseException {
         Applicant applicant = applicantRepository.findById(getCurrentMemberId()).get();
-        String remainingPeriod = "";
+        String matchingCompletionDate = "";
         if (applicant.getIsMatched() == Applicant.Status.NOT_MATCHED) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Timestamp applicationDate = new Timestamp(sdf.parse(applicant.getApplicationDate()).getTime());
 
             Timestamp currentDate = getCurrentKoreanDateToAsTimestamp();
@@ -176,21 +175,21 @@ public class MatchingInfoService {
             if (applicationDate.before(nextMonday18) && applicationDate.before(nextThursday18)) {
                 if (nextMonday18.before(nextThursday18)) {
                     // 월요일 20시 기준으로 남은 시간 계산
-                    remainingPeriod = getRemainingPeriod(currentDate, nextMonday20);
+                    matchingCompletionDate = sdf.format(nextMonday20);
                 } else {
                     // 목요일 20시 기준으로 남은 시간 계산
-                    remainingPeriod = getRemainingPeriod(currentDate, nextThursday20);
+                    matchingCompletionDate = sdf.format(nextThursday20);
                 }
             } else if (applicationDate.before(nextMonday18)) {
                 // 월요일 20시 기준으로 남은 시간 계산
-                remainingPeriod = getRemainingPeriod(currentDate, nextMonday20);
+                matchingCompletionDate = sdf.format(nextMonday20);
             } else if (applicationDate.before(nextThursday18)) {
                 // 목요일 20시 기준으로 남은 시간 계산
-                remainingPeriod = getRemainingPeriod(currentDate, nextThursday20);
+                matchingCompletionDate = sdf.format(nextThursday20);
             }
         }
 
-        return Collections.singletonMap("remainingPeriod", remainingPeriod);
+        return Collections.singletonMap("matchingCompletionDate", matchingCompletionDate);
     }
 
     protected Integer getCurrentMemberId() {
@@ -246,15 +245,5 @@ public class MatchingInfoService {
         LocalDateTime currentDateTime = LocalDateTime.now(seoulZoneId);
 
         return Timestamp.valueOf(currentDateTime);
-    }
-
-    private String getRemainingPeriod(Timestamp applicationDate, Timestamp matchingDate) {
-        Duration duration = Duration.between(applicationDate.toInstant(), matchingDate.toInstant());
-        long days = duration.toDays();
-        long hours = duration.toHours() % 24;
-        long minutes = duration.toMinutes() % 60;
-        long seconds = duration.getSeconds() % 60;
-
-        return String.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds);
     }
 }

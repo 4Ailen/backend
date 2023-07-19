@@ -2,6 +2,7 @@ package com.aliens.friendship.member.service;
 
 import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthentication;
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
+import com.aliens.friendship.domain.member.controller.dto.MemberInfoByAdminDto;
 import com.aliens.friendship.domain.member.exception.*;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.domain.member.service.ProfileImageService;
@@ -484,6 +485,25 @@ class MemberServiceTest {
                 .birthday("1998-12-31")
                 .profileImage(mockMultipartFile)
                 .build();
+    }
+
+    @Test
+    @DisplayName("관리자에 의한 회원 정보 요청 성공")
+    void GetMemberInfoByAdmin_Success() throws Exception {
+        //given: 회원가입된 회원
+        JoinDto mockJoinDto = createMockJoinDto("test@case.com", "TestPassword");
+        Member spyMember = createSpyMember(mockJoinDto);
+        Integer memberId = 17;
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(spyMember));
+
+        //when: 회원 정보 요청
+        MemberInfoByAdminDto memberDto = memberService.getMemberInfoByAdmin(memberId);
+
+        //then: 회원 정보 요청 성공
+        verify(memberRepository, times(1)).findById(anyInt());
+        assertEquals("test@case.com", memberDto.getEmail());
+        assertEquals("1998-12-31", memberDto.getBirthday());
+        assertEquals(24, memberDto.getAge());
     }
 
     private Member createSpyMember(JoinDto joinDto) {
