@@ -227,16 +227,16 @@ class ServiceModelMatchingControllerTest {
     }
 
     @Test
-    @DisplayName("매칭 남은 기간 요청 성공")
-    void GetMatchingRemainingPeriod_Success() throws Exception {
+    @DisplayName("매칭 완료 일시 요청 성공")
+    void GetMatchingCompletionDate_Success() throws Exception {
         //given
 
         //when
-        ResultActions resultActions = mockMvc.perform(get("/api/v1/matching/remaining-period"));
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/matching/completion-date"));
 
         // then
         resultActions.andExpect(status().isOk());
-        verify(matchingInfoService, times(1)).getMatchingRemainingPeroid();
+        verify(matchingInfoService, times(1)).getMatchingCompletionDate();
     }
 
     @Test

@@ -118,12 +118,12 @@ public class MatchingController {
     // TODO: 새로 매칭 시작 전 member의 is_applied를 none으로 변경 후 matchingParticipants 데이터 모두 삭제
     // TODO: 특정 시간이 되면 매칭 로직을 돌린다...
 
-    @GetMapping("/remaining-period")
+    @GetMapping("/completion-date")
     public SingleResult<Map<String, String>> getMatchingRemainingPeriod() throws ParseException {
         return responseService.getSingleResult(
                 OK.value(),
-                "성공적으로 매칭까지 남은 시간이 조회되었습니다.",
-                matchingInfoService.getMatchingRemainingPeroid()
+                "성공적으로 매칭 완료 일시가 조회되었습니다.",
+                matchingInfoService.getMatchingCompletionDate()
         );
     }
 }
