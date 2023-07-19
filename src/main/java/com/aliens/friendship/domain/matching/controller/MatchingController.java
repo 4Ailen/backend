@@ -7,18 +7,16 @@ import com.aliens.friendship.domain.matching.service.MatchingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingService;
 import com.aliens.friendship.domain.matching.service.ReportService;
 import com.aliens.friendship.global.response.CommonResult;
-import com.aliens.friendship.global.response.ResponseService;
 import com.aliens.friendship.global.response.SingleResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.OK;
-
 @RestController
-@RequestMapping("api/v1/matching")
+@RequestMapping("/api/v1/matching")
 @RequiredArgsConstructor
 public class MatchingController {
 
@@ -28,76 +26,82 @@ public class MatchingController {
     private final MatchingService matchingService;
 
     private final ReportService reportService;
-    private final ResponseService responseService;
 
     @GetMapping("/languages")
-    public SingleResult<Map<String, Object>> getLanguages() {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 언어리스트를 조회하였습니다.",
-                matchingInfoService.getLanguages()
-        );
-    }
-
-    @PostMapping("/applicant")
-    public CommonResult applyMatching(@RequestBody ApplicantRequest applicantRequest) {
-        matchingInfoService.applyMatching(applicantRequest);
-
-        return responseService.getSuccessResult(
-                OK.value(),
-                "성공적으로 매칭 신청이 완료되었습니다."
-        );
-    }
-
-    @GetMapping("/status")
-    public SingleResult<Map<String, String>> getStatus() {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 매칭상태가 조회되었습니다.",
-                matchingInfoService.getMatchingStatus()
-        );
-    }
-
-    @GetMapping("/partners")
-    public SingleResult<PartnersResponse> getPartners() {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 파트너가 조회되었습니다.",
-                matchingInfoService.getPartnersResponse()
+    public ResponseEntity<SingleResult<Map<String, Object>>> getLanguages() {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 언어리스트를 조회하였습니다.",
+                        matchingInfoService.getLanguages()
+                )
         );
     }
 
     @GetMapping("/applicant")
-    public SingleResult<ApplicantResponse> getApplicant() throws Exception {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 매칭 신청자가 조회되었습니다.",
-                matchingInfoService.getApplicant()
+    public ResponseEntity<SingleResult<ApplicantResponse>> getApplicant() throws Exception {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 매칭 신청자가 조회되었습니다.",
+                        matchingInfoService.getApplicant()
+                )
+        );
+    }
+
+    @PostMapping("/applicant")
+    public ResponseEntity<CommonResult> applyMatching(@RequestBody ApplicantRequest applicantRequest) {
+        matchingInfoService.applyMatching(applicantRequest);
+
+        return ResponseEntity.ok(
+                CommonResult.of(
+                        "성공적으로 매칭 신청이 완료되었습니다."
+                )
+        );
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<SingleResult<Map<String, String>>> getStatus() {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 매칭상태가 조회되었습니다.",
+                        matchingInfoService.getMatchingStatus()
+                )
+        );
+    }
+
+    @GetMapping("/partners")
+    public ResponseEntity<SingleResult<PartnersResponse>> getPartners() {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 파트너가 조회되었습니다.",
+                        matchingInfoService.getPartnersResponse()
+                )
         );
     }
 
     @PostMapping("/partner/{memberId}/block")
-    public CommonResult blocking(
+    public ResponseEntity<CommonResult> blocking(
             @PathVariable Integer memberId,
             @RequestBody Long roomId
     ) {
         blockingInfoService.block(memberId);
         chattingService.blockChattingRoom(roomId);
-        return responseService.getSuccessResult(
-                OK.value(),
-                "차단 완료"
+        return ResponseEntity.ok(
+                CommonResult.of(
+                        "차단 완료"
+                )
         );
     }
 
     @PostMapping("/partner/{memberId}/report")
-    public CommonResult report(
+    public ResponseEntity<CommonResult> report(
             @PathVariable Integer memberId,
             @RequestBody ReportRequest reportRequest
     ) {
         reportService.report(memberId, reportRequest);
-        return responseService.getSuccessResult(
-                OK.value(),
-                "신고 완료"
+        return ResponseEntity.ok(
+                CommonResult.of(
+                        "신고 완료"
+                )
         );
     }
 

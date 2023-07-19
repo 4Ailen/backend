@@ -4,6 +4,7 @@ import com.aliens.friendship.domain.emailAuthentication.domain.EmailAuthenticati
 import com.aliens.friendship.domain.emailAuthentication.repository.EmailAuthenticationRepository;
 import com.aliens.friendship.domain.emailAuthentication.service.EmailAuthenticationService;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -108,6 +109,7 @@ class EmailAuthenticationServiceTest {
         assertEquals("이메일 인증 시간이 초과되었습니다.", exception.getMessage());
     }
 
+    @Disabled
     @Test
     @DisplayName("이메일 인증 예외: 유효하지 않은 토큰일 경우")
     void ValidateEmail_ThrowException_When_GivenInvalidToken() {

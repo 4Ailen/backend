@@ -1,14 +1,19 @@
 package com.aliens.friendship.global.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 성공 결과만 반환하는 응답
- */
+import java.time.LocalDateTime;
+
 @Getter
-@AllArgsConstructor
 public class CommonResult {
-    private Integer status;
-    private String message;
+    private final String message;
+    private final LocalDateTime timestamp = LocalDateTime.now();
+
+    protected CommonResult(final String message) {
+        this.message = message;
+    }
+
+    public static CommonResult of(final String message) {
+        return new CommonResult(message);
+    }
 }

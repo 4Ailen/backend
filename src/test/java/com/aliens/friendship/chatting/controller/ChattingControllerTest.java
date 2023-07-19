@@ -6,7 +6,6 @@ import com.aliens.friendship.domain.auth.service.AuthService;
 import com.aliens.friendship.domain.chatting.controller.ChattingController;
 import com.aliens.friendship.domain.chatting.service.ChattingService;
 import com.aliens.friendship.domain.member.service.MemberService;
-import com.aliens.friendship.global.response.ResponseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +40,6 @@ class ChattingControllerTest {
 
     @MockBean
     private AuthService authService;
-
-    @MockBean
-    private ResponseService responseService;
-
 
     @Test
     @DisplayName("채팅토큰 발급 컨트롤러 요청 성공")

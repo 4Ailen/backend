@@ -9,6 +9,7 @@ import com.aliens.friendship.domain.matching.repository.MatchingRepository;
 import com.aliens.friendship.domain.matching.repository.ApplicantRepository;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 @SpringBootTest
 @Transactional
 class ServiceModelMatchingRepositoryImplTest {

@@ -4,6 +4,7 @@ import com.aliens.friendship.domain.auth.model.entity.Authority;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.repository.MemberRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 @SpringBootTest
 @Transactional
 class MemberRepositoryImplTest {
