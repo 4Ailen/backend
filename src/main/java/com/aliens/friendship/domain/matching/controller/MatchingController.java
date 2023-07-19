@@ -1,10 +1,7 @@
 package com.aliens.friendship.domain.matching.controller;
 
 import com.aliens.friendship.domain.chatting.service.ChattingService;
-import com.aliens.friendship.domain.matching.controller.dto.ApplicantRequest;
-import com.aliens.friendship.domain.matching.controller.dto.ApplicantResponse;
-import com.aliens.friendship.domain.matching.controller.dto.PartnersResponse;
-import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
+import com.aliens.friendship.domain.matching.controller.dto.*;
 import com.aliens.friendship.domain.matching.service.BlockingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingInfoService;
 import com.aliens.friendship.domain.matching.service.MatchingService;
@@ -101,6 +98,15 @@ public class MatchingController {
         return responseService.getSuccessResult(
                 OK.value(),
                 "신고 완료"
+        );
+    }
+
+    @GetMapping("/reports")
+    public SingleResult<ReportResponse> getReportsByAdmin() {
+        return responseService.getSingleResult(
+                OK.value(),
+                "성공적으로 신고 목록을 조회하였습니다.",
+                reportService.getReportsByAdmin()
         );
     }
 

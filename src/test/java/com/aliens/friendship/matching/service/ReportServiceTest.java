@@ -1,5 +1,6 @@
 package com.aliens.friendship.matching.service;
 
+import com.aliens.friendship.domain.matching.controller.dto.ReportResponse;
 import com.aliens.friendship.domain.matching.service.ReportService;
 import com.aliens.friendship.domain.matching.controller.dto.ReportRequest;
 import com.aliens.friendship.domain.matching.domain.Report;
@@ -23,6 +24,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,6 +110,33 @@ public class ReportServiceTest {
         // then
         verify(memberRepository, times(1)).findByEmail(blockingMember.getEmail());
         assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("관리자에 의한 신고 목록 조회 성공")
+    void GetReportsByAdmin_Success() {
+        //given
+        List<Report> reports = new ArrayList<>();
+        Member reporterMember = MemberFixture.createTestMember();
+        Member reportedMember = MemberFixture.createTestMember();
+        for (int i = 0; i < 9; i++) {
+            reports.add(Report.builder()
+                    .id(i)
+                    .reportedMember(reportedMember)
+                    .reporterMember(reporterMember)
+                    .reportCategory(ReportCategory.VIOLENCE)
+                    .reportContent("폭력적인 언행")
+                    .reportDate(String.valueOf(new Timestamp(System.currentTimeMillis())))
+                    .build());
+        }
+        when(reportRepository.findAll()).thenReturn(reports);
+
+        //when
+        ReportResponse reportResponse = reportService.getReportsByAdmin();
+
+        // then
+        verify(reportRepository, times(1)).findAll();
+        assertEquals(reportResponse.getReports().size(), 9);
     }
 
     private void setUpAuthentication(Member member) {

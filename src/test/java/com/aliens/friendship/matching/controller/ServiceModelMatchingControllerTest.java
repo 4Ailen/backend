@@ -238,5 +238,18 @@ class ServiceModelMatchingControllerTest {
         resultActions.andExpect(status().isOk());
         verify(matchingInfoService, times(1)).getMatchingRemainingPeroid();
     }
+
+    @Test
+    @DisplayName("관리자에 의한 신고 목록 조회 성공")
+    void GetReportsByAdmin_Success() throws Exception {
+        //given
+
+        //when
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/matching/reports"));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        verify(reportService, times(1)).getReportsByAdmin();
+    }
 }
 

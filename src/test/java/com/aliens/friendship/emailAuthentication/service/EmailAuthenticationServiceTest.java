@@ -124,6 +124,6 @@ class EmailAuthenticationServiceTest {
         });
 
         // then: 예외 발생
-        assertEquals("유효하지 않은 토큰입니다.", exception.getMessage());
+        assertEquals("유효하지 않은 이메일 인증 토큰입니다.", exception.getMessage());
     }
 }

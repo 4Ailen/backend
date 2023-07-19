@@ -3,6 +3,7 @@ package com.aliens.friendship.member.controller;
 import com.aliens.friendship.domain.auth.filter.JwtAuthenticationFilter;
 import com.aliens.friendship.domain.auth.service.AuthService;
 import com.aliens.friendship.domain.member.controller.MemberController;
+import com.aliens.friendship.domain.member.controller.dto.MemberInfoByAdminDto;
 import com.aliens.friendship.domain.member.domain.Member;
 import com.aliens.friendship.domain.member.controller.dto.JoinDto;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoDto;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -303,7 +305,7 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("멤버 관련 정보 삭제 성공")
-    void deleteMemberInfoByAdmin_Success() throws Exception {
+    void DeleteMemberInfoByAdmin_Success() throws Exception {
         // given
         Integer memberId = 17;
         doNothing().when(memberService).deleteMemberInfoByAdmin(memberId);
@@ -312,6 +314,32 @@ class MemberControllerTest {
         mockMvc.perform(delete("/api/v1/member/" + memberId))
                 .andExpect(status().isOk());
         verify(memberService, times(1)).deleteMemberInfoByAdmin(anyInt());
+    }
+
+    @Test
+    @DisplayName("관리자에 의한 멤버 정보 조회 성공")
+    void GetMemberInfoByAdmin_Success() throws Exception {
+        // given
+        Integer memberId = 17;
+        MemberInfoByAdminDto expectedMemberInfoByAdminDto = MemberInfoByAdminDto.builder()
+                .email("test@example.com")
+                .mbti(Member.Mbti.ENFP)
+                .gender("여성")
+                .nationality("South Korea")
+                .age(24)
+                .birthday("2002-07-18")
+                .name("Joy")
+                .withdrawalDate("2023-05-29")
+                .joinDate(Instant.now())
+                .status(Member.Status.APPLIED)
+                .build();
+        when(memberService.getMemberInfoByAdmin(memberId)).thenReturn(expectedMemberInfoByAdminDto);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/member/" + memberId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        verify(memberService, times(1)).getMemberInfoByAdmin(anyInt());
     }
 
 }
