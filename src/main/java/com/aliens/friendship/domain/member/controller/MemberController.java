@@ -147,11 +147,12 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}")
-    public SingleResult<MemberInfoByAdminDto> getMemberInfoByAdmin(@PathVariable Integer memberId) throws Exception {
-        return responseService.getSingleResult(
-                OK.value(),
-                "성공적으로 사용자 정보를 조회하였습니다.",
-                memberService.getMemberInfoByAdmin(memberId)
+    public ResponseEntity<SingleResult<MemberInfoByAdminDto>> getMemberInfoByAdmin(@PathVariable Integer memberId) throws Exception {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 사용자 정보를 조회하였습니다.",
+                        memberService.getMemberInfoByAdmin(memberId)
+                )
         );
     }
 }
