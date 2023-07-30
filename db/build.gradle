@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+
+apply plugin: 'io.spring.dependency-management'
+group 'webSocket'
+version '0.0.1-SNAPSHOT'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation 'org.webjars:webjars-locator-core'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    //JPA
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.7'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    //MongoDB
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    //MYSQL
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+
+bootJar {
+    enabled = false
+}
+
+
+jar {
+    enabled = true
+}
+

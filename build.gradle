@@ -1,128 +1,21 @@
-buildscript {
-	ext {
-		queryDslVersion = "5.0.0"
-	}
-}
-
 plugins {
-	id 'org.springframework.boot' version '2.7.7'
-	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
-	id "org.asciidoctor.jvm.convert" version "3.3.2"
+	id 'org.springframework.boot' version '2.7.9'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-apply plugin: 'io.spring.dependency-management'
-group = 'webSocket'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+allprojects {
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
+	repositories {
+		mavenCentral()
 	}
-	asciidoctorExt
 }
 
-repositories {
-	mavenCentral()
-}
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
-	implementation 'mysql:mysql-connector-java'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'mysql:mysql-connector-java'
-
-	implementation 'org.webjars:webjars-locator-core'
-	implementation 'org.webjars:sockjs-client:1.0.2'
-	implementation 'org.webjars:stomp-websocket:2.3.3'
-//	implementation 'org.webjars:bootstrap:3.3.7'
-//	implementation 'org.webjars:jquery:3.1.1-1'
-
-	// Gson
-	implementation 'com.google.code.gson:gson:2.10.1'
-
-	//redis
-	implementation 'org.springframework.boot:spring-boot-starter-redis:1.4.6.RELEASE'
-
-	//jpa query log
-	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.7'
-
-	//querydsl
-	implementation "com.querydsl:querydsl-core:${queryDslVersion}"
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-
-	// REST DOCS
-	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
-
-	annotationProcessor 'org.projectlombok:lombok'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-}
-
-ext {
-	snippetsDir = file('build/generated-snippets')
-}
-
-test {
-	useJUnitPlatform()
-	outputs.dir snippetsDir
-}
-
-def querydslDir = "$buildDir/generated/querydsl"
-
-querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
-}
-
-sourceSets {
-	main.java.srcDir querydslDir
-}
-
-compileQuerydsl{
-	options.annotationProcessorPath = configurations.querydsl
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
-}
-
-asciidoctor {
-	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
-	dependsOn test
-	attributes["snippets"] = snippetsDir
-	sources { include("**/index.adoc") }
-	baseDirFollowsSourceFile()
-}
 
 bootJar {
-	dependsOn asciidoctor
-	from("${asciidoctor.outputDir}") {
-		into 'static/docs'
-	}
+	enabled = false
+}
+
+jar {
+	enabled = false
 }
