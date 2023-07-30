@@ -2,9 +2,9 @@ package com.aliens.friendship.domain.match.business;
 
 import com.aliens.db.applicant.entity.ApplicantEntity;
 import com.aliens.friendship.domain.applicant.service.ApplicantService;
-import com.aliens.friendship.domain.applicant.service.model.Participant;
-import com.aliens.friendship.domain.applicant.service.model.ServiceModelMatching;
 import com.aliens.friendship.domain.match.converter.MatchConverter;
+import com.aliens.friendship.domain.match.service.model.Participant;
+import com.aliens.friendship.domain.match.service.model.ServiceModelMatching;
 import com.aliens.friendship.global.common.annotation.Business;
 import lombok.RequiredArgsConstructor;
 

@@ -1,7 +1,7 @@
 package com.aliens.friendship.domain.match.converter;
 
 import com.aliens.db.applicant.entity.ApplicantEntity;
-import com.aliens.friendship.domain.applicant.service.model.Participant;
+import com.aliens.friendship.domain.match.service.model.Participant;
 import com.aliens.friendship.global.common.annotation.Converter;
 import lombok.RequiredArgsConstructor;
 

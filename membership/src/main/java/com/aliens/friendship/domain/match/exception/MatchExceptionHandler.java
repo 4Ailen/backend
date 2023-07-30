@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class MatchExceptionHandler {
 
-    /**
-     * DuplicatedMatchException handling (Custom Exception)
-     */
+
     @ExceptionHandler(DuplicatedMatchException.class)
     protected ResponseEntity<ErrorResponse> handleDuplicatedMatchException(
             DuplicatedMatchException e
