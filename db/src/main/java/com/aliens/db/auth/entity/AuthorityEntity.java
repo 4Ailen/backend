@@ -1,28 +1,26 @@
 package com.aliens.db.auth.entity;
 
+import com.aliens.db.BaseEntity;
 import com.aliens.db.member.entity.MemberEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import static javax.persistence.FetchType.LAZY;
-import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PROTECTED)
-@Entity @Getter @Builder
+@Entity @Getter @SuperBuilder
 @Table(name = "authority", schema = "aliendb")
-public class AuthorityEntity implements GrantedAuthority {
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "authority_id")
-    private Long id;
+public class AuthorityEntity extends BaseEntity implements GrantedAuthority {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
