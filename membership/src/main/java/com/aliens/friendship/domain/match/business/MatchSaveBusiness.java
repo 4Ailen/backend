@@ -4,6 +4,7 @@ import com.aliens.db.applicant.entity.ApplicantEntity;
 import com.aliens.db.chatting.entity.ChattingRoomEntity;
 import com.aliens.db.matching.entity.MatchingEntity;
 import com.aliens.db.member.entity.MemberEntity;
+import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.applicant.service.ApplicantService;
 import com.aliens.friendship.domain.chat.service.ChatService;
 import com.aliens.friendship.domain.match.service.MatchService;
@@ -27,12 +28,12 @@ public class MatchSaveBusiness {
     private final MatchService matchService;
 
     public void saveMatchingResult(List<Participant> participants) throws Exception {
-        ApplicantEntity tmpApplicantEntity = applicantService.findById(participants.get(0).getId());
+        ApplicantEntity tmpApplicantEntity = applicantService.findByMemberEntity(memberService.findById(participants.get(0).getId()));
         Instant matchingDate = applicantService.getDateWillMatched(tmpApplicantEntity);
 
         for (Participant participant : participants) {
             // 신청자 엔티티
-            ApplicantEntity nowApplicantEntity = applicantService.findById(participant.getId());
+            ApplicantEntity nowApplicantEntity = applicantService.findByMemberEntity(memberService.findById(participant.getId()));
 
             // 신청자 매칭완료 상태변경
             applicantService.updateIsMatched(nowApplicantEntity);
@@ -49,8 +50,6 @@ public class MatchSaveBusiness {
 
                 // 매칭 파트너가 주인이고 매칭 주인이 파트너인 매칭 엔티티 조회
                 Optional<MatchingEntity> partnerIsMasterMatchEntity = matchService.findByMatchedMemberAndMatchingMemberReverseWithMatchingDate(matchedMemberEntity,matchingMemberEntity,matchingDate);
-                Optional<MatchingEntity> apartnerIsMasterMatchEntity = matchService.findByMatchedMemberAndMatchingMemberReverseWithMatchingDate(matchingMemberEntity,matchedMemberEntity,matchingDate);
-
 
                 //매칭 파트너가 주인인 매칭 엔티티가 있을 경우,
                 // 저장된 채팅룸으로 매칭 엔티티에 저장
@@ -80,8 +79,4 @@ public class MatchSaveBusiness {
             }
         }
     }
-
-
-
-
 }
