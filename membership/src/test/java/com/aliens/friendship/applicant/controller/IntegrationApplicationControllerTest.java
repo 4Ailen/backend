@@ -2,6 +2,7 @@ package com.aliens.friendship.applicant.controller;
 
 import com.aliens.db.applicant.entity.ApplicantEntity;
 import com.aliens.db.member.entity.MemberEntity;
+import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.applicant.business.ApplicantBusiness;
 import com.aliens.friendship.domain.applicant.controller.dto.ApplicantRequestDto;
 import com.aliens.friendship.domain.applicant.service.ApplicantService;
@@ -26,6 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -36,6 +39,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 public class IntegrationApplicationControllerTest {
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -214,7 +220,7 @@ public class IntegrationApplicationControllerTest {
                             .selfIntroduction("Hello, I am Aden.")
                             .profileImage(createMockProfileImage())
                             .build();
-            memberEntity = memberConverter.toMemberEntityWithUser(joinRequestDto);
+            memberEntity = memberRepository.save(memberConverter.toMemberEntityWithUser(joinRequestDto));
             memberService.register(memberEntity);
 
             applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
@@ -222,11 +228,9 @@ public class IntegrationApplicationControllerTest {
                     .firstPreferLanguage(ApplicantEntity.Language.ENGLISH)
                     .secondPreferLanguage(ApplicantEntity.Language.CHINESE)
                     .build());
-
-            matchBusiness.matchingAllApplicant();
-
         }
 
+        matchBusiness.matchingAllApplicant();
 
         mockMvc.perform(
                         get(BASIC_URL+"/partners")
