@@ -4,7 +4,6 @@ import com.aliens.db.applicant.entity.ApplicantEntity;
 import com.aliens.db.chatting.entity.ChattingRoomEntity;
 import com.aliens.db.matching.entity.MatchingEntity;
 import com.aliens.db.member.entity.MemberEntity;
-import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.applicant.service.ApplicantService;
 import com.aliens.friendship.domain.chat.service.ChatService;
 import com.aliens.friendship.domain.match.service.MatchService;
