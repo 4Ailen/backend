@@ -16,7 +16,7 @@ public class MatchConverter {
         List<Participant> participants = new ArrayList<>();
         for (ApplicantEntity applicantEntity : applicantEntities) {
             Participant participant = new Participant(
-                    applicantEntity.getId(),
+                    applicantEntity.getMemberEntity().getId(),
                     applicantEntity.getFirstPreferLanguage().toString(),
                     applicantEntity.getSecondPreferLanguage().toString()
             );
