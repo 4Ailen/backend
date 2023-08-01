@@ -1,6 +1,7 @@
 package com.aliens.friendship.domain.match.business;
 
 import com.aliens.db.applicant.entity.ApplicantEntity;
+import com.aliens.db.applicant.repository.ApplicantRepository;
 import com.aliens.db.chatting.entity.ChattingRoomEntity;
 import com.aliens.db.matching.entity.MatchingEntity;
 import com.aliens.db.member.entity.MemberEntity;
@@ -25,6 +26,7 @@ public class MatchSaveBusiness {
     private final ApplicantService applicantService;
     private final MemberService memberService;
     private final MatchService matchService;
+    private final ApplicantRepository applicantRepository;
 
     public void saveMatchingResult(List<Participant> participants) throws Exception {
         ApplicantEntity tmpApplicantEntity = applicantService.findByMemberEntity(memberService.findById(participants.get(0).getId()));
@@ -72,10 +74,21 @@ public class MatchSaveBusiness {
                     MatchingEntity matchingEntity = MatchingEntity.builder()
                             .matchingMember(matchingMemberEntity)
                             .matchedMember(matchedMemberEntity)
+                            .matchingDate(matchingDate)
                             .chattingRoomEntity(chattingRoom).build();
                     matchService.save(matchingEntity);
                 }
             }
         }
+
+        updateAllApplicantsIsMatchedToMatched();
+    }
+
+    private void updateAllApplicantsIsMatchedToMatched() {
+        List<ApplicantEntity> allParticipants = applicantService.findAllParticipants();
+        for(ApplicantEntity applicantEntity : allParticipants) {
+            applicantEntity.updateIsMatched(ApplicantEntity.Status.MATCHED);
+        }
+        applicantRepository.saveAll(allParticipants);
     }
 }
