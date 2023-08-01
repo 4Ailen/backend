@@ -141,8 +141,8 @@ public class MatchBusiness {
 
     public boolean isValidMatching(Participant participant, Participant matchedParticipant) {
         return matchedParticipant != participant &&
-                !participant.getServiceModelMatchingList().contains(matchedParticipant) &&
-                !matchedParticipant.getServiceModelMatchingList().contains(participant) &&
+                !isServiceModelMatchigListContainsParticipantId(participant.getServiceModelMatchingList(), matchedParticipant.getId()) &&
+                !isServiceModelMatchigListContainsParticipantId(matchedParticipant.getServiceModelMatchingList(), participant.getId()) &&
                 matchedParticipant.getNumberOfMatches() < maxMatches;
     }
 
@@ -150,6 +150,13 @@ public class MatchBusiness {
         return matchingParticipants.stream().allMatch(p -> p.getNumberOfMatches() >= 3);
     }
 
+    private boolean isServiceModelMatchigListContainsParticipantId(List<ServiceModelMatching> serviceModelMatchingList, Long participantId){
+        for(ServiceModelMatching serviceModelMatching : serviceModelMatchingList){
+            if(serviceModelMatching.getPartner().getId() == participantId) return true;
+        }
+
+        return false;
+    }
 }
 
 
