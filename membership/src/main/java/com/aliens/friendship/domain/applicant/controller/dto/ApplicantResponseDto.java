@@ -21,6 +21,7 @@ public class ApplicantResponseDto {
         private Integer age;
         private String profileImage;
         private String countryImage;
+        private String selfIntroduction;
     }
 
     @Getter
