@@ -154,4 +154,17 @@ public class ApplicantBusiness {
         return result;
     }
 
+    public void changePreferLanguages(ApplicantRequestDto applicantRequestDto) throws Exception {
+        // 로그인 회원 엔티티
+        MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
+
+        // 탈퇴하지 않은 회원 검증
+        matchingInfoService.validateApplied(loginMemberEntity);
+
+        // Dto -> Entity
+        ApplicantEntity applicantEntity = applicantConverter.toApplicantEntity(loginMemberEntity,applicantRequestDto);
+
+        //저장
+        applicantService.changePreferLanguages(applicantEntity, applicantRequestDto);
+    }
 }

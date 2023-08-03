@@ -3,6 +3,7 @@ package com.aliens.friendship.domain.applicant.service;
 import com.aliens.db.applicant.entity.ApplicantEntity;
 import com.aliens.db.applicant.repository.ApplicantRepository;
 import com.aliens.db.member.entity.MemberEntity;
+import com.aliens.friendship.domain.applicant.controller.dto.ApplicantRequestDto;
 import com.aliens.friendship.domain.match.exception.ApplicantNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,5 +70,11 @@ public class ApplicantService {
     @Transactional
     public void updateIsMatched(ApplicantEntity applicantEntity) {
         applicantEntity.updateIsMatched(ApplicantEntity.Status.MATCHED);
+    }
+
+    @Transactional
+    public void changePreferLanguages(ApplicantEntity applicantEntity, ApplicantRequestDto applicantRequestDto) {
+        applicantEntity.updatePreferLanguages(ApplicantEntity.Language.valueOf(applicantRequestDto.getFirstPreferLanguage()), ApplicantEntity.Language.valueOf(applicantRequestDto.getSecondPreferLanguage()));
+        applicantRepository.save(applicantEntity);
     }
 }
