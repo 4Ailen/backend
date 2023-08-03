@@ -78,7 +78,15 @@ public class ApplicantController {
         );
     }
 
-
+    @PatchMapping("/prefer-languages")
+    public ResponseEntity<CommonResult> updatePreferLanguages(@RequestBody ApplicantRequestDto applicantRequestDto) throws Exception {
+        applicantBusiness.changePreferLanguages(applicantRequestDto);
+        return ResponseEntity.ok(
+                CommonResult.of(
+                        "성공적으로 선호 언어 수정이 완료되었습니다."
+                )
+        );
+    }
 
 
 }

@@ -81,10 +81,10 @@ public class EmailAuthenticationService {
     public String getMemberAuthenticationStatus(String email, boolean isJoinedEmail,EmailAuthenticationEntity emailAuthenticationEntity) {
         boolean isNullEmailAuthenticationEntity = isNullEmailAuthenticationEntity(emailAuthenticationEntity);
 
-        if (isNullEmailAuthenticationEntity && !isJoinedEmail){
+        if (isNullEmailAuthenticationEntity && isJoinedEmail){
             return "JOINED"; // 이메일 인증 후 회원가입된 상태
         }
-        else if (isNullEmailAuthenticationEntity && isJoinedEmail){
+        else if (isNullEmailAuthenticationEntity && !isJoinedEmail){
             return "EMAIL_NOT_SENT"; // 이메일 전송 요청필요 상태
         }
         String status = emailAuthenticationEntity.getStatus().toString();

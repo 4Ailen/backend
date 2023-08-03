@@ -27,8 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -239,5 +238,34 @@ public class IntegrationApplicationControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("IntegrationController 매칭 선호 언어 수정 - 성공")
+    void testChangePreferLanguages_Success() throws Exception {
+        //given
+        memberService.register(memberEntity);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+
+        applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
+                .memberEntity(memberEntity)
+                .firstPreferLanguage(ApplicantEntity.Language.ENGLISH)
+                .secondPreferLanguage(ApplicantEntity.Language.CHINESE)
+                .build());
+
+        ApplicantRequestDto modifiedPreferLanguage = ApplicantRequestDto.builder()
+                .firstPreferLanguage("ENGLISH")
+                .secondPreferLanguage("KOREAN")
+                .build();
+
+        mockMvc.perform(
+                        patch(BASIC_URL+"/prefer-languages")
+                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
+                                .header("RefreshToken",tokenDto.getRefreshToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(modifiedPreferLanguage)
+                                )
+                )
+                .andExpect(status().isOk());
+
+    }
 
 }

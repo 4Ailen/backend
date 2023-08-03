@@ -35,6 +35,11 @@ public class ApplicantEntity extends BaseEntity {
         this.isMatched = isMatched;
     }
 
+    public void updatePreferLanguages(Language firstPreferLanguage, Language secondPreferLanguage) {
+        this.firstPreferLanguage = firstPreferLanguage;
+        this.secondPreferLanguage = secondPreferLanguage;
+    }
+
     public enum Status {
         MATCHED, MATCHING, NOT_MATCHED;
     }

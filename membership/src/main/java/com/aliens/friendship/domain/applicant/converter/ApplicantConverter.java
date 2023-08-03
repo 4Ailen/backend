@@ -31,6 +31,7 @@ public class ApplicantConverter {
                 .nationality(applicantEntity.getMemberEntity().getNationality())
                 .profileImage(applicantEntity.getMemberEntity().getProfileImageUrl())
                 .countryImage(applicantEntity.getMemberEntity().getNationality())
+                .selfIntroduction(applicantEntity.getMemberEntity().getSelfIntroduction())
                 .build();
         ApplicantResponseDto.PreferLanguages preferLanguagesDto = ApplicantResponseDto.PreferLanguages.builder()
                 .firstPreferLanguage(applicantEntity.getFirstPreferLanguage().toString())
