@@ -56,7 +56,9 @@ public class MemberConverter {
                 .nationality(memberEntity.getNationality())
                 .status(memberEntity.getStatus())
                 .name(memberEntity.getName())
-                .withdrawalAt(memberEntity.getWithdrawalAt().toString())
+                .withdrawalAt(memberEntity.getWithdrawalAt() != null
+                        ? memberEntity.getWithdrawalAt().toString()
+                        : null)
                 .birthday(memberEntity.getBirthday())
                 .age(memberEntity.getAge())
                 .build();
