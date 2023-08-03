@@ -45,22 +45,6 @@ public class EmailAuthenticationController {
         );
     }
 
-//    @GetMapping("/{email}/verification")
-//    public ResponseEntity<CommonResult>  verifyEmail(
-//            @PathVariable String email,
-//            @RequestParam("token") String token
-//    ) throws Exception {
-//        emailAuthenticationBusiness.validateEmail(email,token);
-//        ModelAndView modelAndView = new ModelAndView();
-//        modelAndView.setViewName("emailVerificationComplete");
-//
-//        return ResponseEntity.ok(
-//                CommonResult.of(
-//                        "이메일 인증에 성공하였습니다."
-//                )
-//        );
-//    }
-
     @GetMapping("/{email}/verification")
     public ModelAndView verifyEmail(
             @PathVariable String email,
