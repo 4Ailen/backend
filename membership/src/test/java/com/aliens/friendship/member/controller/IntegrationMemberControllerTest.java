@@ -64,6 +64,7 @@ public class IntegrationMemberControllerTest {
     String BASIC_URL;
     String email;
     String password;
+    String fcmToken;
     JoinRequestDto joinRequestDto;
     MemberEntity memberEntity;
 
@@ -73,6 +74,8 @@ public class IntegrationMemberControllerTest {
         BASIC_URL = "/api/v1/member";
         email = "test@example.com";
         password = "test1234";
+        fcmToken = "testFcmToken";
+
         mockEmailAuthenticationEntity =
                 EmailAuthenticationEntity.builder().
                         id("ddkls")
@@ -141,7 +144,7 @@ public class IntegrationMemberControllerTest {
     void testGetMemberInfo_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         // when & then
         mockMvc.perform(get(BASIC_URL+ "/email/"+email+"/existence")
@@ -158,7 +161,7 @@ public class IntegrationMemberControllerTest {
     void testMemberWithdrawal_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
 
         Map<String, String> passwordMap = new HashMap<>();
@@ -228,7 +231,7 @@ public class IntegrationMemberControllerTest {
     void ChangePassword_Success() throws Exception {
         // given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         PasswordUpdateRequestDto passwordUpdateRequestDto =
                 PasswordUpdateRequestDto.builder()
@@ -252,7 +255,7 @@ public class IntegrationMemberControllerTest {
     void ChangeSelfIntroduction_Success() throws Exception {
         // given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
         String selfIntroductionChangeRequest = "반가워요!";
 
         // when & then
@@ -274,7 +277,7 @@ public class IntegrationMemberControllerTest {
     void ChangeProfileImage_Success() throws Exception {
         // given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         // When
         ResultActions resultActions = mockMvc.perform(
