@@ -88,15 +88,13 @@ public class AuthService {
 
     public void saveFcmToken(Long memberId, String fcmToken) {
         validateFcmToken(fcmToken);
-        if (fcmTokenRepository.existsByValue(fcmToken)) {
-            fcmTokenRepository.deleteAllByValue(fcmToken);
+        FcmTokenEntity existingToken = fcmTokenRepository.findByValue(fcmToken);
+        if (existingToken != null && !existingToken.getMemberId().equals(memberId)) {
+            existingToken.changeMemberId(memberId);
+            fcmTokenRepository.save(existingToken);
+        } else {
+            fcmTokenRepository.save(FcmTokenEntity.of(memberId, fcmToken));
         }
-        fcmTokenRepository.save(
-                FcmTokenEntity.of(
-                        memberId,
-                        fcmToken
-                )
-        );
     }
 
     public void deleteFcmToken(String fcmToken) {

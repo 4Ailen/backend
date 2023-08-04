@@ -32,4 +32,8 @@ public class FcmTokenEntity {
     ) {
         return new FcmTokenEntity(memberPersonalId, value);
     }
+
+    public void changeMemberId(Long memberId) {
+        this.memberId = memberId;
+    }
 }

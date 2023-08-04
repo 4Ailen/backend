@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface FcmTokenRepository extends MongoRepository<FcmTokenEntity, String> {
-    boolean existsByValue(String value);
     void deleteAllByValue(String value);
+    FcmTokenEntity findByValue(String fcmToken);
 }
