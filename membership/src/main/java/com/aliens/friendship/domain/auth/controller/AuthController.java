@@ -20,12 +20,12 @@ public class AuthController {
     private final AuthBusiness authBusiness;
 
     @PostMapping("/authentication")
-    public ResponseEntity<SingleResult<TokenDto>> login(@RequestBody LoginRequest request) throws Exception {
-
+    public ResponseEntity<SingleResult<TokenDto>> login(@RequestBody LoginRequest request, HttpServletRequest httpServletRequest) throws Exception {
+        String fcmToken = HeaderUtil.getFcmToken(httpServletRequest);
         return ResponseEntity.ok(
                 SingleResult.of(
                         "성공적으로 토큰이 발급되었습니다.",
-                        authBusiness.login(request)
+                        authBusiness.login(request, fcmToken)
                 )
         );
     }

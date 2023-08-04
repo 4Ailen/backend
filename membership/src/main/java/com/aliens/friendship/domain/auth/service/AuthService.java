@@ -1,6 +1,8 @@
 package com.aliens.friendship.domain.auth.service;
 
+import com.aliens.db.auth.entity.FcmTokenEntity;
 import com.aliens.db.auth.entity.RefreshTokenEntity;
+import com.aliens.db.auth.repository.FcmTokenRepository;
 import com.aliens.db.auth.repository.RefreshTokenRepository;
 import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.db.member.repository.MemberRepository;
@@ -37,6 +39,7 @@ public class AuthService {
     private final AuthTokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final FcmTokenRepository fcmTokenRepository;
 
     @Transactional
     public void deleteRefreshTokenByEmail(String email) {
@@ -83,6 +86,18 @@ public class AuthService {
 
     public AuthToken createAuthTokenOfRefreshToken(String refreshToken) {
         return tokenProvider.createAuthTokenOfRefreshToken(refreshToken);
+    }
+
+    public void saveFcmToken(Long memberId, String fcmToken) {
+        if (fcmTokenRepository.existsByValue(fcmToken)) {
+            fcmTokenRepository.deleteAllByValue(fcmToken);
+        }
+        fcmTokenRepository.save(
+                FcmTokenEntity.of(
+                        memberId,
+                        fcmToken
+                )
+        );
     }
 
     public Collection<? extends GrantedAuthority> getMemberAuthority(String memberRoles) {

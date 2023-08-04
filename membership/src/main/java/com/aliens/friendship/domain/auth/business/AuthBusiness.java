@@ -28,7 +28,7 @@ public class AuthBusiness {
     /**
      * 로그인
      */
-    public TokenDto login(LoginRequest request) throws Exception {
+    public TokenDto login(LoginRequest request, String FcmToken) throws Exception {
         //회원 엔티티 조회
         MemberEntity memberEntity = memberService.findByEmail(request.getEmail());
 
@@ -37,6 +37,9 @@ public class AuthBusiness {
 
         //회원 비밀번호 검증
         authService.checkMemberPassword(request.getPassword(), memberEntity.getPassword());
+
+        // fcmToken 저장
+        authService.saveFcmToken(memberEntity.getId(), FcmToken);
 
         //accessToken 발급
         String accessToken = authService.createAccessToken(request.getEmail(), memberEntity.getAuthorities()).getValue();

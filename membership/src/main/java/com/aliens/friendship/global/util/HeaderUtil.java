@@ -30,4 +30,14 @@ public class HeaderUtil {
 
         return headerValue;
     }
+
+    public static String getFcmToken(HttpServletRequest request) {
+        String headerValue = request.getHeader("FcmToken");
+
+        if (headerValue == null) {
+            return null;
+        }
+
+        return headerValue;
+    }
 }
