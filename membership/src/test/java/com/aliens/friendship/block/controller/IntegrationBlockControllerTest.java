@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -28,6 +29,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
 public class IntegrationBlockControllerTest {
 
@@ -138,6 +143,15 @@ public class IntegrationBlockControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("차단 완료"));
+                .andDo(document("blockMember",
+                        requestFields(
+                                fieldWithPath("roomId").description("차단할 채팅방 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간")
+                        )
+                ));
+
     }
 }
