@@ -15,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Business
@@ -69,16 +72,16 @@ public class ApplicantBusiness {
      */
     public Map<String, String> getMatchingStatus() throws Exception {
         // 로그인 회원 엔티티
-        MemberEntity loginMemberEntity = memberService.getCurrentMemberEntity();
+        MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
 
-        // 신청자 엔티티
-        Optional<ApplicantEntity> applicantEntity = applicantService.findApplicantByMemberEntity(loginMemberEntity);
+        //신청자 엔티티
+        ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
 
         //상태
         String status;
 
-        if (applicantEntity.isPresent()) {
-            if (applicantEntity.get().getIsMatched() == ApplicantEntity.Status.MATCHED) {
+        if (loginMemberEntity.getStatus().equals(MemberEntity.Status.APPLIED)) {
+            if (applicantEntity.getIsMatched() == ApplicantEntity.Status.MATCHED) {
                 status = "MATCHED";
             } else {
                 status = "PENDING";

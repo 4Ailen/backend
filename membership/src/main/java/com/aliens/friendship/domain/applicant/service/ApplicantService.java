@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,16 +24,10 @@ public class ApplicantService {
         applicantRepository.save(applicantEntity);
     }
 
-    public ApplicantEntity getApplicantByMemberEntity(MemberEntity memberEntity) {
+    public ApplicantEntity findByMemberEntity(MemberEntity memberEntity) {
         ApplicantEntity applicantEntity = applicantRepository
                 .findFirstByMemberEntityOrderByCreatedAtDesc(memberEntity)
                 .orElseThrow(ApplicantNotFoundException::new);
-        return applicantEntity;
-    }
-
-    public Optional<ApplicantEntity> findApplicantByMemberEntity(MemberEntity memberEntity) {
-        Optional<ApplicantEntity> applicantEntity = applicantRepository
-                .findFirstByMemberEntityOrderByCreatedAtDesc(memberEntity);
         return applicantEntity;
     }
 
