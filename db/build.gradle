@@ -8,6 +8,7 @@ plugins {
 apply plugin: 'io.spring.dependency-management'
 group 'webSocket'
 version '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
 
 configurations {
     compileOnly {

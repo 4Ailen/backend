@@ -13,7 +13,7 @@ plugins {
 apply plugin: 'io.spring.dependency-management'
 group 'webSocket'
 version '0.0.1-SNAPSHOT'
-
+sourceCompatibility = '11'
 
 configurations {
     compileOnly {
@@ -52,6 +52,9 @@ dependencies {
 
     // Gson
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // thyme leaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
