@@ -15,14 +15,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
 public class IntegrationReportControllerTest {
     @Autowired
@@ -115,14 +123,25 @@ public class IntegrationReportControllerTest {
 
         // when & then
         mockMvc.perform(
-                        post(BASIC_URL+ "/"+ reportedMemberEntityId.toString())
+                        RestDocumentationRequestBuilders.post(BASIC_URL+ "/{memberId}", reportedMemberEntityId)
                             .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
                             .header("RefreshToken",tokenDto.getRefreshToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(new ObjectMapper().writeValueAsString(reportRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("신고 완료"))
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(document("reportMember",
+                        pathParameters(parameterWithName("memberId").description("신고할 멤버 아이디")),
+                        requestFields(
+                                fieldWithPath("reportCategory").description("신고 카테고리"),
+                                fieldWithPath("reportContent").description("신고 내용")
+                                ),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간")
+                        )
+                ));
 
     }
 
