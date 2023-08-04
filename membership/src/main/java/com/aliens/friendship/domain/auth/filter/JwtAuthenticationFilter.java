@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter
         }
 
         try {
-            authService.tokenValidate(authAccessToken);
+            authService.validateJwtToken(authAccessToken);
             SecurityContextHolder.getContext().setAuthentication(
                     authService.getAuthentication(authAccessToken)
             );

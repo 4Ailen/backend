@@ -73,7 +73,7 @@ public class AuthBusiness {
         AuthToken authTokenOfRefreshToken = authService.createAuthTokenOfRefreshToken(refreshToken);
 
         // Refresh Token 유효 검증
-        authService.tokenValidate(authTokenOfRefreshToken);
+        authService.validateJwtToken(authTokenOfRefreshToken);
 
         // 이메일과 리프레시토큰을 통해 리프레시토큰 엔티티 조회
         RefreshTokenEntity storedRefreshTokenEntity = authService.findRefreshTokenByEmilandValidRefreshToken(email,refreshToken);
