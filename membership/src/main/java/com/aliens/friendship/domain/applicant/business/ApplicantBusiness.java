@@ -39,7 +39,7 @@ public class ApplicantBusiness {
         matchingInfoService.validateApplied(loginMemberEntity);
 
         //최근 참여기록 검색
-        ApplicantEntity applicantEntity = applicantService.getApplicantByMemberEntity(loginMemberEntity);
+        ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
 
         // Dto 변환
         ApplicantResponseDto applicantResponseDto = applicantConverter.toApplicantResponseDto(applicantEntity);
@@ -100,7 +100,7 @@ public class ApplicantBusiness {
         MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
 
         //최근 신청엔티티
-        ApplicantEntity applicantEntity = applicantService.getApplicantByMemberEntity(loginMemberEntity);
+        ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
 
         //신청에 따른 매칭될 날짜
         Instant matchedDate = applicantService.getDateWillMatched(applicantEntity);
@@ -119,7 +119,7 @@ public class ApplicantBusiness {
                 resultDto.getPartners().add(partnerDto);
             }
             else{
-                ApplicantEntity matchedMembersApplicantEntity = applicantService.getApplicantByMemberEntity(matching.getMatchedMember());
+                ApplicantEntity matchedMembersApplicantEntity = applicantService.findByMemberEntity(matching.getMatchedMember());
                 PartnersResponseDto.Partner partnerDto =  applicantConverter.toPartnerOfResponseDto(matching,matchedMembersApplicantEntity);
                 resultDto.getPartners().add(partnerDto);
             }
@@ -137,7 +137,7 @@ public class ApplicantBusiness {
         MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
 
         //최근 신청엔티티
-        ApplicantEntity applicantEntity = applicantService.getApplicantByMemberEntity(loginMemberEntity);
+        ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
 
         //신청에 따른 매칭될 날짜
         Instant matchedDate = applicantService.getDateWillMatched(applicantEntity);

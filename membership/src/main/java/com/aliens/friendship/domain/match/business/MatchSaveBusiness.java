@@ -29,12 +29,12 @@ public class MatchSaveBusiness {
     private final ApplicantRepository applicantRepository;
 
     public void saveMatchingResult(List<Participant> participants) throws Exception {
-        ApplicantEntity tmpApplicantEntity = applicantService.getApplicantByMemberEntity(memberService.findById(participants.get(0).getId()));
+        ApplicantEntity tmpApplicantEntity = applicantService.findByMemberEntity(memberService.findById(participants.get(0).getId()));
         Instant matchingDate = applicantService.getDateWillMatched(tmpApplicantEntity);
 
         for (Participant participant : participants) {
             // 신청자 엔티티
-            ApplicantEntity nowApplicantEntity = applicantService.getApplicantByMemberEntity(memberService.findById(participant.getId()));
+            ApplicantEntity nowApplicantEntity = applicantService.findByMemberEntity(memberService.findById(participant.getId()));
 
             // 신청자 매칭완료 상태변경
             applicantService.updateIsMatched(nowApplicantEntity);
