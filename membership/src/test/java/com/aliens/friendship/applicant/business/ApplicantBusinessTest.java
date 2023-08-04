@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -61,7 +62,7 @@ public class ApplicantBusinessTest {
     public void testGetApplicant() throws Exception {
         // when
         when(memberService.getCurrentMemberEntity()).thenReturn(loginMemberEntity);
-        when(applicantService.findByMemberEntity(loginMemberEntity)).thenReturn(applicantEntity);
+        when(applicantService.getApplicantByMemberEntity(loginMemberEntity)).thenReturn(applicantEntity);
         when(applicantConverter.toApplicantResponseDto(applicantEntity)).thenReturn(ApplicantResponseDto.builder().build());
 
         // then
@@ -88,7 +89,7 @@ public class ApplicantBusinessTest {
     public void testGetMatchingStatus() throws Exception {
         // when
         when(memberService.getCurrentMemberEntity()).thenReturn(loginMemberEntity);
-        when(applicantService.findByMemberEntity(loginMemberEntity)).thenReturn(applicantEntity);
+        when(applicantService.findApplicantByMemberEntity(loginMemberEntity)).thenReturn(Optional.ofNullable(applicantEntity));
 
         // then
         Map<String, String> result = applicantBusiness.getMatchingStatus();
@@ -108,7 +109,7 @@ public class ApplicantBusinessTest {
 
         // when
         when(memberService.getCurrentMemberEntity()).thenReturn(loginMemberEntity);
-        when(applicantService.findByMemberEntity(loginMemberEntity)).thenReturn(matchedMembersApplicantEntity);
+        when(applicantService.getApplicantByMemberEntity(loginMemberEntity)).thenReturn(matchedMembersApplicantEntity);
         when(applicantService.getDateWillMatched(matchedMembersApplicantEntity)).thenReturn(now);
         when(matchingInfoService.getMatchingResultsByDateAndMemberEntity(now, loginMemberEntity))
                 .thenReturn(matchingEntities);
@@ -127,7 +128,7 @@ public class ApplicantBusinessTest {
     public void testGetMatchingDate() throws Exception {
         // when
         when(memberService.getCurrentMemberEntity()).thenReturn(loginMemberEntity);
-        when(applicantService.findByMemberEntity(loginMemberEntity)).thenReturn(applicantEntity);
+        when(applicantService.getApplicantByMemberEntity(loginMemberEntity)).thenReturn(applicantEntity);
         when(applicantService.getDateWillMatched(applicantEntity)).thenReturn(now);
         when(applicantConverter.getFormattedStringDate(now)).thenReturn("2023-07-25");
 
