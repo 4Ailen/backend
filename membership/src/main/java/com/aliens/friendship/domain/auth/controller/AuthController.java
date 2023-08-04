@@ -50,7 +50,8 @@ public class AuthController {
             HttpServletRequest request
     ) {
         String accessToken = HeaderUtil.getAccessToken(request);
-        authBusiness.logout(accessToken);
+        String fcmToken = HeaderUtil.getFcmToken(request);
+        authBusiness.logout(accessToken, fcmToken);
 
         return ResponseEntity.ok(
                 CommonResult.of(

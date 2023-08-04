@@ -95,13 +95,15 @@ public class AuthBusiness {
     /**
      * 로그아웃
      */
-    public void logout(String accessToken) {
+    public void logout(String accessToken, String fcmToken) {
 
         //이메일 추출
         String email = authService.createAuthTokenOfAccessToken(accessToken).getTokenClaims().get("email").toString();
 
         //이메일을 통한 RefreshToken 삭제 -> 이전 토큰으로 접근 불가
         authService.deleteRefreshTokenByEmail(email);
+
+        authService.deleteFcmToken(fcmToken);
     }
 
 

@@ -141,4 +141,7 @@ public class AuthService {
         return refreshTokenEntity;
     }
 
+    public void deleteFcmToken(String fcmToken) {
+        fcmTokenRepository.deleteAllByValue(fcmToken);
+    }
 }
