@@ -1,5 +1,6 @@
 package com.aliens.friendship.domain.match.service;
 
+import com.aliens.db.chatting.entity.ChattingRoomEntity;
 import com.aliens.db.matching.entity.MatchingEntity;
 import com.aliens.db.matching.repository.MatchRepository;
 import com.aliens.db.member.entity.MemberEntity;
@@ -32,4 +33,9 @@ public class MatchService {
         List<MatchingEntity> matchEntities = matchRepository.findAllByMatchingMember(loginMemberEntity);
         return matchEntities;
     }
+
+    public List<MatchingEntity> findMatchEntityWithOpenedChattingRoomByMemberEntity(MemberEntity loginMemberEntity) {
+        return matchRepository.findAllByMatchingMemberAndChattingRoomEntityStatus(loginMemberEntity, ChattingRoomEntity.RoomStatus.OPEN);
+    }
+
 }

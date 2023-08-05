@@ -60,7 +60,7 @@ public class MockChatBusinessTest {
     public void testGetJwtForChattingServer() throws Exception {
         // when
         when(memberService.getCurrentMemberEntity()).thenReturn(loginMemberEntity);
-        when(matchService.findByMemberEntity(loginMemberEntity)).thenReturn(matchEntities);
+        when(matchService.findMatchEntityWithOpenedChattingRoomByMemberEntity(loginMemberEntity)).thenReturn(matchEntities);
         when(chatConverter.toRoomIds(matchEntities)).thenReturn(new ArrayList<>(List.of(100L, 200L)));
         when(chatService.generateTokenWithMemberIdAndRoomIds(loginMemberEntity.getId(), List.of(100L, 200L)))
                 .thenReturn("test-jwt-token");

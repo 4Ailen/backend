@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -165,5 +166,14 @@ public class MemberService {
         String MemberEmail = userDetails.getUsername();
         MemberEntity memberEntity = findByEmail(MemberEmail);
         return memberEntity;
+    }
+
+    public List<MemberEntity> findAllAppliedMember() {
+        return memberRepository.findAllByStatus(MemberEntity.Status.APPLIED);
+    }
+
+    @Transactional
+    public void changeApplied(MemberEntity loginMemberEntity) {
+        loginMemberEntity.updateStatus(MemberEntity.Status.APPLIED);
     }
 }

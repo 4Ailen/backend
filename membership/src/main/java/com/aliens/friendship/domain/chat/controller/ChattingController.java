@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/chat")
 public class ChattingController {
 
-    private final ChatService chatService;
     private final ChatBusiness chatBusiness;
 
     @GetMapping("/token")
