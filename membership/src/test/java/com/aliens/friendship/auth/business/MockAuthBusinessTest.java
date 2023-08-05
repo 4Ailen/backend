@@ -70,7 +70,7 @@ public class MockAuthBusinessTest {
         when(authConverter.toTokenDto("access_token", "refresh_token")).thenReturn(tokenDto);
 
         // then
-        TokenDto result = authBusiness.login(request);
+        TokenDto result = authBusiness.login(request, "fcm_token");
         assertEquals(tokenDto, result);
     }
     // TODO: 토큰 재발급과 로그아웃에 대한 비즈니스 로직 MOCK 테스트코드 작성

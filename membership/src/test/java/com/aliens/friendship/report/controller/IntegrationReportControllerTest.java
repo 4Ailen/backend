@@ -1,5 +1,6 @@
 package com.aliens.friendship.report.controller;
 
+import com.aliens.db.auth.repository.FcmTokenRepository;
 import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.db.report.ReportCategory;
 import com.aliens.friendship.domain.auth.business.AuthBusiness;
@@ -33,6 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class IntegrationReportControllerTest {
     @Autowired
+    private FcmTokenRepository fcmTokenRepository;
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -52,6 +55,7 @@ public class IntegrationReportControllerTest {
     String BASIC_URL;
     String email;
     String password;
+    String fcmToken;
     JoinRequestDto joinRequestDto;
     MemberEntity memberEntity;
 
@@ -61,6 +65,7 @@ public class IntegrationReportControllerTest {
         BASIC_URL = "/api/v1/report";
         email = "test@example.com";
         password = "test1234";
+        fcmToken = "testFcmToken";
 
         joinRequestDto =
                 JoinRequestDto.builder()
@@ -106,7 +111,7 @@ public class IntegrationReportControllerTest {
         MemberEntity ReportedMemberEntity = memberConverter.toMemberEntityWithUser(joinRequestDto);
         Long reportedMemberEntityId = memberService.register(ReportedMemberEntity);
 
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         ReportRequestDto reportRequestDto = ReportRequestDto.builder()
                 .reportCategory(ReportCategory.SPAM)

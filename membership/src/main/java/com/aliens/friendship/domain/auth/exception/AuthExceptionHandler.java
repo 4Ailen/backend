@@ -60,4 +60,34 @@ public class AuthExceptionHandler {
                 HttpStatus.valueOf(exceptionCode.getHttpStatus().value())
         );
     }
+
+    /**
+     * FcmTokenNotFoundException handling (Custom Exception)
+     */
+    @ExceptionHandler(FcmTokenNotFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleFcmTokenNotFoundException(
+            FcmTokenNotFoundException e
+    ) {
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", e.getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(exceptionCode, exceptionCode.getMessage()),
+                HttpStatus.valueOf(exceptionCode.getHttpStatus().value())
+        );
+    }
+
+    /**
+     * InvalidFcmTokenException handling (Custom Exception)
+     */
+    @ExceptionHandler(InvalidFcmTokenException.class)
+    protected ResponseEntity<ErrorResponse> handleInvalidFcmTokenException(
+            InvalidFcmTokenException e
+    ) {
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", e.getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(exceptionCode, exceptionCode.getMessage()),
+                HttpStatus.valueOf(exceptionCode.getHttpStatus().value())
+        );
+    }
 }

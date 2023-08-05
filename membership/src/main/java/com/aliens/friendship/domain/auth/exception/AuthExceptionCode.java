@@ -31,11 +31,19 @@ public enum AuthExceptionCode
     MEMBER_PASSWORD_MISMATCH(UNAUTHORIZED, "AT-C-102", "일치하지 않는 패스워드입니다."),
 
     /**
-     * Common Exception
-     * 200 ~
+     * FCM
+     * 200 ~ 299
      */
-    AUTHENTICATION_ERROR(UNAUTHORIZED, "AT-C-200", "Authentication exception."),
-    INTERNAL_AUTHENTICATION_SERVICE_EXCEPTION(INTERNAL_SERVER_ERROR, "AT-S-200", "Internal authentication service exception.");
+    REQUEST_FCM_TOKEN_NOT_FOUND(BAD_REQUEST, "AT-C-200", "요청에 FCM 토큰이 존재하지 않습니다."),
+    INVALID_FCM_TOKEN(BAD_REQUEST, "AT-C-201", "유효하지 않은 FCM 토큰입니다."),
+
+
+    /**
+     * Common Exception
+     * 300 ~
+     */
+    AUTHENTICATION_ERROR(UNAUTHORIZED, "AT-C-300", "Authentication exception."),
+    INTERNAL_AUTHENTICATION_SERVICE_EXCEPTION(INTERNAL_SERVER_ERROR, "AT-S-300", "Internal authentication service exception.");
 
     private final HttpStatus httpStatus;
     private final String code;
