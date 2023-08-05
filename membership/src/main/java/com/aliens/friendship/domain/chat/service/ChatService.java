@@ -16,6 +16,10 @@ public class ChatService {
     private final ChattingRoomRepository chattingRoomRepository;
     private final ChattingJwtTokenUtil chattingJwtTokenUtil;
 
+    public  List<ChattingRoomEntity> findAllByStatus(ChattingRoomEntity.RoomStatus open) {
+        return chattingRoomRepository.findAllByStatus(open);
+    }
+
     @Transactional
     public void closeChattingRoom(ChattingRoomEntity chattingRoomEntity) {
         chattingRoomEntity.updateStatus(ChattingRoomEntity.RoomStatus.CLOSE);
@@ -34,4 +38,5 @@ public class ChatService {
     public String generateTokenWithMemberIdAndRoomIds(Long memberId, List<Long> roomIds) {
         return chattingJwtTokenUtil.generateToken(memberId,roomIds);
     }
+
 }

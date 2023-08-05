@@ -83,16 +83,16 @@ public class IntegrationMemberControllerTest {
                         .build();
         joinRequestDto =
                 JoinRequestDto.builder()
-                .email(email)
-                .password(password)
-                .name("Aden")
-                .mbti(MemberEntity.Mbti.INTJ)
-                .gender("Male")
-                .nationality("USA")
-                .birthday("1990-01-01")
-                .selfIntroduction("Hello, I am Aden.")
-                .profileImage(createMockProfileImage())
-                .build();
+                        .email(email)
+                        .password(password)
+                        .name("Aden")
+                        .mbti(MemberEntity.Mbti.INTJ)
+                        .gender("Male")
+                        .nationality("USA")
+                        .birthday("1990-01-01")
+                        .selfIntroduction("Hello, I am Aden.")
+                        .profileImage(createMockProfileImage())
+                        .build();
         memberEntity = memberConverter.toMemberEntityWithUser(joinRequestDto);
     }
 
@@ -171,7 +171,7 @@ public class IntegrationMemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(passwordMap)
                                 )
-                        )
+                )
                 .andExpect(status().isOk());
 
         // when & then
