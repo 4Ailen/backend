@@ -40,7 +40,6 @@ public class ChatBusiness {
 
         //MatchEntity -> chattingRoomIds
         ArrayList<Long> chattingRoomIds = chatConverter.toRoomIds(matchEntities);
-        log.info("what: {}", chattingRoomIds.toString());
 
         //토큰 발급
         String jwt = chatService.generateTokenWithMemberIdAndRoomIds(loginMemberEntity.getId(),chattingRoomIds);
