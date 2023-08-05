@@ -30,7 +30,6 @@ public class ApplicantBusiness {
     private final MatchingInfoService matchingInfoService;
     private final ApplicantConverter applicantConverter;
 
-
     /**
      * 매칭 신청 내용 조회
      */
@@ -65,6 +64,9 @@ public class ApplicantBusiness {
 
         //저장
         applicantService.register(applicantEntity);
+
+        //Applied 로 수정
+        memberService.changeApplied(loginMemberEntity);
     }
 
     /**
@@ -74,13 +76,14 @@ public class ApplicantBusiness {
         // 로그인 회원 엔티티
         MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
 
-        //신청자 엔티티
-        ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
-
         //상태
         String status;
 
         if (loginMemberEntity.getStatus().equals(MemberEntity.Status.APPLIED)) {
+
+            //신청자 엔티티
+            ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
+
             if (applicantEntity.getIsMatched() == ApplicantEntity.Status.MATCHED) {
                 status = "MATCHED";
             } else {
@@ -154,6 +157,9 @@ public class ApplicantBusiness {
         return result;
     }
 
+    /**
+     * 선호 언어 변경
+     */
     public void changePreferLanguages(ApplicantRequestDto applicantRequestDto) throws Exception {
         // 로그인 회원 엔티티
         MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
@@ -167,4 +173,5 @@ public class ApplicantBusiness {
         //저장
         applicantService.changePreferLanguages(applicantEntity, applicantRequestDto);
     }
+
 }
