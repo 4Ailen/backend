@@ -167,11 +167,8 @@ public class ApplicantBusiness {
         // 탈퇴하지 않은 회원 검증
         matchingInfoService.validateApplied(loginMemberEntity);
 
-        // Dto -> Entity
-        ApplicantEntity applicantEntity = applicantConverter.toApplicantEntity(loginMemberEntity,applicantRequestDto);
-
         //저장
-        applicantService.changePreferLanguages(applicantEntity, applicantRequestDto);
+        applicantService.changePreferLanguages(applicantRequestDto);
     }
 
 }

@@ -245,7 +245,7 @@ public class IntegrationApplicationControllerTest {
     void testChangePreferLanguages_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)

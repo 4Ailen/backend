@@ -3,9 +3,17 @@ package com.aliens.friendship.domain.applicant.service;
 import com.aliens.db.applicant.entity.ApplicantEntity;
 import com.aliens.db.applicant.repository.ApplicantRepository;
 import com.aliens.db.member.entity.MemberEntity;
+import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.applicant.controller.dto.ApplicantRequestDto;
 import com.aliens.friendship.domain.match.exception.ApplicantNotFoundException;
+import com.aliens.friendship.domain.match.exception.MatchNotFoundException;
+import com.aliens.friendship.domain.match.exception.MatchRequestNotSubmitted;
+import com.aliens.friendship.domain.match.exception.MatchingCompletedException;
+import com.aliens.friendship.domain.member.exception.MemberNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +27,7 @@ import java.util.List;
 public class ApplicantService {
 
     private final ApplicantRepository applicantRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void register(ApplicantEntity applicantEntity) {
@@ -28,7 +37,7 @@ public class ApplicantService {
     public ApplicantEntity findByMemberEntity(MemberEntity memberEntity) {
         ApplicantEntity applicantEntity = applicantRepository
                 .findFirstByMemberEntityOrderByCreatedAtDesc(memberEntity)
-                .orElseThrow(ApplicantNotFoundException::new);
+                .orElseThrow(MatchRequestNotSubmitted::new);
         return applicantEntity;
     }
 
@@ -97,9 +106,15 @@ public class ApplicantService {
     }
 
     @Transactional
-    public void changePreferLanguages(ApplicantEntity applicantEntity, ApplicantRequestDto applicantRequestDto) {
-        applicantEntity.updatePreferLanguages(ApplicantEntity.Language.valueOf(applicantRequestDto.getFirstPreferLanguage()), ApplicantEntity.Language.valueOf(applicantRequestDto.getSecondPreferLanguage()));
-        applicantRepository.save(applicantEntity);
+    public void changePreferLanguages(ApplicantRequestDto applicantRequestDto) throws Exception {
+        MemberEntity memberEntity = getCurrentMemberEntity();
+        ApplicantEntity applicantEntity = findByMemberEntity(memberEntity);
+
+       if(!isMatched(applicantEntity)){
+           applicantEntity.updatePreferLanguages(ApplicantEntity.Language.valueOf(applicantRequestDto.getFirstPreferLanguage()), ApplicantEntity.Language.valueOf(applicantRequestDto.getSecondPreferLanguage()));
+       } else{
+           throw new MatchingCompletedException();
+       }
     }
 
     public static Instant getThisFriday(LocalDate date) {
@@ -114,5 +129,25 @@ public class ApplicantService {
                 .atTime(LocalTime.MIN)
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
+    }
+
+    private boolean isApplied(MemberEntity memberEntity){
+        return memberEntity.getStatus() == MemberEntity.Status.APPLIED;
+    }
+
+    private boolean isMatched(ApplicantEntity applicantEntity){
+        return applicantEntity.getIsMatched() == ApplicantEntity.Status.MATCHED;
+    }
+
+    private MemberEntity getCurrentMemberEntity() throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String MemberEmail = userDetails.getUsername();
+        MemberEntity memberEntity = findByEmail(MemberEmail);
+        return memberEntity;
+    }
+
+    private MemberEntity findByEmail(String email) throws Exception {
+        return memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
     }
 }
