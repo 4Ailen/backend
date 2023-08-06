@@ -83,6 +83,7 @@ public class IntegrationChatControllerTest {
     String BASIC_URL;
     String email;
     String password;
+    String fcmToken;
     JoinRequestDto joinRequestDto;
     MemberEntity memberEntity;
 
@@ -92,6 +93,7 @@ public class IntegrationChatControllerTest {
         BASIC_URL = "/api/v1/chat";
         email = "test@example312123.com";
         password = "test1234";
+        fcmToken = "testFcmToken";
 
         joinRequestDto =
                 JoinRequestDto.builder()
@@ -117,7 +119,7 @@ public class IntegrationChatControllerTest {
     void tesChattingTokenGenerate_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
