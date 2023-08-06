@@ -100,4 +100,19 @@ public class MemberExceptionHandler {
                 HttpStatus.valueOf(e.getExceptionCode().getHttpStatus().value())
         );
     }
+
+    /**
+     * IdenticalPasswordException 핸들링
+     * Custom Exception
+     */
+    @ExceptionHandler(IdenticalPasswordException.class)
+    protected ResponseEntity<ErrorResponse> handlingIdenticalPasswordException(
+            IdenticalPasswordException e
+    ) {
+        log.error("[handling IdenticalPasswordException] {}", e.getExceptionCode().getMessage());
+        return new ResponseEntity<>(
+                ErrorResponse.of(e.getExceptionCode()),
+                HttpStatus.valueOf(e.getExceptionCode().getHttpStatus().value())
+        );
+    }
 }

@@ -136,7 +136,7 @@ public class MemberService {
 
     public void checkSameNewPasswordAndCurrentPassword(PasswordUpdateRequestDto passwordUpdateRequestDto) throws Exception {
         if (passwordUpdateRequestDto.getNewPassword().equals(passwordUpdateRequestDto.getCurrentPassword())) {
-            throw new PasswordChangeFailedException();
+            throw new IdenticalPasswordException();
         }
     }
 
