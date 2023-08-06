@@ -1,7 +1,13 @@
 package com.aliens.friendship.domain.member.service;
 
+import com.aliens.db.applicant.entity.ApplicantEntity;
+import com.aliens.db.chatting.entity.ChattingRoomEntity;
+import com.aliens.db.chatting.repository.ChattingRoomRepository;
+import com.aliens.db.matching.entity.MatchingEntity;
+import com.aliens.db.matching.repository.MatchRepository;
 import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.db.member.repository.MemberRepository;
+import com.aliens.friendship.domain.applicant.service.ApplicantService;
 import com.aliens.friendship.domain.emailauthentication.exception.EmailAlreadyRegisteredException;
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.exception.*;
@@ -29,6 +35,9 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final ProfileImageService profileImageService;
     private final JavaMailSender javaMailSender;
+    private final ApplicantService applicantService;
+    private final MatchRepository matchRepository;
+    private final ChattingRoomRepository chattingRoomRepository;
 
     @Value("${file-server.domain}")
     private String domainUrl;
@@ -48,7 +57,11 @@ public class MemberService {
     }
 
     @Transactional
-    public void unregister(MemberEntity memberEntity,String password) throws Exception {
+    public void unregister(MemberEntity memberEntity,String password) {
+        if(isAppliedAndMatched(memberEntity, applicantService.findByMemberEntity(memberEntity))){
+            closeChattingRoomWithMember(memberEntity);
+        }
+
         if (!passwordEncoder.matches(password, memberEntity.getPassword())) {
             throw new InvalidMemberPasswordException();
         }
@@ -175,5 +188,16 @@ public class MemberService {
     @Transactional
     public void changeApplied(MemberEntity loginMemberEntity) {
         loginMemberEntity.updateStatus(MemberEntity.Status.APPLIED);
+    }
+
+    private boolean isAppliedAndMatched(MemberEntity memberEntity, ApplicantEntity applicantEntity){
+        return memberEntity.getStatus() == MemberEntity.Status.APPLIED && applicantEntity.getIsMatched() == ApplicantEntity.Status.MATCHED;
+    }
+
+    private void closeChattingRoomWithMember(MemberEntity memberEntity){
+        List<MatchingEntity> matchingEntities = matchRepository.findAllByMatchingMember(memberEntity);
+        for(MatchingEntity matchingEntity : matchingEntities){
+            matchingEntity.getChattingRoomEntity().updateStatus(ChattingRoomEntity.RoomStatus.CLOSE);
+        }
     }
 }
