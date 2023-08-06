@@ -18,7 +18,8 @@ public enum MatchExceptionCode implements ExceptionCode {
     MATCH_REQUEST_NOT_SUBMITTED(BAD_REQUEST, "MT-C-004", "매칭 신청을 하지 않은 사용자입니다."),
     APPLICANT_NOT_FOUND(NOT_FOUND, "MT-C-005", "매칭 신청자의 정보가 없습니다."),
     DUPLICATED_MATCH(BAD_REQUEST, "MT-C-006", "이미 매칭을 신청한 사용자입니다."),
-    LANGUAGE_NOT_FOUND(NOT_FOUND, "MT-C-007", "존재하지 않는 언어입니다.");
+    LANGUAGE_NOT_FOUND(NOT_FOUND, "MT-C-007", "존재하지 않는 언어입니다."),
+    MATCHING_COMPLETED(BAD_REQUEST, "MT-C-008", "매칭이 완료된 사용자입니다.");
 
 
     private final HttpStatus httpStatus;
