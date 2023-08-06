@@ -92,7 +92,7 @@ public class AuthService {
         if (existingToken != null && !existingToken.getMemberId().equals(memberId)) {
             existingToken.changeMemberId(memberId);
             fcmTokenRepository.save(existingToken);
-        } else {
+        } else if(existingToken == null){
             fcmTokenRepository.save(FcmTokenEntity.of(memberId, fcmToken));
         }
     }
