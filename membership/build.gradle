@@ -85,10 +85,8 @@ test {
 }
 
 asciidoctor {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
     dependsOn test
-    attributes 'snippets': file(snippetsDir).listFiles().findAll { it.directory }
+    inputs.dir snippetsDir
 }
 
 asciidoctor.doFirst {
@@ -96,9 +94,11 @@ asciidoctor.doFirst {
 }
 
 bootJar {
+    enabled = true
     dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
+    copy {
+        from "${asciidoctor.outputDir}"
+        into file("src/main/resources/static/docs")
     }
 }
 
