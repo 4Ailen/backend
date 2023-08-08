@@ -155,11 +155,12 @@ public class MemberService {
         return true;
     }
 
-    private SimpleMailMessage createAuthenticationMail(String email, String name, String temporaryPassword) {
+    public SimpleMailMessage createAuthenticationMail(String email, String name, String temporaryPassword) {
         SimpleMailMessage authenticationEmail = new SimpleMailMessage();
         authenticationEmail.setTo(email);
-        authenticationEmail.setSubject("[FriendShip] 임시 비밀번호 발급");
-        authenticationEmail.setText("안녕하세요, " + name + "님!\n요청하신 임시 비밀번호는 다음과 같습니다.\n\n" + "임시 비밀번호: " + temporaryPassword + "\n\n\n해당 비밀번호로 로그인 후 비밀번호를 변경해주세요.");
+        authenticationEmail.setSubject("[FriendShip] Temporary Password Information  임시 비밀번호 발급");
+        String content = getContentWithNameAndTemporaryPassword(name,temporaryPassword);
+        authenticationEmail.setText(content);
         return authenticationEmail;
     }
 
@@ -199,5 +200,34 @@ public class MemberService {
         for(MatchingEntity matchingEntity : matchingEntities){
             matchingEntity.getChattingRoomEntity().updateStatus(ChattingRoomEntity.RoomStatus.CLOSE);
         }
+    }
+    private String getContentWithNameAndTemporaryPassword(String name,String temporaryPassword){
+        String content = "Hello "+name+",\n\n"+
+                "Please use this temporary password to log in, \n"+
+                "and make sure to change your password for security purposes once you're logged in.\n\n"+
+                "Temporary Password: "+temporaryPassword+
+                "\n\nAfter logging in, please follow these steps to change your password:\n"+
+                "1. Log in to FriendShip App.\n" +
+                "2. Navigate to \" Profile Settings.\"\n"+
+                "3. Choose the \"Change Password\" option.\n"+
+                "4. Enter the temporary password and your new password.\n"+
+                "5. Save the changes.\n"+
+                "If you have any questions," +
+                "please contact us at this email.\n\n"+
+                "Thank you,\n"+
+                "The 4aliens Team\n\n\n\n"+
+                "안녕하세요, "+name+"님,\n\n"+
+                "비밀번호 변경 요청에 따라 임시 비밀번호를 안내해 드립니다. 로그인 후에는 보안을 위해 비밀번호를 변경하셔야 합니다.\n\n"+
+                "임시 비밀번호: "+temporaryPassword+
+                "\n\n로그인하신 후에는 다음 단계를 따라 비밀번호를 변경해 주세요:\n" +
+                "1. FriendShip App에 로그인하세요.\n" +
+                "2. \"계정 설정\" 메뉴로 이동하세요.\n"+
+                "3. \"비밀번호 변경\" 옵션을 선택하세요.\n"+
+                "4. 임시 비밀번호와 새로운 비밀번호를 입력해 주세요.\n" +
+                "5. 변경 사항을 저장하세요.\n" +
+                "만약 궁금한 사항이 있으시면 해당 이메일로 문의해 주세요.\n\n"+
+                "감사합니다,\n"+
+                "4aliens 팀 올림\n";
+        return content;
     }
 }
