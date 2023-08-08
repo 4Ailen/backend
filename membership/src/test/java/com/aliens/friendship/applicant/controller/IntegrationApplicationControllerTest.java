@@ -47,9 +47,6 @@ public class IntegrationApplicationControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     MemberConverter memberConverter;
 
     @Autowired
@@ -118,8 +115,8 @@ public class IntegrationApplicationControllerTest {
 
         mockMvc.perform(
                         post(BASIC_URL)
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(applicantRequestDto)
                                 )
@@ -143,7 +140,7 @@ public class IntegrationApplicationControllerTest {
     void testGetMyApplicant_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -153,9 +150,9 @@ public class IntegrationApplicationControllerTest {
 
         mockMvc.perform(
                         get(BASIC_URL)
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
-                                )
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
+                )
                 .andExpect(status().isOk())
                 .andDo(document("getMyApplicant",
                         responseFields(
@@ -181,7 +178,7 @@ public class IntegrationApplicationControllerTest {
     void testGetMyApplicantStatus_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -190,9 +187,9 @@ public class IntegrationApplicationControllerTest {
                 .build());
 
         mockMvc.perform(
-                        get(BASIC_URL+"/status")
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                        get(BASIC_URL + "/status")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                 )
                 .andExpect(status().isOk())
                 .andDo(document("getMyApplicantStatus",
@@ -210,7 +207,7 @@ public class IntegrationApplicationControllerTest {
     void testMatchingTime_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -219,9 +216,9 @@ public class IntegrationApplicationControllerTest {
                 .build());
 
         mockMvc.perform(
-        get(BASIC_URL+"/completion-date")
-                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                .header("RefreshToken",tokenDto.getRefreshToken())
+                        get(BASIC_URL + "/completion-date")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                 )
                 .andExpect(status().isOk())
                 .andDo(document("matchingTime",
@@ -240,7 +237,7 @@ public class IntegrationApplicationControllerTest {
     void testMatchingPartners_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -249,12 +246,12 @@ public class IntegrationApplicationControllerTest {
                 .build());
 
         //given
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             joinRequestDto =
                     JoinRequestDto.builder()
-                            .email(email+i)
+                            .email(email + i)
                             .password(password)
-                            .name("Aden"+i)
+                            .name("Aden" + i)
                             .mbti(MemberEntity.Mbti.INTJ)
                             .gender("Male")
                             .nationality("USA")
@@ -275,16 +272,15 @@ public class IntegrationApplicationControllerTest {
         matchBusiness.matchingAllApplicant();
 
         mockMvc.perform(
-                        get(BASIC_URL+"/partners")
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                        get(BASIC_URL + "/partners")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                 )
                 .andExpect(status().isOk())
-                .andDo(document("matchingPartners",
+                .andDo(document("getmatchingPartnersInfo",
                         responseFields(
                                 fieldWithPath("message").description("성공 메시지"),
                                 fieldWithPath("timestamp").description("처리 시간"),
-                                fieldWithPath("data.matchingCompleteDate").description("매칭 완료 일시"),
                                 fieldWithPath("data.partners").description("파트너 리스트"),
                                 fieldWithPath("data.partners[].roomState").description("방 상태 (OPEN)"),
                                 fieldWithPath("data.partners[].roomId").description("방 ID"),
@@ -306,7 +302,7 @@ public class IntegrationApplicationControllerTest {
     void testChangePreferLanguages_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password), fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -320,9 +316,9 @@ public class IntegrationApplicationControllerTest {
                 .build();
 
         mockMvc.perform(
-                        patch(BASIC_URL+"/prefer-languages")
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                        patch(BASIC_URL + "/prefer-languages")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(modifiedPreferLanguage)
                                 )
