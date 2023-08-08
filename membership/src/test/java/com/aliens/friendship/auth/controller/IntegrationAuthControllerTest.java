@@ -56,6 +56,7 @@ public class IntegrationAuthControllerTest {
     String BASIC_URL;
     String email;
     String password;
+    String fcmToken;
     JoinRequestDto joinRequestDto;
     MemberEntity memberEntity;
 
@@ -65,6 +66,7 @@ public class IntegrationAuthControllerTest {
         BASIC_URL = "/api/v1/auth";
         email = "test@example.com";
         password = "test1234";
+        fcmToken = "testFcmToken";
 
         joinRequestDto =
                 JoinRequestDto.builder()
@@ -98,6 +100,7 @@ public class IntegrationAuthControllerTest {
         mockMvc.perform(
                         post(BASIC_URL + "/authentication")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("FcmToken", fcmToken)
                                 .content(new ObjectMapper().writeValueAsString(loginRequest))
                 )
                 .andExpect(status().isOk())
@@ -122,7 +125,7 @@ public class IntegrationAuthControllerTest {
     void testReissueToken_Success() throws Exception {
         // Given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email,password));
+        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email,password),fcmToken);
 
 
         // when & then
@@ -131,6 +134,7 @@ public class IntegrationAuthControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
                                 .header("RefreshToken",tokenDto.getRefreshToken())
+                                .header("FcmToken", fcmToken)
                 )
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.message").exists())

@@ -1,12 +1,12 @@
 package com.aliens.friendship.domain.auth.service;
 
+import com.aliens.db.auth.entity.FcmTokenEntity;
 import com.aliens.db.auth.entity.RefreshTokenEntity;
+import com.aliens.db.auth.repository.FcmTokenRepository;
 import com.aliens.db.auth.repository.RefreshTokenRepository;
 import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.db.member.repository.MemberRepository;
-import com.aliens.friendship.domain.auth.exception.MemberPasswordMisMatchException;
-import com.aliens.friendship.domain.auth.exception.RefreshTokenNotFoundException;
-import com.aliens.friendship.domain.auth.exception.TokenException;
+import com.aliens.friendship.domain.auth.exception.*;
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
 import com.aliens.friendship.domain.auth.token.AuthToken;
 import com.aliens.friendship.domain.auth.token.AuthTokenProvider;
@@ -37,6 +37,7 @@ public class AuthService {
     private final AuthTokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final FcmTokenRepository fcmTokenRepository;
 
     @Transactional
     public void deleteRefreshTokenByEmail(String email) {
@@ -85,6 +86,22 @@ public class AuthService {
         return tokenProvider.createAuthTokenOfRefreshToken(refreshToken);
     }
 
+    public void saveFcmToken(Long memberId, String fcmToken) {
+        validateFcmToken(fcmToken);
+        FcmTokenEntity existingToken = fcmTokenRepository.findByValue(fcmToken);
+        if (existingToken != null && !existingToken.getMemberId().equals(memberId)) {
+            existingToken.changeMemberId(memberId);
+            fcmTokenRepository.save(existingToken);
+        } else if(existingToken == null){
+            fcmTokenRepository.save(FcmTokenEntity.of(memberId, fcmToken));
+        }
+    }
+
+    public void deleteFcmToken(String fcmToken) {
+        validateFcmToken(fcmToken);
+        fcmTokenRepository.deleteAllByValue(fcmToken);
+    }
+
     public Collection<? extends GrantedAuthority> getMemberAuthority(String memberRoles) {
         System.out.println(memberRoles);
         return Arrays.stream(memberRoles.split(","))
@@ -92,7 +109,7 @@ public class AuthService {
                 .collect(Collectors.toList());
     }
 
-    public boolean tokenValidate(AuthToken token) {
+    public boolean validateJwtToken(AuthToken token) {
         Claims tokenClaims = token.getTokenClaims();
         if (tokenClaims == null)
             throw new TokenException(INVALID_TOKEN);
@@ -102,8 +119,16 @@ public class AuthService {
         return true;
     }
 
+    private void validateFcmToken(String fcmToken) {
+        if (fcmToken == null) {
+            throw new FcmTokenNotFoundException();
+        } else if (fcmToken == "") {
+            throw new InvalidFcmTokenException();
+        }
+    }
+
     public Authentication getAuthentication(AuthToken accessToken) {
-        tokenValidate(accessToken);
+        validateJwtToken(accessToken);
 
         Claims claims = accessToken.getTokenClaims();
 
@@ -125,5 +150,4 @@ public class AuthService {
                 .orElseThrow(RefreshTokenNotFoundException::new);
         return refreshTokenEntity;
     }
-
 }

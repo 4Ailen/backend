@@ -28,7 +28,7 @@ public class AuthBusiness {
     /**
      * 로그인
      */
-    public TokenDto login(LoginRequest request) throws Exception {
+    public TokenDto login(LoginRequest request, String FcmToken) throws Exception {
         //회원 엔티티 조회
         MemberEntity memberEntity = memberService.findByEmail(request.getEmail());
 
@@ -37,6 +37,9 @@ public class AuthBusiness {
 
         //회원 비밀번호 검증
         authService.checkMemberPassword(request.getPassword(), memberEntity.getPassword());
+
+        // fcmToken 저장
+        authService.saveFcmToken(memberEntity.getId(), FcmToken);
 
         //accessToken 발급
         String accessToken = authService.createAccessToken(request.getEmail(), memberEntity.getAuthorities()).getValue();
@@ -70,7 +73,7 @@ public class AuthBusiness {
         AuthToken authTokenOfRefreshToken = authService.createAuthTokenOfRefreshToken(refreshToken);
 
         // Refresh Token 유효 검증
-        authService.tokenValidate(authTokenOfRefreshToken);
+        authService.validateJwtToken(authTokenOfRefreshToken);
 
         // 이메일과 리프레시토큰을 통해 리프레시토큰 엔티티 조회
         RefreshTokenEntity storedRefreshTokenEntity = authService.findRefreshTokenByEmilandValidRefreshToken(email,refreshToken);
@@ -92,13 +95,15 @@ public class AuthBusiness {
     /**
      * 로그아웃
      */
-    public void logout(String accessToken) {
+    public void logout(String accessToken, String fcmToken) {
 
         //이메일 추출
         String email = authService.createAuthTokenOfAccessToken(accessToken).getTokenClaims().get("email").toString();
 
         //이메일을 통한 RefreshToken 삭제 -> 이전 토큰으로 접근 불가
         authService.deleteRefreshTokenByEmail(email);
+
+        authService.deleteFcmToken(fcmToken);
     }
 
 

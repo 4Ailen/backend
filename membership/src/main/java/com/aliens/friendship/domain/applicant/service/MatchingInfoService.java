@@ -38,7 +38,7 @@ public class MatchingInfoService {
 
 
     public List<MatchingEntity> getMatchingResultsByDateAndMemberEntity(Instant matchedDate, MemberEntity matchingMemberEntity) {
-        Instant yesterdayOfMatchedDate = matchedDate.minus(3, ChronoUnit.DAYS);
+        Instant yesterdayOfMatchedDate = matchedDate.minus(6, ChronoUnit.DAYS);
         List<MatchingEntity> matchingEntities = matchRepository.
                 findAllByCreatedAtBetweenAndMatchingMember(
                         yesterdayOfMatchedDate

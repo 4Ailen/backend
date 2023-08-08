@@ -70,6 +70,7 @@ public class IntegrationApplicationControllerTest {
     String BASIC_URL;
     String email;
     String password;
+    String fcmToken;
     JoinRequestDto joinRequestDto;
     MemberEntity memberEntity;
 
@@ -79,6 +80,7 @@ public class IntegrationApplicationControllerTest {
         BASIC_URL = "/api/v1/applicant";
         email = "test@example.com";
         password = "test1234";
+        fcmToken = "testFcmToken";
 
         joinRequestDto =
                 JoinRequestDto.builder()
@@ -105,7 +107,7 @@ public class IntegrationApplicationControllerTest {
     void testApplicant_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
 
         ApplicantRequestDto applicantRequestDto = ApplicantRequestDto.builder()
@@ -141,7 +143,7 @@ public class IntegrationApplicationControllerTest {
     void testGetMyApplicant_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -179,7 +181,7 @@ public class IntegrationApplicationControllerTest {
     void testGetMyApplicantStatus_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -208,7 +210,7 @@ public class IntegrationApplicationControllerTest {
     void testMatchingTime_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -238,7 +240,7 @@ public class IntegrationApplicationControllerTest {
     void testMatchingPartners_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -304,7 +306,7 @@ public class IntegrationApplicationControllerTest {
     void testChangePreferLanguages_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)

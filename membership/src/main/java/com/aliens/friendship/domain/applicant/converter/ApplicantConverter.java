@@ -71,6 +71,7 @@ public class ApplicantConverter {
                 .gender(matching.getMatchedMember().getGender())
                 .mbti(matching.getMatchedMember().getMbti())
                 .memberId(matching.getMatchedMember().getId())
+                .selfIntroduction(matching.getMatchedMember().getSelfIntroduction())
                 .profileImage(matching.getMatchedMember().getProfileImageUrl())
                 .firstPreferLanguage(applicantEntity.getFirstPreferLanguage().toString())
                 .secondPreferLanguage(applicantEntity.getSecondPreferLanguage().toString())

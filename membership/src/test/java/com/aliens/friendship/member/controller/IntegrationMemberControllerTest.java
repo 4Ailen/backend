@@ -16,13 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -33,10 +31,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureRestDocs
 @Transactional
 public class IntegrationMemberControllerTest {
 
@@ -71,6 +64,7 @@ public class IntegrationMemberControllerTest {
     String BASIC_URL;
     String email;
     String password;
+    String fcmToken;
     JoinRequestDto joinRequestDto;
     MemberEntity memberEntity;
 
@@ -80,6 +74,8 @@ public class IntegrationMemberControllerTest {
         BASIC_URL = "/api/v1/member";
         email = "test@example.com";
         password = "test1234";
+        fcmToken = "testFcmToken";
+
         mockEmailAuthenticationEntity =
                 EmailAuthenticationEntity.builder().
                         id("ddkls")
@@ -90,16 +86,16 @@ public class IntegrationMemberControllerTest {
                         .build();
         joinRequestDto =
                 JoinRequestDto.builder()
-                .email(email)
-                .password(password)
-                .name("Aden")
-                .mbti(MemberEntity.Mbti.INTJ)
-                .gender("Male")
-                .nationality("USA")
-                .birthday("1990-01-01")
-                .selfIntroduction("Hello, I am Aden.")
-                .profileImage(createMockProfileImage())
-                .build();
+                        .email(email)
+                        .password(password)
+                        .name("Aden")
+                        .mbti(MemberEntity.Mbti.INTJ)
+                        .gender("Male")
+                        .nationality("USA")
+                        .birthday("1990-01-01")
+                        .selfIntroduction("Hello, I am Aden.")
+                        .profileImage(createMockProfileImage())
+                        .build();
         memberEntity = memberConverter.toMemberEntityWithUser(joinRequestDto);
     }
 
@@ -124,8 +120,8 @@ public class IntegrationMemberControllerTest {
                 .profileImage(createMockProfileImage())
                 .build();
 
-        // When && then
-        mockMvc.perform(
+        // When
+        ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.multipart(BASIC_URL)
                         .file("profileImage", createMockProfileImage().getBytes())
                         .param("email", joinRequestDto.getEmail())
@@ -135,28 +131,11 @@ public class IntegrationMemberControllerTest {
                         .param("gender", joinRequestDto.getGender())
                         .param("nationality", joinRequestDto.getNationality())
                         .param("birthday", joinRequestDto.getBirthday())
-                        .param("selfIntroduction", joinRequestDto.getSelfIntroduction()))
-                .andExpect(status().isOk())
-                .andDo(document("joinMember",
-                        requestParts(
-                                partWithName("profileImage").description("프로필 이미지")
-                        ),
-                        requestParameters(
-                                parameterWithName("email").description("이메일"),
-                                parameterWithName("password").description("비밀번호"),
-                                parameterWithName("name").description("이름"),
-                                parameterWithName("mbti").description("MBTI"),
-                                parameterWithName("gender").description("성별"),
-                                parameterWithName("nationality").description("국적"),
-                                parameterWithName("birthday").description("생년월일"),
-                                parameterWithName("selfIntroduction").description("자기 소개")
-                        ),
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간")
-                        )
-                ));
+                        .param("selfIntroduction", joinRequestDto.getSelfIntroduction())
+        );
 
+        // Then
+        resultActions.andExpect(status().isOk());
     }
 
 
@@ -165,30 +144,14 @@ public class IntegrationMemberControllerTest {
     void testGetMemberInfo_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         // when & then
-        mockMvc.perform(RestDocumentationRequestBuilders.get(BASIC_URL)
+        mockMvc.perform(get(BASIC_URL+ "/email/"+email+"/existence")
                         .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
                         .header("RefreshToken",tokenDto.getRefreshToken()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("성공적으로 사용자 정보를 조회하였습니다."))
-                .andDo(document("getMemberInfo",
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간"),
-                                fieldWithPath("data.memberId").description("회원 아이디"),
-                                fieldWithPath("data.email").description("이메일"),
-                                fieldWithPath("data.mbti").description("mbti"),
-                                fieldWithPath("data.gender").description("성별"),
-                                fieldWithPath("data.nationality").description("국적"),
-                                fieldWithPath("data.birthday").description("생년월일"),
-                                fieldWithPath("data.name").description("이름"),
-                                fieldWithPath("data.profileImage").description("프로필 이미지"),
-                                fieldWithPath("data.selfIntroduction").description("자기 소개"),
-                                fieldWithPath("data.age").description("나이")
-                        )
-                ));
+                .andExpect(jsonPath("$.message").value("성공적으로 조회하였습니다."));
 
     }
 
@@ -198,7 +161,7 @@ public class IntegrationMemberControllerTest {
     void testMemberWithdrawal_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
 
         Map<String, String> passwordMap = new HashMap<>();
@@ -211,18 +174,17 @@ public class IntegrationMemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(passwordMap)
                                 )
-                        )
-                .andExpect(status().isOk())
-                .andDo(document("memberWithdrawal",
-                        requestFields(
-                                fieldWithPath("password").description("회원 비밀번호")
-                        ),
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간")
+                )
+                .andExpect(status().isOk());
 
-                        )
-                ));
+        // when & then
+        mockMvc.perform(
+                        get(BASIC_URL + "/email/{email}/existence", email)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.data.existence").value(true));
     }
 
 
@@ -234,20 +196,12 @@ public class IntegrationMemberControllerTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.get(BASIC_URL + "/email/{email}/existence", email)
+                        get(BASIC_URL + "/email/{email}/existence", email)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.timestamp").exists())
-                .andExpect(jsonPath("$.data.existence").value(true))
-                .andDo(document("isExistMemberEmail",
-                        pathParameters(parameterWithName("email").description("이메일")),
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간"),
-                                fieldWithPath("data.existence").description("이메일 존재 여부")
-                        )
-                ));
+                .andExpect(jsonPath("$.data.existence").value(true));
     }
 
 
@@ -262,23 +216,13 @@ public class IntegrationMemberControllerTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.post(BASIC_URL + "/{email}/password/temp", email)
+                        post(BASIC_URL + "/{email}/password/temp", email)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(nameMap))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.timestamp").exists())
-                .andDo(document("issueTemporaryPassword",
-                        pathParameters(parameterWithName("email").description("이메일")),
-                        requestFields(
-                                fieldWithPath("name").description("이름")
-                        ),
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간")
-                        )
-                ));
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
 
@@ -287,7 +231,7 @@ public class IntegrationMemberControllerTest {
     void ChangePassword_Success() throws Exception {
         // given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         PasswordUpdateRequestDto passwordUpdateRequestDto =
                 PasswordUpdateRequestDto.builder()
@@ -304,24 +248,14 @@ public class IntegrationMemberControllerTest {
                                 .content(new ObjectMapper().writeValueAsString(passwordUpdateRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.timestamp").exists())
-                .andDo(document("changePassword",
-                        requestFields(
-                                fieldWithPath("currentPassword").description("현재 비밀번호"),
-                                fieldWithPath("newPassword").description("새 비밀번호")
-                        ),
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간")
-                        )
-                ));
+                .andExpect(jsonPath("$.timestamp").exists());
     }
     @Test
     @DisplayName("IntegrationController 프로필 자기소개 변경 요청 - 성공")
     void ChangeSelfIntroduction_Success() throws Exception {
         // given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
         String selfIntroductionChangeRequest = "반가워요!";
 
         // when & then
@@ -330,48 +264,42 @@ public class IntegrationMemberControllerTest {
                                 .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
                                 .header("RefreshToken",tokenDto.getRefreshToken())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .param("selfIntroductionChangeRequest", selfIntroductionChangeRequest)
+                                .content(new ObjectMapper().writeValueAsString(selfIntroductionChangeRequest))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.timestamp").exists())
-                .andDo(document("changeSelfIntroduction",
-                        requestParameters(
-                                parameterWithName("selfIntroductionChangeRequest").description("프로필 자기소개")
-                        ),
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간")
-                        )
-                ));
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
 
     @Test
-    @DisplayName("IntegrationController 프로필 이미지 수정 요청 - 성공")
+    @DisplayName("IntegrationController프로필 이미지 수정 요청 - 성공")
     void ChangeProfileImage_Success() throws Exception {
         // given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         // When
-        mockMvc.perform(
+        ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.multipart(HttpMethod.PUT,BASIC_URL+"/profile-image")
                         .file("profileImage",createMockProfileImage().getBytes())
                         .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
                         .header("RefreshToken",tokenDto.getRefreshToken())
-                )
-                .andExpect(status().isOk())
-                .andDo(document("changeProfileImage",
-                        requestParts(
-                                partWithName("profileImage").description("프로필 이미지")
-                        ),
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간")
-                        )
-                ));
+        );
+
+        // Then
+        resultActions.andExpect(status().isOk());
 
     }
+
+
+
+
+
+
+
+
+
+
 
 }

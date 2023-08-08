@@ -67,6 +67,7 @@ public class IntegrationBlockControllerTest {
     String BASIC_URL;
     String email;
     String password;
+    String fcmToken;
     JoinRequestDto joinRequestDto;
     MemberEntity memberEntity;
 
@@ -76,6 +77,8 @@ public class IntegrationBlockControllerTest {
         BASIC_URL = "/api/v1/block";
         email = "test@example.com";
         password = "test1234";
+        fcmToken = "testFcmToken";
+
         mockEmailAuthenticationEntity =
                 EmailAuthenticationEntity.builder().
                         id("ddkls")
@@ -126,7 +129,7 @@ public class IntegrationBlockControllerTest {
         MemberEntity blockedMemberEntity = memberConverter.toMemberEntityWithUser(joinRequestDto);
         Long blockedMemberEntityId = memberService.register(blockedMemberEntity);
 
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password));
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
 
         ChattingRoomEntity chattingRoomEntity = ChattingRoomEntity.builder()
                 .status(ChattingRoomEntity.RoomStatus.OPEN)
