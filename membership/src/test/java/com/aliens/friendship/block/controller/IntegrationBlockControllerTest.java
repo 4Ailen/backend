@@ -33,7 +33,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -47,9 +46,6 @@ public class IntegrationBlockControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     MemberConverter memberConverter;
 
     @Autowired
@@ -60,7 +56,6 @@ public class IntegrationBlockControllerTest {
 
     @Autowired
     ChattingRoomRepository chattingRoomRepository;
-
 
 
     EmailAuthenticationEntity mockEmailAuthenticationEntity;
@@ -78,7 +73,6 @@ public class IntegrationBlockControllerTest {
         email = "test@example.com";
         password = "test1234";
         fcmToken = "testFcmToken";
-
         mockEmailAuthenticationEntity =
                 EmailAuthenticationEntity.builder().
                         id("ddkls")
@@ -129,7 +123,7 @@ public class IntegrationBlockControllerTest {
         MemberEntity blockedMemberEntity = memberConverter.toMemberEntityWithUser(joinRequestDto);
         Long blockedMemberEntityId = memberService.register(blockedMemberEntity);
 
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         ChattingRoomEntity chattingRoomEntity = ChattingRoomEntity.builder()
                 .status(ChattingRoomEntity.RoomStatus.OPEN)
@@ -137,12 +131,12 @@ public class IntegrationBlockControllerTest {
         chattingRoomRepository.save(chattingRoomEntity);
 
         Map<String, String> request = new HashMap<>();
-        request.put("roomId",chattingRoomEntity.getId().toString());
+        request.put("roomId", chattingRoomEntity.getId().toString());
 
         // when & then
-        mockMvc.perform(post(BASIC_URL+ "/"+ blockedMemberEntityId)
-                        .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                        .header("RefreshToken",tokenDto.getRefreshToken())
+        mockMvc.perform(post(BASIC_URL + "/" + blockedMemberEntityId)
+                        .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                        .header("RefreshToken", tokenDto.getRefreshToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
