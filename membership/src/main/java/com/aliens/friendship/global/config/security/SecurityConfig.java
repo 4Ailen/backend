@@ -59,7 +59,7 @@ public class SecurityConfig {
 
                 .mvcMatchers(
                         OPEN_SWAGGER.toArray(new String[0])
-                ).permitAll()
+                ).hasRole("admin")
 
                 .mvcMatchers(
                         OPEN_SOURCE.toArray(new String[0])
