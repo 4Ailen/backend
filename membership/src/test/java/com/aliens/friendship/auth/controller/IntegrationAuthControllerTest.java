@@ -41,9 +41,6 @@ public class IntegrationAuthControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     MemberConverter memberConverter;
 
     @Autowired
@@ -125,15 +122,15 @@ public class IntegrationAuthControllerTest {
     void testReissueToken_Success() throws Exception {
         // Given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email, password), fcmToken);
 
 
         // when & then
         mockMvc.perform(
                         post(BASIC_URL + "/reissue")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                                 .header("FcmToken", fcmToken)
                 )
                 .andExpect(status().is4xxClientError())
@@ -148,7 +145,28 @@ public class IntegrationAuthControllerTest {
                                 fieldWithPath("timestamp").description("에러 발생 시간")
                         )
                 ));
+    }
+
+    @Test
+    @DisplayName("IntegrationController 로그아웃 - 성공")
+    void testLogout_Success() throws Exception {
+        // Given
+        memberService.register(memberEntity);
+        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email, password), fcmToken);
 
 
+        // when & then
+        mockMvc.perform(
+                        post(BASIC_URL + "/logout")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
+                                .header("FcmToken", fcmToken)
+                )
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(document("logout"
+                ));
     }
 }
