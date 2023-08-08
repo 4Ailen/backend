@@ -1,11 +1,334 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
 = Friendship API Docs
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
-:toclevels: 3
+:toclevels: 2
 :sectlinks:
 
-include::overview.adoc[]
+v1.0.0, 2023.08.08
 
-include::Matching-API.adoc[]
+== Applicant API
+=== 매칭 신청
+.http-request
+include::{snippets}/applicant/http-request.adoc[]
+
+.request-fields
+include::{snippets}/applicant/request-fields.adoc[]
+
+.http-response
+include::{snippets}/applicant/http-response.adoc[]
+
+.response-fields
+include::{snippets}/applicant/response-fields.adoc[]
+
+=== 매칭 신청 정보 조회
+.http-request
+include::{snippets}/getMyApplicant/http-request.adoc[]
+
+.http-response
+include::{snippets}/getMyApplicant/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getMyApplicant/response-fields.adoc[]
+
+=== 매칭 상태 조회
+.http-request
+include::{snippets}/getMyApplicantStatus/http-request.adoc[]
+
+.http-response
+include::{snippets}/getMyApplicantStatus/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getMyApplicantStatus/response-fields.adoc[]
+
+=== 매칭 완료 일시 조회
+.http-request
+include::{snippets}/matchingTime/http-request.adoc[]
+
+.http-response
+include::{snippets}/matchingTime/http-response.adoc[]
+
+.response-fields
+include::{snippets}/matchingTime/response-fields.adoc[]
+
+=== 매칭 파트너 조회
+.http-request
+include::{snippets}/getmatchingPartnersInfo/http-request.adoc[]
+
+.http-response
+include::{snippets}/getmatchingPartnersInfo/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getmatchingPartnersInfo/response-fields.adoc[]
+
+=== 매칭 선호 언어 수정
+.http-request
+include::{snippets}/changePreferLanguages/http-request.adoc[]
+
+.request-fields
+include::{snippets}/changePreferLanguages/request-fields.adoc[]
+
+.http-response
+include::{snippets}/changePreferLanguages/http-response.adoc[]
+
+.response-fields
+include::{snippets}/changePreferLanguages/response-fields.adoc[]
+
+== Auth API
+=== 로그인
+.http-request
+include::{snippets}/login/http-request.adoc[]
+
+.request-fields
+include::{snippets}/login/request-fields.adoc[]
+
+.http-response
+include::{snippets}/login/http-response.adoc[]
+
+.response-fields
+include::{snippets}/login/response-fields.adoc[]
+
+=== 토큰 재발급 실패(만료되지 않은 토큰)
+.http-request
+include::{snippets}/reissueTokenFail/http-request.adoc[]
+
+.http-response
+include::{snippets}/reissueTokenFail/http-response.adoc[]
+
+.response-fields
+include::{snippets}/reissueTokenFail/response-fields.adoc[]
+
+=== 로그아웃
+.http-request
+include::{snippets}/logout/http-request.adoc[]
+
+.http-response
+include::{snippets}/logout/http-response.adoc[]
+
+== Block API
+=== 사용자 차단
+.http-request
+include::{snippets}/blockMember/http-request.adoc[]
+
+.request-fields
+include::{snippets}/blockMember/request-fields.adoc[]
+
+.http-response
+include::{snippets}/blockMember/http-response.adoc[]
+
+.response-fields
+include::{snippets}/blockMember/response-fields.adoc[]
+
+== Chat API
+=== 채팅 토큰 발급
+.http-request
+include::{snippets}/generateChattingToken/http-request.adoc[]
+
+.http-response
+include::{snippets}/generateChattingToken/http-response.adoc[]
+
+== Email Authentication API
+=== 이메일 전송
+.http-request
+include::{snippets}/sendEmail/http-request.adoc[]
+
+.request-fields
+include::{snippets}/sendEmail/httpie-request.adoc[]
+
+.http-response
+include::{snippets}/sendEmail/http-response.adoc[]
+
+.response-fields
+include::{snippets}/sendEmail/response-fields.adoc[]
+
+=== 이메일 인증
+.http-request
+include::{snippets}/verifyEmail/http-request.adoc[]
+
+.request-fields
+include::{snippets}/verifyEmail/httpie-request.adoc[]
+
+.http-response
+include::{snippets}/verifyEmail/http-response.adoc[]
+
+=== 이메일 인증 상태 요청
+.http-request
+include::{snippets}/getMyApplicantStatus/http-request.adoc[]
+
+.http-response
+include::{snippets}/getMyApplicantStatus/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getMyApplicantStatus/response-fields.adoc[]
+
+== Member API
+=== 회원 가입
+.http-request
+include::{snippets}/login/http-request.adoc[]
+
+.request-fields
+include::{snippets}/login/request-fields.adoc[]
+
+.http-response
+include::{snippets}/login/http-response.adoc[]
+
+.response-fields
+include::{snippets}/login/response-fields.adoc[]
+
+=== 회원 정보 조회
+.http-request
+include::{snippets}/getMemberInfo/http-request.adoc[]
+
+.request-fields
+include::{snippets}/getMemberInfo/httpie-request.adoc[]
+
+.http-response
+include::{snippets}/getMemberInfo/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getMemberInfo/response-fields.adoc[]
+
+=== 회원 탈퇴
+.http-request
+include::{snippets}/memberWithdrawal/http-request.adoc[]
+
+.request-fields
+include::{snippets}/memberWithdrawal/request-fields.adoc[]
+
+.http-response
+include::{snippets}/memberWithdrawal/http-response.adoc[]
+
+.response-fields
+include::{snippets}/memberWithdrawal/response-fields.adoc[]
+
+=== 이메일 중복 확인
+.http-request
+include::{snippets}/isExistMemberEmail/http-request.adoc[]
+
+.request-fields
+include::{snippets}/isExistMemberEmail/httpie-request.adoc[]
+
+.http-response
+include::{snippets}/isExistMemberEmail/http-response.adoc[]
+
+.response-fields
+include::{snippets}/isExistMemberEmail/response-fields.adoc[]
+
+=== 임시 비밀번호 발급
+.http-request
+include::{snippets}/issueTemporaryPassword/http-request.adoc[]
+
+.request-fields
+include::{snippets}/issueTemporaryPassword/request-fields.adoc[]
+
+.http-response
+include::{snippets}/issueTemporaryPassword/http-response.adoc[]
+
+.response-fields
+include::{snippets}/issueTemporaryPassword/response-fields.adoc[]
+
+=== 비밀번호 변경
+.http-request
+include::{snippets}/issueTemporaryPassword/http-request.adoc[]
+
+.request-fields
+include::{snippets}/issueTemporaryPassword/request-fields.adoc[]
+
+.http-response
+include::{snippets}/issueTemporaryPassword/http-response.adoc[]
+
+.response-fields
+include::{snippets}/issueTemporaryPassword/response-fields.adoc[]
+
+=== 프로필 자기소개 수정
+.http-request
+include::{snippets}/changeSelfIntroduction/http-request.adoc[]
+
+.request-fields
+include::{snippets}/changeSelfIntroduction/httpie-request.adoc[]
+
+.http-response
+include::{snippets}/changeSelfIntroduction/http-response.adoc[]
+
+.response-fields
+include::{snippets}/changeSelfIntroduction/response-fields.adoc[]
+
+=== 프로필 이미지 수정
+.http-request
+include::{snippets}/changeProfileImage/http-request.adoc[]
+
+.http-response
+include::{snippets}/changeProfileImage/http-response.adoc[]
+
+.response-fields
+include::{snippets}/changeProfileImage/response-fields.adoc[]
+
+=== mbti 수정
+.http-request
+include::{snippets}/changeMbti/http-request.adoc[]
+
+.request-fields
+include::{snippets}/changeMbti/request-fields.adoc[]
+
+.http-response
+include::{snippets}/changeMbti/http-response.adoc[]
+
+.response-fields
+include::{snippets}/changeMbti/response-fields.adoc[]
+
+== Report API
+=== 사용자 신고
+.http-request
+include::{snippets}/reportMember/http-request.adoc[]
+
+.request-fields
+include::{snippets}/reportMember/request-fields.adoc[]
+
+.http-response
+include::{snippets}/reportMember/http-response.adoc[]
+
+.response-fields
+include::{snippets}/reportMember/response-fields.adoc[]
+
+== Admin API
+=== 회원 정보 삭제(관리자)
+.http-request
+include::{snippets}/deleteMemberInfoByAdmin/http-request.adoc[]
+
+.http-response
+include::{snippets}/deleteMemberInfoByAdmin/http-response.adoc[]
+
+.response-fields
+include::{snippets}/deleteMemberInfoByAdmin/response-fields.adoc[]
+
+=== 회원 정보 조회(관리자)
+.http-request
+include::{snippets}/getMemberInfoByAdmin/http-request.adoc[]
+
+.http-response
+include::{snippets}/getMemberInfoByAdmin/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getMemberInfoByAdmin/response-fields.adoc[]
+
+=== 신고 목록 조회(관리자)
+.http-request
+include::{snippets}/getReportsByAdmin/http-request.adoc[]
+
+.http-response
+include::{snippets}/getReportsByAdmin/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getReportsByAdmin/response-fields.adoc[]
+
+=== 매칭 로직(관리자)
+.http-request
+include::{snippets}/matching/http-request.adoc[]
+
+.http-response
+include::{snippets}/matching/http-response.adoc[]
