@@ -1,8 +1,6 @@
 package com.aliens.friendship.chat.controller;
 
 import com.aliens.db.applicant.entity.ApplicantEntity;
-import com.aliens.db.emailauthentication.entity.EmailAuthenticationEntity;
-import com.aliens.db.emailauthentication.repository.EmailAuthenticationRepository;
 import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.applicant.business.ApplicantBusiness;
@@ -12,40 +10,31 @@ import com.aliens.friendship.domain.auth.dto.TokenDto;
 import com.aliens.friendship.domain.auth.dto.request.LoginRequest;
 import com.aliens.friendship.domain.chat.business.ChatBusiness;
 import com.aliens.friendship.domain.match.business.MatchBusiness;
-import com.aliens.friendship.domain.member.business.MemberBusiness;
 import com.aliens.friendship.domain.member.controller.dto.JoinRequestDto;
-import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.converter.MemberConverter;
 import com.aliens.friendship.domain.member.service.MemberService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
 @Rollback(value = true)
 public class IntegrationChatControllerTest {
@@ -55,9 +44,6 @@ public class IntegrationChatControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     MemberConverter memberConverter;
@@ -119,7 +105,7 @@ public class IntegrationChatControllerTest {
     void tesChattingTokenGenerate_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -128,12 +114,12 @@ public class IntegrationChatControllerTest {
                 .build());
 
         //given
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             joinRequestDto =
                     JoinRequestDto.builder()
-                            .email(email+i)
+                            .email(email + i)
                             .password(password)
-                            .name("Aden"+i)
+                            .name("Aden" + i)
                             .mbti(MemberEntity.Mbti.INTJ)
                             .gender("Male")
                             .nationality("USA")
@@ -154,12 +140,13 @@ public class IntegrationChatControllerTest {
         matchBusiness.matchingAllApplicant();
 
         mockMvc.perform(
-                        get(BASIC_URL+"/token")
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                        get(BASIC_URL + "/token")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                 )
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(document("generateChattingToken"
+                ));
     }
 }
 
