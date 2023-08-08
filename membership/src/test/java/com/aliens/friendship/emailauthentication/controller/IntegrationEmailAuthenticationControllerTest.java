@@ -2,7 +2,6 @@ package com.aliens.friendship.emailauthentication.controller;
 
 import com.aliens.db.emailauthentication.entity.EmailAuthenticationEntity;
 import com.aliens.db.emailauthentication.repository.EmailAuthenticationRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,14 +11,15 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
+
 import javax.transaction.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -37,9 +37,6 @@ public class IntegrationEmailAuthenticationControllerTest {
 
     @Autowired
     private EmailAuthenticationRepository emailAuthenticationRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     String BASIC_URL;
     EmailAuthenticationEntity mockEmailAuthenticationEntity;
@@ -71,7 +68,7 @@ public class IntegrationEmailAuthenticationControllerTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.post(BASIC_URL + "/{email}/verification", email)
+                        post(BASIC_URL + "/{email}/verification", email)
                 )
                 //then
                 .andExpect(status().isOk())
@@ -96,7 +93,7 @@ public class IntegrationEmailAuthenticationControllerTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.get(BASIC_URL + "/{email}/verification", email)
+                        get(BASIC_URL + "/{email}/verification", email)
                                 .queryParam("token", token)
                 )
                 .andExpect(status().isOk())
@@ -118,7 +115,7 @@ public class IntegrationEmailAuthenticationControllerTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.get(BASIC_URL + "/{email}/authentication-status", email)
+                        get(BASIC_URL + "/{email}/authentication-status", email)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("AUTHENTICATED"))
