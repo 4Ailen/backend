@@ -3,10 +3,12 @@ package com.aliens.friendship.domain.market.entity;
 import com.aliens.db.BaseEntity;
 import com.aliens.db.member.entity.MemberEntity;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class MarketBookmark

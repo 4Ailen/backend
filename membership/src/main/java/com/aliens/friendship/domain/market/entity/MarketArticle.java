@@ -5,10 +5,12 @@ import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.friendship.domain.market.constant.MarketArticleStatus;
 import com.aliens.friendship.domain.market.constant.ProductStatus;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class MarketArticle
@@ -70,5 +72,19 @@ public class MarketArticle
                 content,
                 member
         );
+    }
+
+    public void update(
+            String title,
+            MarketArticleStatus status,
+            Integer price,
+            ProductStatus productStatus,
+            String content
+    ) {
+        this.title = title;
+        this.status = status;
+        this.price = price;
+        this.productStatus = productStatus;
+        this.content = content;
     }
 }
