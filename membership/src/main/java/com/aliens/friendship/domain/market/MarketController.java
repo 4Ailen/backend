@@ -2,7 +2,7 @@ package com.aliens.friendship.domain.market;
 
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
 import com.aliens.friendship.domain.market.dto.request.CreateMarketArticleRequest;
-import com.aliens.friendship.domain.market.dto.request.MarketArticleDto;
+import com.aliens.friendship.domain.market.dto.MarketArticleDto;
 import com.aliens.friendship.domain.market.dto.request.UpdateMarketArticleRequest;
 import com.aliens.friendship.domain.market.dto.response.CreateMarketResponse;
 import com.aliens.friendship.domain.market.service.MarketService;

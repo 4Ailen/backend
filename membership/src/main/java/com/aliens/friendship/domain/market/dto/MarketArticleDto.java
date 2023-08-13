@@ -1,8 +1,9 @@
-package com.aliens.friendship.domain.market.dto.request;
+package com.aliens.friendship.domain.market.dto;
 
 import com.aliens.friendship.domain.market.constant.MarketArticleStatus;
 import com.aliens.friendship.domain.market.constant.ProductStatus;
 import com.aliens.friendship.domain.market.entity.MarketArticle;
+import com.aliens.friendship.domain.member.controller.dto.MemberDto;
 import lombok.Getter;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class MarketArticleDto {
     private ProductStatus productStatus;
     private String content;
     List<String> images;
+    MemberDto member;
 
     private MarketArticleDto(
             Long marketArticleId,
@@ -25,7 +27,8 @@ public class MarketArticleDto {
             Integer price,
             ProductStatus productStatus,
             String content,
-            List<String> images
+            List<String> images,
+            MemberDto member
     ) {
         this.marketArticleId = marketArticleId;
         this.title = title;
@@ -34,6 +37,7 @@ public class MarketArticleDto {
         this.productStatus = productStatus;
         this.content = content;
         this.images = images;
+        this.member = member;
     }
 
     public static MarketArticleDto of(
@@ -43,7 +47,8 @@ public class MarketArticleDto {
             Integer price,
             ProductStatus productStatus,
             String content,
-            List<String> images
+            List<String> images,
+            MemberDto member
     ) {
         return new MarketArticleDto(
                 marketArticleId,
@@ -52,7 +57,8 @@ public class MarketArticleDto {
                 price,
                 productStatus,
                 content,
-                images
+                images,
+                member
         );
     }
 
@@ -67,7 +73,8 @@ public class MarketArticleDto {
                 marketArticle.getPrice(),
                 marketArticle.getProductStatus(),
                 marketArticle.getContent(),
-                images
+                images,
+                MemberDto.from(marketArticle.getMember())
         );
     }
 }

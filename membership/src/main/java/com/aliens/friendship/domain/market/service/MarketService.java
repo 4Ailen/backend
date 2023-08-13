@@ -3,7 +3,7 @@ package com.aliens.friendship.domain.market.service;
 import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.market.dto.request.CreateMarketArticleRequest;
-import com.aliens.friendship.domain.market.dto.request.MarketArticleDto;
+import com.aliens.friendship.domain.market.dto.MarketArticleDto;
 import com.aliens.friendship.domain.market.dto.request.UpdateMarketArticleRequest;
 import com.aliens.friendship.domain.market.entity.MarketArticle;
 import com.aliens.friendship.domain.market.entity.MarketBookmark;
@@ -56,13 +56,8 @@ public class MarketService {
                     .map(ProductImage::getImageUrl)
                     .collect(Collectors.toList());
             marketArticleDtos.add(
-                    MarketArticleDto.of(
-                            marketArticle.getId(),
-                            marketArticle.getTitle(),
-                            marketArticle.getStatus(),
-                            marketArticle.getPrice(),
-                            marketArticle.getProductStatus(),
-                            marketArticle.getContent(),
+                    MarketArticleDto.from(
+                            marketArticle,
                             images
                     )
             );
