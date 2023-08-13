@@ -11,7 +11,7 @@ import java.time.Instant;
 
 @MappedSuperclass @SuperBuilder @Getter
 @NoArgsConstructor @AllArgsConstructor
-public class BaseEntity {
+public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
