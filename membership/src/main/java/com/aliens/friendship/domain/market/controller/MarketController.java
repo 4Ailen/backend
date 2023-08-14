@@ -1,4 +1,4 @@
-package com.aliens.friendship.domain.market;
+package com.aliens.friendship.domain.market.controller;
 
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
 import com.aliens.friendship.domain.market.dto.request.CreateMarketArticleRequest;
