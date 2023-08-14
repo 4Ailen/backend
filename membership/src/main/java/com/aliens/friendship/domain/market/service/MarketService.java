@@ -16,6 +16,7 @@ import com.aliens.friendship.global.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import static com.aliens.friendship.domain.market.exception.MarketExceptionCode.
 import static com.aliens.friendship.domain.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 import static com.aliens.friendship.global.error.GlobalExceptionCode.INVALID_RESOURCE_OWNER;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class MarketService {
@@ -34,6 +36,7 @@ public class MarketService {
     private final MarketBookmarkRepository marketBookmarkRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional(readOnly = true)
     public MarketArticleDto getMarketArticle(Long marketArticleId) {
         MarketArticle savedMarketArticle = getMarketArticleEntity(marketArticleId);
         List<String> images = productImageRepository.findAllByMarketArticle(savedMarketArticle)
@@ -47,6 +50,7 @@ public class MarketService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<MarketArticleDto> getAllMarketArticles() {
         List<MarketArticle> marketArticles = marketArticleRepository.findAll();
 
