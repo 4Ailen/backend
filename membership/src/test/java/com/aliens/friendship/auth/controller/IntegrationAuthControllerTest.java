@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,6 +23,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,14 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
 public class IntegrationAuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     MemberConverter memberConverter;
@@ -100,7 +102,19 @@ public class IntegrationAuthControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(document("login",
+                        requestFields(
+                                fieldWithPath("email").description("이메일"),
+                                fieldWithPath("password").description("비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간"),
+                                fieldWithPath("data.accessToken").description("accessToken"),
+                                fieldWithPath("data.refreshToken").description("refreshToken")
+                        )
+                ));
     }
 
     @Test
@@ -108,21 +122,51 @@ public class IntegrationAuthControllerTest {
     void testReissueToken_Success() throws Exception {
         // Given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email, password), fcmToken);
 
 
         // when & then
         mockMvc.perform(
                         post(BASIC_URL + "/reissue")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                                 .header("FcmToken", fcmToken)
                 )
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(document("reissueTokenFail",
+                        responseFields(
+                                fieldWithPath("status").description("HTTP 응답 상태 코드"),
+                                fieldWithPath("code").description("API 에러 코드"),
+                                fieldWithPath("message").description("에러 메시지"),
+                                fieldWithPath("errors").description("에러 세부 정보"),
+                                fieldWithPath("timestamp").description("에러 발생 시간")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("IntegrationController 로그아웃 - 성공")
+    void testLogout_Success() throws Exception {
+        // Given
+        memberService.register(memberEntity);
+        TokenDto tokenDto = authBusiness.login(LoginRequest.of(email, password), fcmToken);
 
 
+        // when & then
+        mockMvc.perform(
+                        post(BASIC_URL + "/logout")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
+                                .header("FcmToken", fcmToken)
+                )
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andDo(document("logout"
+                ));
     }
 }

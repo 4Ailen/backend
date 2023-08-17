@@ -58,8 +58,10 @@ public class MemberService {
 
     @Transactional
     public void unregister(MemberEntity memberEntity,String password) {
-        if(isAppliedAndMatched(memberEntity, applicantService.findByMemberEntity(memberEntity))){
-            closeChattingRoomWithMember(memberEntity);
+        if(isApplied(memberEntity)){
+            if(isMatched(applicantService.findByMemberEntity(memberEntity))){
+                closeChattingRoomWithMember(memberEntity);
+            }
         }
 
         if (!passwordEncoder.matches(password, memberEntity.getPassword())) {
@@ -191,8 +193,12 @@ public class MemberService {
         loginMemberEntity.updateStatus(MemberEntity.Status.APPLIED);
     }
 
-    private boolean isAppliedAndMatched(MemberEntity memberEntity, ApplicantEntity applicantEntity){
-        return memberEntity.getStatus() == MemberEntity.Status.APPLIED && applicantEntity.getIsMatched() == ApplicantEntity.Status.MATCHED;
+    private boolean isApplied(MemberEntity memberEntity){
+        return memberEntity.getStatus() == MemberEntity.Status.APPLIED;
+    }
+
+    private boolean isMatched(ApplicantEntity applicantEntity){
+        return applicantEntity.getIsMatched() == ApplicantEntity.Status.MATCHED;
     }
 
     private void closeChattingRoomWithMember(MemberEntity memberEntity){

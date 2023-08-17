@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -27,13 +28,15 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
 public class IntegrationApplicationControllerTest {
 
@@ -42,9 +45,6 @@ public class IntegrationApplicationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     MemberConverter memberConverter;
@@ -115,13 +115,23 @@ public class IntegrationApplicationControllerTest {
 
         mockMvc.perform(
                         post(BASIC_URL)
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(applicantRequestDto)
                                 )
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("applicant",
+                        requestFields(
+                                fieldWithPath("firstPreferLanguage").description("첫번째 선호언어"),
+                                fieldWithPath("secondPreferLanguage").description("두번째 선호언어")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간")
+                        )
+                ));
 
     }
 
@@ -130,7 +140,7 @@ public class IntegrationApplicationControllerTest {
     void testGetMyApplicant_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -140,10 +150,26 @@ public class IntegrationApplicationControllerTest {
 
         mockMvc.perform(
                         get(BASIC_URL)
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
-                                )
-                .andExpect(status().isOk());
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
+                )
+                .andExpect(status().isOk())
+                .andDo(document("getMyApplicant",
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간"),
+                                fieldWithPath("data.member.name").description("이름"),
+                                fieldWithPath("data.member.gender").description("성별"),
+                                fieldWithPath("data.member.mbti").description("MBTI"),
+                                fieldWithPath("data.member.nationality").description("국적"),
+                                fieldWithPath("data.member.age").description("나이"),
+                                fieldWithPath("data.member.profileImage").description("프로필 이미지 경로"),
+                                fieldWithPath("data.member.countryImage").description("국가 이미지"),
+                                fieldWithPath("data.member.selfIntroduction").description("자기 소개"),
+                                fieldWithPath("data.preferLanguages.firstPreferLanguage").description("첫 번째 선호 언어"),
+                                fieldWithPath("data.preferLanguages.secondPreferLanguage").description("두 번째 선호 언어")
+                        )
+                ));
 
     }
 
@@ -152,7 +178,7 @@ public class IntegrationApplicationControllerTest {
     void testGetMyApplicantStatus_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -161,11 +187,18 @@ public class IntegrationApplicationControllerTest {
                 .build());
 
         mockMvc.perform(
-                        get(BASIC_URL+"/status")
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                        get(BASIC_URL + "/status")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("getMyApplicantStatus",
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간"),
+                                fieldWithPath("data.status").description("매칭 상태")
+                        )
+                ));
 
     }
 
@@ -174,7 +207,7 @@ public class IntegrationApplicationControllerTest {
     void testMatchingTime_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -183,11 +216,18 @@ public class IntegrationApplicationControllerTest {
                 .build());
 
         mockMvc.perform(
-        get(BASIC_URL+"/completion-date")
-                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                .header("RefreshToken",tokenDto.getRefreshToken())
+                        get(BASIC_URL + "/completion-date")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("matchingTime",
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간"),
+                                fieldWithPath("data.matchingCompleteDate").description("매칭 완료 일시")
+                        )
+                ));
     }
 
 
@@ -197,7 +237,7 @@ public class IntegrationApplicationControllerTest {
     void testMatchingPartners_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -206,12 +246,12 @@ public class IntegrationApplicationControllerTest {
                 .build());
 
         //given
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             joinRequestDto =
                     JoinRequestDto.builder()
-                            .email(email+i)
+                            .email(email + i)
                             .password(password)
-                            .name("Aden"+i)
+                            .name("Aden" + i)
                             .mbti(MemberEntity.Mbti.INTJ)
                             .gender("Male")
                             .nationality("USA")
@@ -232,12 +272,29 @@ public class IntegrationApplicationControllerTest {
         matchBusiness.matchingAllApplicant();
 
         mockMvc.perform(
-                        get(BASIC_URL+"/partners")
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                        get(BASIC_URL + "/partners")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                 )
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(document("getmatchingPartnersInfo",
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간"),
+                                fieldWithPath("data.partners").description("파트너 리스트"),
+                                fieldWithPath("data.partners[].roomState").description("방 상태 (OPEN)"),
+                                fieldWithPath("data.partners[].roomId").description("방 ID"),
+                                fieldWithPath("data.partners[].name").description("이름"),
+                                fieldWithPath("data.partners[].nationality").description("국적"),
+                                fieldWithPath("data.partners[].gender").description("성별"),
+                                fieldWithPath("data.partners[].mbti").description("MBTI"),
+                                fieldWithPath("data.partners[].memberId").description("멤버 ID"),
+                                fieldWithPath("data.partners[].profileImage").description("프로필 이미지 경로"),
+                                fieldWithPath("data.partners[].firstPreferLanguage").description("첫 번째 선호 언어"),
+                                fieldWithPath("data.partners[].secondPreferLanguage").description("두 번째 선호 언어"),
+                                fieldWithPath("data.partners[].selfIntroduction").description("자기 소개")
+                        )
+                ));
     }
 
     @Test
@@ -245,7 +302,7 @@ public class IntegrationApplicationControllerTest {
     void testChangePreferLanguages_Success() throws Exception {
         //given
         memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password), fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
                 .memberEntity(memberEntity)
@@ -259,14 +316,24 @@ public class IntegrationApplicationControllerTest {
                 .build();
 
         mockMvc.perform(
-                        patch(BASIC_URL+"/prefer-languages")
-                                .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                                .header("RefreshToken",tokenDto.getRefreshToken())
+                        patch(BASIC_URL + "/prefer-languages")
+                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                                .header("RefreshToken", tokenDto.getRefreshToken())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(modifiedPreferLanguage)
                                 )
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("changePreferLanguages",
+                        requestFields(
+                                fieldWithPath("firstPreferLanguage").description("첫번째 선호언어"),
+                                fieldWithPath("secondPreferLanguage").description("두번째 선호언어")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간")
+                        )
+                ));
 
     }
 

@@ -2,29 +2,33 @@ package com.aliens.friendship.emailauthentication.controller;
 
 import com.aliens.db.emailauthentication.entity.EmailAuthenticationEntity;
 import com.aliens.db.emailauthentication.repository.EmailAuthenticationRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import javax.transaction.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
 public class IntegrationEmailAuthenticationControllerTest {
 
@@ -33,9 +37,6 @@ public class IntegrationEmailAuthenticationControllerTest {
 
     @Autowired
     private EmailAuthenticationRepository emailAuthenticationRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     String BASIC_URL;
     EmailAuthenticationEntity mockEmailAuthenticationEntity;
@@ -73,7 +74,13 @@ public class IntegrationEmailAuthenticationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.timestamp").exists())
-                .andDo(print());
+                .andDo(document("sendEmail",
+                        pathParameters(parameterWithName("email").description("이메일")),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간")
+                        )
+                ));
 
     }
 
@@ -91,7 +98,10 @@ public class IntegrationEmailAuthenticationControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(view().name("emailVerificationComplete"))
-                .andDo(print());
+                .andDo(document("verifyEmail",
+                        pathParameters(parameterWithName("email").description("이메일")),
+                        requestParameters(parameterWithName("token").description("토큰"))
+                ));
 
     }
 
@@ -108,7 +118,15 @@ public class IntegrationEmailAuthenticationControllerTest {
                         get(BASIC_URL + "/{email}/authentication-status", email)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.status").value("AUTHENTICATED"));
+                .andExpect(jsonPath("$.data.status").value("AUTHENTICATED"))
+                .andDo(document("getMemberAuthenticationStatus",
+                        pathParameters(parameterWithName("email").description("이메일")),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간"),
+                                fieldWithPath("data.status").description("이메일 인증 상태")
+                        )
+                ));
 
     }
 

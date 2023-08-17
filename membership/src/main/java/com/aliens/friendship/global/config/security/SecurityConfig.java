@@ -37,6 +37,7 @@ public class SecurityConfig {
     );
 
     private List<String> OPEN_SOURCE = List.of(
+            "/docs/index.html",
             "/images/character.png",
             "/api/v1/email/**",
             "/api/v1/auth/**",

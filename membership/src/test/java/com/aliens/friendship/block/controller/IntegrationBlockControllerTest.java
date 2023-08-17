@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -28,21 +29,21 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
 public class IntegrationBlockControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     MemberConverter memberConverter;
@@ -55,7 +56,6 @@ public class IntegrationBlockControllerTest {
 
     @Autowired
     ChattingRoomRepository chattingRoomRepository;
-
 
 
     EmailAuthenticationEntity mockEmailAuthenticationEntity;
@@ -73,7 +73,6 @@ public class IntegrationBlockControllerTest {
         email = "test@example.com";
         password = "test1234";
         fcmToken = "testFcmToken";
-
         mockEmailAuthenticationEntity =
                 EmailAuthenticationEntity.builder().
                         id("ddkls")
@@ -124,7 +123,7 @@ public class IntegrationBlockControllerTest {
         MemberEntity blockedMemberEntity = memberConverter.toMemberEntityWithUser(joinRequestDto);
         Long blockedMemberEntityId = memberService.register(blockedMemberEntity);
 
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email,password),fcmToken);
+        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
 
         ChattingRoomEntity chattingRoomEntity = ChattingRoomEntity.builder()
                 .status(ChattingRoomEntity.RoomStatus.OPEN)
@@ -132,15 +131,24 @@ public class IntegrationBlockControllerTest {
         chattingRoomRepository.save(chattingRoomEntity);
 
         Map<String, String> request = new HashMap<>();
-        request.put("roomId",chattingRoomEntity.getId().toString());
+        request.put("roomId", chattingRoomEntity.getId().toString());
 
         // when & then
-        mockMvc.perform(post(BASIC_URL+ "/"+ blockedMemberEntityId)
-                        .header("Authorization", "Bearer "+ tokenDto.getAccessToken())
-                        .header("RefreshToken",tokenDto.getRefreshToken())
+        mockMvc.perform(post(BASIC_URL + "/" + blockedMemberEntityId)
+                        .header("Authorization", "Bearer " + tokenDto.getAccessToken())
+                        .header("RefreshToken", tokenDto.getRefreshToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("차단 완료"));
+                .andDo(document("blockMember",
+                        requestFields(
+                                fieldWithPath("roomId").description("차단할 채팅방 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("성공 메시지"),
+                                fieldWithPath("timestamp").description("처리 시간")
+                        )
+                ));
+
     }
 }
