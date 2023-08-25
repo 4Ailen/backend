@@ -1,11 +1,13 @@
 package com.aliens.db.communityarticlelike.entity;
 
-import jakarta.persistence.*;
+import com.aliens.db.BaseEntity;
+import com.aliens.db.communityarticle.entity.CommunityArticleEntity;
+import com.aliens.db.member.entity.MemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.packit.packit.domain.member.entity.MemberEntity;
-import site.packit.packit.global.audit.BaseEntity;
+
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,13 +20,13 @@ public class CommunityArticleLikeEntity
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private CommunityArticle communityArticle;
+    private CommunityArticleEntity communityArticle;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity memberEntity;
 
     private CommunityArticleLikeEntity(
-            CommunityArticle communityArticle,
+            CommunityArticleEntity communityArticle,
             MemberEntity member
     ) {
         this.communityArticle = communityArticle;
@@ -32,7 +34,7 @@ public class CommunityArticleLikeEntity
     }
 
     public static CommunityArticleLikeEntity of(
-            CommunityArticle communityArticle,
+            CommunityArticleEntity communityArticle,
             MemberEntity member
     ) {
         return new CommunityArticleLikeEntity(

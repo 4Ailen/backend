@@ -1,13 +1,14 @@
 package com.aliens.db.marketarticle.entity;
 
-import jakarta.persistence.*;
+import com.aliens.db.BaseEntity;
+import com.aliens.db.marketarticle.MarketArticleStatus;
+import com.aliens.db.marketarticle.ProductStatus;
+import com.aliens.db.member.entity.MemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.packit.packit.domain.article.market.constant.MarketArticleStatus;
-import site.packit.packit.domain.article.market.constant.ProductStatus;
-import site.packit.packit.domain.member.entity.MemberEntity;
-import site.packit.packit.global.audit.BaseEntity;
+
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

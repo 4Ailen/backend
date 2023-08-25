@@ -1,15 +1,16 @@
 package com.aliens.db.marketarticlecomment.entity;
 
-import jakarta.persistence.*;
+import com.aliens.db.BaseEntity;
+import com.aliens.db.marketarticle.entity.MarketArticleEntity;
+import com.aliens.db.marketarticlecomment.CommentStatus;
+import com.aliens.db.marketarticlecomment.CommentType;
+import com.aliens.db.member.entity.MemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import site.packit.packit.domain.article.comment.constant.CommentStatus;
-import site.packit.packit.domain.article.comment.constant.CommentType;
-import site.packit.packit.domain.article.market.entity.MarketArticle;
-import site.packit.packit.domain.member.entity.MemberEntity;
-import site.packit.packit.global.audit.BaseEntity;
+
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,7 +38,7 @@ public class MarketArticleCommentEntity
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private MarketArticle marketArticle;
+    private MarketArticleEntity marketArticle;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
@@ -45,7 +46,7 @@ public class MarketArticleCommentEntity
     private MarketArticleCommentEntity(
             String content,
             CommentType type,
-            MarketArticle marketArticle,
+            MarketArticleEntity marketArticle,
             Long parentCommentId,
             MemberEntity member
     ) {
@@ -59,7 +60,7 @@ public class MarketArticleCommentEntity
     public static MarketArticleCommentEntity of(
             String content,
             CommentType type,
-            MarketArticle marketArticle,
+            MarketArticleEntity marketArticle,
             Long parentCommentId,
             MemberEntity member
     ) {

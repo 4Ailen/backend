@@ -1,14 +1,14 @@
 package com.aliens.db.productimage.repsitory;
 
+import com.aliens.db.marketarticle.entity.MarketArticleEntity;
+import com.aliens.db.productimage.entity.ProductImageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import site.packit.packit.domain.article.market.entity.MarketArticle;
-import site.packit.packit.domain.article.market.entity.ProductImage;
 
 import java.util.List;
 
-public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
+public interface ProductImageRepository extends JpaRepository<ProductImageEntity, Long> {
 
-    void deleteAllByMarketArticle(MarketArticle marketArticle);
+    void deleteAllByMarketArticle(MarketArticleEntity marketArticle);
 
-    List<ProductImage> findAllByMarketArticle(MarketArticle marketArticle);
+    List<ProductImageEntity> findAllByMarketArticle(MarketArticleEntity marketArticle);
 }

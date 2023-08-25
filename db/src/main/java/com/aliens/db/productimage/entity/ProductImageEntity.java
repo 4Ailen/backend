@@ -1,10 +1,12 @@
 package com.aliens.db.productimage.entity;
 
-import jakarta.persistence.*;
+import com.aliens.db.BaseEntity;
+import com.aliens.db.marketarticle.entity.MarketArticleEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.packit.packit.global.audit.BaseEntity;
+
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,11 +22,11 @@ public class ProductImageEntity
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private MarketArticle marketArticle;
+    private MarketArticleEntity marketArticle;
 
     private ProductImageEntity(
             String imageUrl,
-            MarketArticle marketArticle
+            MarketArticleEntity marketArticle
     ) {
         this.imageUrl = imageUrl;
         this.marketArticle = marketArticle;
@@ -32,7 +34,7 @@ public class ProductImageEntity
 
     public static ProductImageEntity of(
             String imageUrl,
-            MarketArticle marketArticle
+            MarketArticleEntity marketArticle
     ) {
         return new ProductImageEntity(
                 imageUrl,

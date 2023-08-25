@@ -1,22 +1,22 @@
 package com.aliens.db.marketarticlecomment.repository;
 
+import com.aliens.db.marketarticle.entity.MarketArticleEntity;
+import com.aliens.db.marketarticlecomment.entity.MarketArticleCommentEntity;
+import com.aliens.db.member.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import site.packit.packit.domain.article.market.entity.MarketArticle;
-import site.packit.packit.domain.article.comment.entity.MarketArticleComment;
-import site.packit.packit.domain.member.entity.MemberEntity;
 
 import java.util.List;
 
 public interface MarketArticleCommentRepository
-        extends JpaRepository<MarketArticleComment, Long> {
+        extends JpaRepository<MarketArticleCommentEntity, Long> {
 
-    List<MarketArticleComment> findAllByMarketArticle_Id(Long marketArticleId);
+    List<MarketArticleCommentEntity> findAllByMarketArticle_Id(Long marketArticleId);
 
-    void deleteByMarketArticleAndMember(MarketArticle marketArticle, MemberEntity member);
+    void deleteByMarketArticleAndMember(MarketArticleEntity marketArticle, MemberEntity member);
 
-    void deleteAllByMarketArticle(MarketArticle marketArticle);
+    void deleteAllByMarketArticle(MarketArticleEntity marketArticle);
 
-    List<MarketArticleComment> findAllByParentCommentId(Long parentId);
+    List<MarketArticleCommentEntity> findAllByParentCommentId(Long parentId);
 
-    int countAllByMarketArticle(MarketArticle marketArticle);
+    int countAllByMarketArticle(MarketArticleEntity marketArticle);
 }

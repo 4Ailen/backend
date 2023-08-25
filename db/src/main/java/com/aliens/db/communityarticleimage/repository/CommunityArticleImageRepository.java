@@ -1,14 +1,14 @@
 package com.aliens.db.communityarticleimage.repository;
 
+import com.aliens.db.communityarticle.entity.CommunityArticleEntity;
+import com.aliens.db.communityarticleimage.entity.CommunityArticleImageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import site.packit.packit.domain.article.community.entity.CommunityArticle;
-import site.packit.packit.domain.article.community.entity.CommunityArticleImage;
 
 import java.util.List;
 
-public interface CommunityArticleImageRepository extends JpaRepository<CommunityArticleImage, Long> {
+public interface CommunityArticleImageRepository extends JpaRepository<CommunityArticleImageEntity, Long> {
 
-    void deleteAllByCommunityArticle(CommunityArticle communityArticle);
+    void deleteAllByCommunityArticle(CommunityArticleEntity communityArticle);
 
-    List<CommunityArticleImage> findAllByCommunityArticle(CommunityArticle communityArticle);
+    List<CommunityArticleImageEntity> findAllByCommunityArticle(CommunityArticleEntity communityArticle);
 }

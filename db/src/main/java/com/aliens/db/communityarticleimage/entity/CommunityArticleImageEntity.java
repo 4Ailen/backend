@@ -1,10 +1,12 @@
 package com.aliens.db.communityarticleimage.entity;
 
-import jakarta.persistence.*;
+import com.aliens.db.BaseEntity;
+import com.aliens.db.communityarticle.entity.CommunityArticleEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.packit.packit.global.audit.BaseEntity;
+
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,11 +22,11 @@ public class CommunityArticleImageEntity
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private CommunityArticle communityArticle;
+    private CommunityArticleEntity communityArticle;
 
     private CommunityArticleImageEntity(
             String imageUrl,
-            CommunityArticle communityArticle
+            CommunityArticleEntity communityArticle
     ) {
         this.imageUrl = imageUrl;
         this.communityArticle = communityArticle;
@@ -32,7 +34,7 @@ public class CommunityArticleImageEntity
 
     public static CommunityArticleImageEntity of(
             String imageUrl,
-            CommunityArticle communityArticle
+            CommunityArticleEntity communityArticle
     ) {
         return new CommunityArticleImageEntity(
                 imageUrl,

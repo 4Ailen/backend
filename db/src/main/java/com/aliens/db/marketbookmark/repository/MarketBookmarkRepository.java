@@ -1,19 +1,19 @@
 package com.aliens.db.marketbookmark.repository;
 
+import com.aliens.db.marketarticle.entity.MarketArticleEntity;
+import com.aliens.db.marketbookmark.entity.MarketBookmarkEntity;
+import com.aliens.db.member.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import site.packit.packit.domain.article.market.entity.MarketArticle;
-import site.packit.packit.domain.article.market.entity.MarketBookmark;
-import site.packit.packit.domain.member.entity.MemberEntity;
 
 import java.util.List;
 
-public interface MarketBookmarkRepository extends JpaRepository<MarketBookmark, Long> {
+public interface MarketBookmarkRepository extends JpaRepository<MarketBookmarkEntity, Long> {
 
-    void deleteAllByMarketArticleAndMemberEntity(MarketArticle marketArticle, MemberEntity member);
+    void deleteAllByMarketArticleAndMemberEntity(MarketArticleEntity marketArticle, MemberEntity member);
 
-    void deleteAllByMarketArticle(MarketArticle marketArticle);
+    void deleteAllByMarketArticle(MarketArticleEntity marketArticle);
 
-    List<MarketBookmark> findAllByMemberEntity(MemberEntity member);
+    List<MarketBookmarkEntity> findAllByMemberEntity(MemberEntity member);
 
-    int countAllByMarketArticle(MarketArticle marketArticle);
+    int countAllByMarketArticle(MarketArticleEntity marketArticle);
 }

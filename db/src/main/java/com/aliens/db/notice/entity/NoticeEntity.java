@@ -1,7 +1,6 @@
-package com.aliens.db.communityarticle.entity;
+package com.aliens.db.notice.entity;
 
 import com.aliens.db.BaseEntity;
-import com.aliens.db.communityarticle.ArticleCategory;
 import com.aliens.db.member.entity.MemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class CommunityArticleEntity
+public class NoticeEntity
         extends BaseEntity {
 
     @Id
@@ -25,43 +24,32 @@ public class CommunityArticleEntity
     @Column(length = 10000, nullable = false)
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50, nullable = false)
-    private ArticleCategory category;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
 
-    private CommunityArticleEntity(
+    private NoticeEntity(
             String title,
             String content,
-            ArticleCategory category,
             MemberEntity member
     ) {
         this.title = title;
         this.content = content;
-        this.category = category;
         this.member = member;
     }
 
-    public static CommunityArticleEntity of(
+    public static NoticeEntity of(
             String title,
             String content,
-            ArticleCategory category,
             MemberEntity member
     ) {
-        return new CommunityArticleEntity(
+        return new NoticeEntity(
                 title,
                 content,
-                category,
                 member
         );
     }
 
-    public void update(
-            String title,
-            String content
-    ) {
+    public void update(String title, String content) {
         this.title = title;
         this.content = content;
     }

@@ -1,17 +1,17 @@
 package com.aliens.db.communityarticlelike.repository;
 
+import com.aliens.db.communityarticle.entity.CommunityArticleEntity;
+import com.aliens.db.communityarticlelike.entity.CommunityArticleLikeEntity;
+import com.aliens.db.member.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import site.packit.packit.domain.article.community.entity.CommunityArticleLike;
-import site.packit.packit.domain.article.community.entity.CommunityArticle;
-import site.packit.packit.domain.member.entity.MemberEntity;
 
 import java.util.List;
 
-public interface CommunityArticleLikeRepository extends JpaRepository<CommunityArticleLike, Long> {
+public interface CommunityArticleLikeRepository extends JpaRepository<CommunityArticleLikeEntity, Long> {
 
-    List<CommunityArticleLike> findAllByCommunityArticle(CommunityArticle communityArticle);
+    List<CommunityArticleLikeEntity> findAllByCommunityArticle(CommunityArticleEntity communityArticle);
 
-    void deleteAllByCommunityArticleAndMemberEntity(CommunityArticle communityArticle, MemberEntity member);
+    void deleteAllByCommunityArticleAndMemberEntity(CommunityArticleEntity communityArticle, MemberEntity member);
 
-    List<CommunityArticleLike> findAllByMemberEntity(MemberEntity member);
+    List<CommunityArticleLikeEntity> findAllByMemberEntity(MemberEntity member);
 }
