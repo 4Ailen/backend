@@ -46,7 +46,8 @@ public class SecurityConfig {
     );
 
     private List<String> ADMIN_SOURCE = List.of(
-            "/admin/**"
+            "/admin/**",
+            "/monitoring/**"
     );
 
 
