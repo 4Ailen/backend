@@ -50,7 +50,7 @@ public class MockAuthBusinessTest {
 
     @BeforeEach
     public void setup() {
-        memberEntity = MemberEntity.builder().email("test@test.com").status(MemberEntity.Status.APPLIED).build();
+        memberEntity = MemberEntity.builder().email("test@test.com").status(MemberEntity.Status.AppliedAndNotMatched).build();
         accessToken = AuthToken.of("access_token", mock(Key.class));
         refreshToken = AuthToken.of("refresh_token", mock(Key.class));
     }

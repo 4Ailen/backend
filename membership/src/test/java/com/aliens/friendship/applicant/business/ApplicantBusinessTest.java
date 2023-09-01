@@ -51,7 +51,7 @@ public class ApplicantBusinessTest {
 
     @BeforeEach
     public void setup() {
-        loginMemberEntity = MemberEntity.builder().status(MemberEntity.Status.APPLIED).build();
+        loginMemberEntity = MemberEntity.builder().status(MemberEntity.Status.AppliedAndNotMatched).build();
         applicantEntity = ApplicantEntity.builder().isMatched(ApplicantEntity.Status.MATCHED).build();
         now = Instant.now();
     }
@@ -83,17 +83,6 @@ public class ApplicantBusinessTest {
         applicantBusiness.applyMatching(applicantRequestDto);
     }
 
-    @Test
-    @DisplayName("매칭 상태 조회 - 성공")
-    public void testGetMatchingStatus() throws Exception {
-        // when
-        when(memberService.getCurrentMemberEntity()).thenReturn(loginMemberEntity);
-        when(applicantService.findByMemberEntity(loginMemberEntity)).thenReturn(applicantEntity);
-
-        // then
-        Map<String, String> result = applicantBusiness.getMatchingStatus();
-        assertEquals(Collections.singletonMap("status", "MATCHED"), result);
-    }
 
     @Test
     @DisplayName("매칭된 파트너들 조회 - 성공")

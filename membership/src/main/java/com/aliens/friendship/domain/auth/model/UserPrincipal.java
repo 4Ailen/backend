@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-import static com.aliens.db.member.entity.MemberEntity.Status.APPLIED;
+import static com.aliens.db.member.entity.MemberEntity.Status.WITHDRAWN;
 
 @Getter
 public class UserPrincipal implements UserDetails {
@@ -33,22 +33,22 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return this.memberStatus == APPLIED;
+        return this.memberStatus != WITHDRAWN;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return this.memberStatus == APPLIED;
+        return this.memberStatus != WITHDRAWN;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.memberStatus == APPLIED;
+        return this.memberStatus != WITHDRAWN;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.memberStatus == APPLIED;
+        return this.memberStatus != WITHDRAWN;
     }
 
     private UserPrincipal(

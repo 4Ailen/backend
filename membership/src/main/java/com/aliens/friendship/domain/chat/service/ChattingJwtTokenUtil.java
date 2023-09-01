@@ -19,7 +19,7 @@ public class ChattingJwtTokenUtil {
 
     @Value("${app.jwt.secret.chatting-access-token-secret-key}")
     private String secret;
-    long tokenValidityInSeconds =  	172800;
+    long tokenValidityInSeconds =  	259200;
 
 
     public String generateToken(Long memberId,List<Long> roomIds ) {
