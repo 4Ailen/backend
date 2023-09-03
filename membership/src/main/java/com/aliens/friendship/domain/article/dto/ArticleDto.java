@@ -20,7 +20,7 @@ public class ArticleDto {
     private String content;
     private Integer likeCount;
     private Integer commentsCount;
-    private List<String> images;
+    private List<String> imageUrls;
     private Instant createdAt;
     private MemberDto member;
 
@@ -31,7 +31,7 @@ public class ArticleDto {
             String content,
             Integer likeCount,
             Integer commentsCount,
-            List<String> images,
+            List<String> imageUrls,
             Instant createdAt,
             MemberDto member
     ) {
@@ -41,7 +41,7 @@ public class ArticleDto {
         this.content = content;
         this.likeCount = likeCount;
         this.commentsCount = commentsCount;
-        this.images = images;
+        this.imageUrls = imageUrls;
         this.createdAt = createdAt;
         this.member = member;
     }
@@ -50,7 +50,7 @@ public class ArticleDto {
             CommunityArticleEntity communityArticle,
             Integer likeCount,
             Integer commentCount,
-            List<String> images
+            List<String> imageUrls
     ) {
         return new ArticleDto(
                 communityArticle.getId(),
@@ -59,7 +59,7 @@ public class ArticleDto {
                 communityArticle.getContent(),
                 likeCount,
                 commentCount,
-                images,
+                imageUrls,
                 communityArticle.getCreatedAt(),
                 MemberDto.from(communityArticle.getMember())
         );
@@ -69,7 +69,7 @@ public class ArticleDto {
             MarketArticleEntity marketArticle,
             Integer likeCount,
             Integer commentCount,
-            List<String> images
+            List<String> imageUrls
     ) {
         return new ArticleDto(
                 marketArticle.getId(),
@@ -78,7 +78,7 @@ public class ArticleDto {
                 marketArticle.getContent(),
                 likeCount,
                 commentCount,
-                images,
+                imageUrls,
                 marketArticle.getCreatedAt(),
                 MemberDto.from(marketArticle.getMember())
         );
