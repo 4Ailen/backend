@@ -9,6 +9,7 @@ import com.aliens.friendship.domain.article.community.dto.UpdateLikeResponse;
 import com.aliens.friendship.domain.article.community.service.CommunityArticleService;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ListResult;
 import com.aliens.friendship.global.response.SingleResult;
@@ -27,6 +28,7 @@ import java.util.Optional;
 public class CommunityArticleController {
 
     private final CommunityArticleService communityArticleService;
+    private final FcmService fcmService;
 
     /**
      * 커뮤니티 게시글 검색
@@ -131,6 +133,7 @@ public class CommunityArticleController {
         Optional<CommunityArticleLikeEntity> communityArticleLike = communityArticleService.updateArticleLike(articleId, principal);
         UpdateLikeResponse updateLikedResponse;
         if(communityArticleLike.isPresent()){
+            fcmService.sendArticleLikeNoticeToWriter(communityArticleLike.get());
             updateLikedResponse = new UpdateLikeResponse(communityArticleService.getCommunityArticleLikesCount(articleId), true);
         } else{
             updateLikedResponse = new UpdateLikeResponse(communityArticleService.getCommunityArticleLikesCount(articleId), false);

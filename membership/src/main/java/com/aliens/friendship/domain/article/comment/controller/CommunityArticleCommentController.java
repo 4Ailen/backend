@@ -1,10 +1,12 @@
 package com.aliens.friendship.domain.article.comment.controller;
 
+import com.aliens.db.communityarticlecomment.entity.CommunityArticleCommentEntity;
 import com.aliens.friendship.domain.article.comment.dto.ArticleCommentsDto;
 import com.aliens.friendship.domain.article.comment.dto.CreateArticleCommentRequest;
 import com.aliens.friendship.domain.article.comment.dto.UpdateArticleCommentRequest;
 import com.aliens.friendship.domain.article.comment.service.CommunityArticleCommentService;
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ListResult;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 public class CommunityArticleCommentController {
 
     private final CommunityArticleCommentService communityArticleCommentService;
+    private final FcmService fcmService;
 
     @GetMapping("/api/v2/community-articles/{article-id}/comments")
     public ResponseEntity<ListResult<ArticleCommentsDto>> getAllCommunityArticleComments(
@@ -38,12 +41,13 @@ public class CommunityArticleCommentController {
             @PathVariable("article-id") Long articleId,
             @RequestBody CreateArticleCommentRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        communityArticleCommentService.createCommunityArticleComment(
+    ) throws Exception {
+        CommunityArticleCommentEntity communityArticleComment = communityArticleCommentService.createCommunityArticleComment(
                 articleId,
                 request,
                 userPrincipal
         );
+        fcmService.sendArticleCommentNoticeToWriter(communityArticleComment);
 
         return ResponseEntity.ok(
                 CommonResult.of(
@@ -57,12 +61,13 @@ public class CommunityArticleCommentController {
             @PathVariable("article-comment-id") Long commentId,
             @RequestBody CreateArticleCommentRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        communityArticleCommentService.createCommunityArticleCommentReply(
+    ) throws Exception {
+        CommunityArticleCommentEntity communityArticleComment = communityArticleCommentService.createCommunityArticleCommentReply(
                 commentId,
                 request,
                 userPrincipal
         );
+        fcmService.sendArticleCommentReplyNotice(communityArticleComment);
 
         return ResponseEntity.ok(
                 CommonResult.of(
