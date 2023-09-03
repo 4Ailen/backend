@@ -4,6 +4,7 @@ import com.aliens.db.marketbookmark.entity.MarketBookmarkEntity;
 import com.aliens.friendship.domain.article.market.dto.*;
 import com.aliens.friendship.domain.article.market.service.MarketArticleService;
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ListResult;
 import com.aliens.friendship.global.response.SingleResult;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class MarketArticleController {
 
     private final MarketArticleService marketArticleService;
+    private final FcmService fcmService;
 
     /**
      * 장터 게시판 검색
@@ -129,6 +131,7 @@ public class MarketArticleController {
         Optional<MarketBookmarkEntity> marketBookmark = marketArticleService.updateArticleLike(articleId, principal);
         UpdateBookmarkResponse updateBookmarkResponse;
         if(marketBookmark.isPresent()){
+            fcmService.sendArticleLikeNoticeToWriter(marketBookmark.get());
             updateBookmarkResponse = new UpdateBookmarkResponse(marketArticleService.getMarketArticleBookmarkCount(articleId), true);
         } else{
             updateBookmarkResponse = new UpdateBookmarkResponse(marketArticleService.getMarketArticleBookmarkCount(articleId), false);

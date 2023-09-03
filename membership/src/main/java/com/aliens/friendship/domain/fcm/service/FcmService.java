@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FcmService {
     private final PersonalNoticeRepository personalNoticeRepository;
+    private final MarketArticleCommentRepository marketArticleCommentRepository;
     private final CommunityArticleCommentRepository communityArticleCommentRepository;
     private final FcmTokenRepository fcmTokenRepository;
     private final FirebaseMessagingWrapper firebaseMessagingWrapper;
@@ -62,6 +63,25 @@ public class FcmService {
     }
 
     /**
+     * 장터게시판 게시글 좋아요 알림
+     * 알림 대상: 게시글 작성자
+     */
+    public void sendArticleLikeNoticeToWriter(MarketBookmarkEntity marketBookmarkEntity) throws Exception {
+        MarketArticleEntity marketArticle = marketBookmarkEntity.getMarketArticle();
+        String articleUrl = domainUrlAndPort + "/api/v2/market-articles/" + marketArticle.getId();
+        if (!isRecipientCurrentUser(marketArticle.getMember())) {
+            PersonalNoticeEntity personalNotice = personalNoticeRepository.save(PersonalNoticeEntity.of(PersonalNoticeEntity.NoticeType.ARTICLE_LIKE, ArticleCategory.MARKET, marketBookmarkEntity.getMemberEntity(), marketArticle.getMember(), articleUrl));
+
+            // 알림 대상 토큰
+            List<String> writerFcmTokens = getFcmTokens(marketArticle.getMember().getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList());
+
+            // 알림
+            MulticastMessage message = fcmMessageConverter.toArticleLikeNotice(personalNotice, writerFcmTokens);
+            firebaseMessagingWrapper.sendMulticast(message);
+        }
+    }
+
+    /**
      * 게시글 댓글 알림
      * 알림 대상: 게시글 작성자
      */
@@ -73,6 +93,25 @@ public class FcmService {
 
             // 알림 대상 토큰
             List<String> writerFcmTokens = getFcmTokens(communityArticle.getMember().getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList());
+
+            // 알림
+            MulticastMessage message = fcmMessageConverter.toArticleCommentNotice(personalNotice, writerFcmTokens);
+            firebaseMessagingWrapper.sendMulticast(message);
+        }
+    }
+
+    /**
+     * 장터게시판 게시글 댓글 알림
+     * 알림 대상: 게시글 작성자
+     */
+    public void sendArticleCommentNoticeToWriter(MarketArticleCommentEntity marketArticleCommentEntity) throws Exception {
+        MarketArticleEntity marketArticle = marketArticleCommentEntity.getMarketArticle();
+        String articleUrl = domainUrlAndPort + "/api/v2/market-articles/" + marketArticle.getId();
+        if (!isRecipientCurrentUser(marketArticle.getMember())) {
+            PersonalNoticeEntity personalNotice = personalNoticeRepository.save(PersonalNoticeEntity.of(PersonalNoticeEntity.NoticeType.ARTICLE_COMMENT, ArticleCategory.MARKET, marketArticleCommentEntity.getContent(), marketArticleCommentEntity.getMember(), marketArticle.getMember(), articleUrl));
+
+            // 알림 대상 토큰
+            List<String> writerFcmTokens = getFcmTokens(marketArticle.getMember().getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList());
 
             // 알림
             MulticastMessage message = fcmMessageConverter.toArticleCommentNotice(personalNotice, writerFcmTokens);
@@ -111,6 +150,47 @@ public class FcmService {
         for (MemberEntity parentCommentReplyMember : parentCommentReplyMembers) {
             if (!isRecipientCurrentUser(parentCommentReplyMember) && !notifiedMemberIds.contains(parentCommentReplyMember.getId())) {
                 personalNoticeRepository.save(PersonalNoticeEntity.of(PersonalNoticeEntity.NoticeType.ARTICLE_COMMENT_REPLY, communityArticle.getCategory(), communityArticleCommentEntity.getContent(), communityArticleCommentEntity.getMember(), parentCommentReplyMember, articleUrl));
+                fcmTokens.addAll(getFcmTokens(parentCommentReplyMember.getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList()));
+                notifiedMemberIds.add(parentCommentReplyMember.getId());
+            }
+        }
+
+        // 알림
+        MulticastMessage message = fcmMessageConverter.toArticleCommentReplyNotice(personalNotice, fcmTokens);
+        firebaseMessagingWrapper.sendMulticast(message);
+    }
+
+    /**
+     * 장터게시판 게시글 대댓글 알림
+     * 알림 대상: 게시글 작성자, 부모 댓글 작성자, 부모 댓글의 대댓글 작성자 모두
+     */
+    public void sendArticleCommentReplyNotice(MarketArticleCommentEntity marketArticleCommentEntity) throws Exception {
+        MarketArticleEntity marketArticle = marketArticleCommentEntity.getMarketArticle();
+        String articleUrl = domainUrlAndPort + "/api/v2/market-articles/" + marketArticle.getId();
+
+        // 중복 알림 방지
+        Set<Long> notifiedMemberIds = new HashSet<>();
+
+        // 알림 대상 토큰
+        MemberEntity marketArticleMember = marketArticle.getMember();
+        Long parentCommentId = marketArticleCommentEntity.getParentCommentId();
+        MemberEntity parentCommentMember = marketArticleCommentRepository.findById(parentCommentId).get().getMember();
+        List<MemberEntity> parentCommentReplyMembers = marketArticleCommentRepository.findAllByParentCommentId(parentCommentId).stream().map(MarketArticleCommentEntity::getMember).collect(Collectors.toList());
+        List<String> fcmTokens = new ArrayList<>();
+        PersonalNoticeEntity personalNotice = new PersonalNoticeEntity();
+        if (!isRecipientCurrentUser(marketArticleMember)) {
+            fcmTokens.addAll(getFcmTokens(marketArticleMember.getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList()));
+            personalNotice = personalNoticeRepository.save(PersonalNoticeEntity.of(PersonalNoticeEntity.NoticeType.ARTICLE_COMMENT_REPLY, ArticleCategory.MARKET, marketArticleCommentEntity.getContent(), marketArticleCommentEntity.getMember(), marketArticleMember, articleUrl));
+            notifiedMemberIds.add(marketArticleMember.getId());
+        }
+        if (!isRecipientCurrentUser(parentCommentMember) && !notifiedMemberIds.contains(parentCommentMember.getId())) {
+            fcmTokens.addAll(getFcmTokens(parentCommentMember.getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList()));
+            personalNoticeRepository.save(PersonalNoticeEntity.of(PersonalNoticeEntity.NoticeType.ARTICLE_COMMENT_REPLY, ArticleCategory.MARKET, marketArticleCommentEntity.getContent(), marketArticleCommentEntity.getMember(), parentCommentMember, articleUrl));
+            notifiedMemberIds.add(parentCommentMember.getId());
+        }
+        for (MemberEntity parentCommentReplyMember : parentCommentReplyMembers) {
+            if (!isRecipientCurrentUser(parentCommentReplyMember) && !notifiedMemberIds.contains(parentCommentReplyMember.getId())) {
+                personalNoticeRepository.save(PersonalNoticeEntity.of(PersonalNoticeEntity.NoticeType.ARTICLE_COMMENT_REPLY, ArticleCategory.MARKET, marketArticleCommentEntity.getContent(), marketArticleCommentEntity.getMember(), parentCommentReplyMember, articleUrl));
                 fcmTokens.addAll(getFcmTokens(parentCommentReplyMember.getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList()));
                 notifiedMemberIds.add(parentCommentReplyMember.getId());
             }
