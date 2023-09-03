@@ -18,10 +18,6 @@ import javax.persistence.*;
 public class MarketArticleCommentEntity
         extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
     private CommentType type;

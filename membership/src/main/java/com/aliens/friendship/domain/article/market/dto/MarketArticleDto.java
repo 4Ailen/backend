@@ -21,7 +21,7 @@ public class MarketArticleDto {
     private String content;
     private Integer marketArticleBookmarkCount;
     private Integer commentsCount;
-    List<String> images;
+    List<String> imageUrls;
     private Instant createdAt;
     MemberDto member;
 
@@ -34,7 +34,7 @@ public class MarketArticleDto {
             String content,
             Integer marketArticleBookmarkCount,
             Integer commentsCount,
-            List<String> images,
+            List<String> imageUrls,
             Instant createdAt,
             MemberDto member
     ) {
@@ -46,7 +46,7 @@ public class MarketArticleDto {
         this.content = content;
         this.marketArticleBookmarkCount = marketArticleBookmarkCount;
         this.commentsCount = commentsCount;
-        this.images = images;
+        this.imageUrls = imageUrls;
         this.createdAt = createdAt;
         this.member = member;
     }
@@ -60,7 +60,7 @@ public class MarketArticleDto {
             String content,
             Integer marketArticleBookmarkCount,
             Integer commentsCount,
-            List<String> images,
+            List<String> imageUrls,
             Instant createdAt,
             MemberDto member
     ) {
@@ -73,7 +73,7 @@ public class MarketArticleDto {
                 content,
                 marketArticleBookmarkCount,
                 commentsCount,
-                images,
+                imageUrls,
                 createdAt,
                 member
         );
@@ -83,7 +83,7 @@ public class MarketArticleDto {
             MarketArticleEntity marketArticle,
             Integer marketArticleBookmarkCount,
             Integer commentsCount,
-            List<String> images
+            List<String> imageUrls
     ) {
         return new MarketArticleDto(
                 marketArticle.getId(),
@@ -94,7 +94,7 @@ public class MarketArticleDto {
                 marketArticle.getContent(),
                 marketArticleBookmarkCount,
                 commentsCount,
-                images,
+                imageUrls,
                 marketArticle.getCreatedAt(),
                 MemberDto.from(marketArticle.getMember())
         );

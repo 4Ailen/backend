@@ -12,11 +12,11 @@ public interface MarketArticleCommentRepository
 
     List<MarketArticleCommentEntity> findAllByMarketArticle_Id(Long marketArticleId);
 
-    void deleteByMarketArticleAndMember(MarketArticleEntity marketArticle, MemberEntity member);
-
     void deleteAllByMarketArticle(MarketArticleEntity marketArticle);
 
     List<MarketArticleCommentEntity> findAllByParentCommentId(Long parentId);
 
     int countAllByMarketArticle(MarketArticleEntity marketArticle);
+
+    List<MarketArticleCommentEntity> findAllByMember(MemberEntity loginMemberEntity);
 }

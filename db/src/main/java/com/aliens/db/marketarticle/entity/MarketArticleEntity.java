@@ -16,10 +16,6 @@ import javax.persistence.*;
 public class MarketArticleEntity
         extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(length = 100, nullable = false)
     private String title;
 
