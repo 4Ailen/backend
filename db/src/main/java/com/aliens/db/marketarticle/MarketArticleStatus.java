@@ -1,5 +1,6 @@
 package com.aliens.db.marketarticle;
 
+import com.aliens.db.communityarticle.ArticleCategory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -21,5 +22,15 @@ public enum MarketArticleStatus {
 
     public String getValue() {
         return value;
+    }
+
+    public static MarketArticleStatus of(String category) {
+        for (MarketArticleStatus ba : MarketArticleStatus.values()) {
+            if (ba.value.equals(category)) {
+                return ba;
+            }
+        }
+
+        throw new IllegalArgumentException("일치하는 판매상태 없음");
     }
 }
