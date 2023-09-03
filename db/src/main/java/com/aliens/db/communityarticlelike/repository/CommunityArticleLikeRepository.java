@@ -6,6 +6,7 @@ import com.aliens.db.member.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommunityArticleLikeRepository extends JpaRepository<CommunityArticleLikeEntity, Long> {
 
@@ -14,4 +15,6 @@ public interface CommunityArticleLikeRepository extends JpaRepository<CommunityA
     void deleteAllByCommunityArticleAndMemberEntity(CommunityArticleEntity communityArticle, MemberEntity member);
 
     List<CommunityArticleLikeEntity> findAllByMemberEntity(MemberEntity member);
+
+    Optional<CommunityArticleLikeEntity> findByCommunityArticleAndMemberEntity(CommunityArticleEntity communityArticle, MemberEntity member);
 }

@@ -13,6 +13,7 @@ import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.article.community.dto.CreateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.community.dto.UpdateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.global.error.InvalidResourceOwnerException;
 import com.aliens.friendship.global.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.aliens.friendship.domain.article.exception.ArticleExceptionCode.ARTICLE_NOT_FOUND;
@@ -40,6 +42,7 @@ public class CommunityArticleService {
     private final CommunityArticleLikeRepository communityArticleLikeRepository;
     private final CommunityArticleCommentRepository communityArticleCommentRepository;
     private final MemberRepository memberRepository;
+    private final FcmService fcmService;
 
     /**
      * 커뮤니티 게시판 검색
@@ -147,14 +150,29 @@ public class CommunityArticleService {
         communityArticleRepository.delete(savedCommunityArticle);
     }
 
-    public void createArticleLike(
+    public Optional<CommunityArticleLikeEntity> updateArticleLike(
+            Long articleId,
+            UserDetails principal
+    ) {
+        CommunityArticleEntity communityArticle = getCommunityArticleEntity(articleId);
+        MemberEntity member = getMemberEntity(principal.getUsername());
+        Optional<CommunityArticleLikeEntity> communityArticleLike = communityArticleLikeRepository.findByCommunityArticleAndMemberEntity(communityArticle, member);
+        if(communityArticleLike.isPresent()){
+            deleteArticleLike(articleId, principal);
+            return Optional.empty();
+        } else{
+            return Optional.of(createArticleLike(articleId, principal));
+        }
+    }
+
+    private CommunityArticleLikeEntity createArticleLike(
             Long articleId,
             UserDetails principal
     ) {
         CommunityArticleEntity communityArticle = getCommunityArticleEntity(articleId);
         MemberEntity member = getMemberEntity(principal.getUsername());
 
-        communityArticleLikeRepository.save(
+        return communityArticleLikeRepository.save(
                 CommunityArticleLikeEntity.of(
                         communityArticle,
                         member
@@ -162,7 +180,7 @@ public class CommunityArticleService {
         );
     }
 
-    public void deleteArticleLike(
+    private void deleteArticleLike(
             Long articleId,
             UserDetails principal
     ) {
@@ -221,6 +239,11 @@ public class CommunityArticleService {
     }
 
     public Integer getCommunityArticleLikesCount(CommunityArticleEntity communityArticle) {
+        return communityArticleLikeRepository.findAllByCommunityArticle(communityArticle).size();
+    }
+
+    public Integer getCommunityArticleLikesCount(Long communityArticleId) {
+        CommunityArticleEntity communityArticle = communityArticleRepository.findById(communityArticleId).get();
         return communityArticleLikeRepository.findAllByCommunityArticle(communityArticle).size();
     }
 
