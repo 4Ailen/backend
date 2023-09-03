@@ -14,10 +14,6 @@ import javax.persistence.*;
 public class CommunityArticleImageEntity
         extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(length = 1000, nullable = false)
     private String imageUrl;
 

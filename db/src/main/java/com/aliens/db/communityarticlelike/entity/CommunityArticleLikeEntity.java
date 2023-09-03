@@ -15,10 +15,6 @@ import javax.persistence.*;
 public class CommunityArticleLikeEntity
         extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private CommunityArticleEntity communityArticle;
 
