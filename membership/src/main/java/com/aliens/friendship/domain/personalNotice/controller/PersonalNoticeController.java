@@ -25,4 +25,15 @@ public class PersonalNoticeController {
         );
     }
 
+    @GetMapping("/personal-notices")
+    public ResponseEntity<SingleResult<PersonalNoticesDto>> getPersonalNotices() throws Exception {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 알림 목록이 조회되었습니다.",
+                        personalNoticeService.getPersonalNotices()
+                )
+        );
+    }
+
+
 }
