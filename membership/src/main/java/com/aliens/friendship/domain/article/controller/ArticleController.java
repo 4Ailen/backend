@@ -69,4 +69,39 @@ public class ArticleController {
 
         return "forward:/api/v2/community-articles/" + articleId;
     }
+
+
+
+    /**
+     * 내가 작성한 전체 게시글 검색
+     */
+    @ResponseBody
+    @GetMapping("/api/v2/articles/member")
+    public ResponseEntity<ListResult<ArticleDto>> searchMyArticles(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) throws Exception {
+        return ResponseEntity.ok(
+                ListResult.of(
+                        "성공적으로 조회되었습니다.",
+                        articleService.searchMyArticles(pageable).getContent()
+                )
+        );
+    }
+
+    /**
+     * 내가 작성한 전체 댓글의 게시글 검색
+     */
+    @ResponseBody
+    @GetMapping("/api/v2/articles/member/comment")
+    public ResponseEntity<ListResult<ArticleDto>> searchArticlesByMyComments(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) throws Exception {
+        return ResponseEntity.ok(
+                ListResult.of(
+                        "성공적으로 조회되었습니다.",
+                        articleService.searchArticlesByMyComments(pageable).getContent()
+                )
+        );
+    }
+
 }
