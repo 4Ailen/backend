@@ -6,6 +6,7 @@ import com.aliens.db.member.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MarketBookmarkRepository extends JpaRepository<MarketBookmarkEntity, Long> {
 
@@ -16,4 +17,5 @@ public interface MarketBookmarkRepository extends JpaRepository<MarketBookmarkEn
     List<MarketBookmarkEntity> findAllByMemberEntity(MemberEntity member);
 
     int countAllByMarketArticle(MarketArticleEntity marketArticle);
+    Optional<MarketBookmarkEntity> findByMarketArticleAndMemberEntity(MarketArticleEntity marketArticle, MemberEntity member);
 }

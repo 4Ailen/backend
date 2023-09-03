@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.aliens.friendship.domain.article.exception.ArticleExceptionCode.ARTICLE_NOT_FOUND;
@@ -165,17 +166,34 @@ public class MarketArticleService {
         marketArticleRepository.delete(savedMarketArticle);
     }
 
+    public Optional<MarketBookmarkEntity> updateArticleLike(
+            Long articleId,
+            UserDetails principal
+    ) {
+        MarketArticleEntity marketArticle = getMarketArticleEntity(articleId);
+        MemberEntity member = getMemberEntity(principal.getUsername());
+        Optional<MarketBookmarkEntity> marketBookmark = marketBookmarkRepository.findByMarketArticleAndMemberEntity(marketArticle, member);
+        if(marketBookmark.isPresent()){
+            deleteBookmark(articleId, principal);
+            return Optional.empty();
+        } else{
+            return Optional.of(createBookmark(articleId, principal));
+        }
+    }
+
     /**
      * 장터 게시글 북마크 등록
+     *
+     * @return
      */
-    public void createBookmark(
+    private MarketBookmarkEntity createBookmark(
             Long articleId,
             UserDetails principal
     ) {
         MarketArticleEntity marketArticle = getMarketArticleEntity(articleId);
         MemberEntity member = getMemberEntity(principal.getUsername());
 
-        marketBookmarkRepository.save(
+        return marketBookmarkRepository.save(
                 MarketBookmarkEntity.of(
                         marketArticle,
                         member
@@ -186,7 +204,7 @@ public class MarketArticleService {
     /**
      * 장터 게시글 북마크 삭제
      */
-    public void deleteBookmark(
+    private void deleteBookmark(
             Long articleId,
             UserDetails principal
     ) {
@@ -225,6 +243,12 @@ public class MarketArticleService {
 
     @Transactional(readOnly = true)
     public int getMarketArticleBookmarkCount(MarketArticleEntity marketArticle) {
+        return marketBookmarkRepository.countAllByMarketArticle(marketArticle);
+    }
+
+    @Transactional(readOnly = true)
+    public int getMarketArticleBookmarkCount(Long marketArticleId) {
+        MarketArticleEntity marketArticle = marketArticleRepository.findById(marketArticleId).get();
         return marketBookmarkRepository.countAllByMarketArticle(marketArticle);
     }
 
