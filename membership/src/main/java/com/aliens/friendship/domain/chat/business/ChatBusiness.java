@@ -47,29 +47,6 @@ public class ChatBusiness {
         return jwt;
     }
 
-    /**
-     *  매주 화요일 00시  채팅방 일괄 자동닫음
-     */
-    @Transactional
-    @Scheduled(cron = "0 0 0 ? * TUE")
-    public void closeAllChattingRooms() {
-        List<ChattingRoomEntity> chattingRoomEntities = chatService.findAllByStatus(ChattingRoomEntity.RoomStatus.OPEN);
-        for(ChattingRoomEntity chattingRoomEntity : chattingRoomEntities){
-            chattingRoomEntity.updateStatus(ChattingRoomEntity.RoomStatus.CLOSE);
-        }
-        List<MemberEntity> memberEntities = memberService.findAllAppliedMember();
-        for(MemberEntity memberEntity : memberEntities){
-            memberEntity.updateStatus(MemberEntity.Status.NOT_APPLIED);
-        }
-    }
 
-    /**
-     *  매주 목요일 23시 매칭 자동실행
-     */
-    @Transactional
-    @Scheduled(cron = "0 0 23 ? * THU") // 매주 목요일 23시 매칭 진행
-    public void matchingStart() throws Exception {
-        matchBusiness.matchingAllApplicant();
-    }
 
 }

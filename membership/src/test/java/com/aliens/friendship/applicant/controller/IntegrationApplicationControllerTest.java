@@ -173,34 +173,6 @@ public class IntegrationApplicationControllerTest {
 
     }
 
-    @Test
-    @DisplayName("IntegrationController 매칭 상태 조회 - 성공")
-    void testGetMyApplicantStatus_Success() throws Exception {
-        //given
-        memberService.register(memberEntity);
-        TokenDto tokenDto = authBusiness.login(new LoginRequest(email, password), fcmToken);
-
-        applicantService.register(ApplicantEntity.builder().isMatched(ApplicantEntity.Status.NOT_MATCHED)
-                .memberEntity(memberEntity)
-                .firstPreferLanguage(ApplicantEntity.Language.ENGLISH)
-                .secondPreferLanguage(ApplicantEntity.Language.CHINESE)
-                .build());
-
-        mockMvc.perform(
-                        get(BASIC_URL + "/status")
-                                .header("Authorization", "Bearer " + tokenDto.getAccessToken())
-                                .header("RefreshToken", tokenDto.getRefreshToken())
-                )
-                .andExpect(status().isOk())
-                .andDo(document("getMyApplicantStatus",
-                        responseFields(
-                                fieldWithPath("message").description("성공 메시지"),
-                                fieldWithPath("timestamp").description("처리 시간"),
-                                fieldWithPath("data.status").description("매칭 상태")
-                        )
-                ));
-
-    }
 
     @Test
     @DisplayName("IntegrationController 매칭 일시 조회 - 성공")

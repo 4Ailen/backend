@@ -24,15 +24,10 @@ public class MatchingInfoService {
 
 
     @Transactional
-    public void validateApplied(MemberEntity memberEntity) {
-        boolean ApplicantPresent = applicantRepository.findById(memberEntity.getId()).isPresent();
-        if (memberEntity.getStatus().equals(MemberEntity.Status.NOT_APPLIED) && !ApplicantPresent) {
-            memberEntity.updateStatus(MemberEntity.Status.APPLIED);
+    public void validateNotWithdraw(MemberEntity memberEntity) {
+        if (memberEntity.getStatus().equals(MemberEntity.Status.WITHDRAWN)) {
+            throw new WithdrawnMemberWithinAWeekException();
         }
-        else if (memberEntity.getStatus().equals(MemberEntity.Status.WITHDRAWN)) {
-            throw  new WithdrawnMemberWithinAWeekException();
-        }
-
     }
 
 

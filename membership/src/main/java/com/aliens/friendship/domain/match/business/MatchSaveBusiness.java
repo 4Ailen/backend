@@ -39,6 +39,9 @@ public class MatchSaveBusiness {
             // 신청자 매칭완료 상태변경
             applicantService.updateIsMatched(nowApplicantEntity);
 
+            // 멤버 엔티티 매칭완료 상태변경
+            memberService.updateMatched(nowApplicantEntity.getMemberEntity());
+
             // 매칭 객체리스트
             List<ServiceModelMatching> serviceModelMatchings = participant.getServiceModelMatchingList();
 

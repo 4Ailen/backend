@@ -38,7 +38,7 @@ public class ApplicantBusiness {
         MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
 
         // 탈퇴하지 않은 회원 검증
-        matchingInfoService.validateApplied(loginMemberEntity);
+        matchingInfoService.validateNotWithdraw(loginMemberEntity);
 
         //최근 참여기록 검색
         ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
@@ -57,7 +57,7 @@ public class ApplicantBusiness {
         MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
 
         // 탈퇴하지 않은 회원 검증
-        matchingInfoService.validateApplied(loginMemberEntity);
+        matchingInfoService.validateNotWithdraw(loginMemberEntity);
 
         //Dto -> Entity
         ApplicantEntity applicantEntity = applicantConverter.toApplicantEntity(loginMemberEntity,applicantRequestDto);
@@ -69,33 +69,6 @@ public class ApplicantBusiness {
         memberService.changeApplied(loginMemberEntity);
     }
 
-    /**
-     * 매칭 상태 조회
-     */
-    public Map<String, String> getMatchingStatus() throws Exception {
-        // 로그인 회원 엔티티
-        MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
-
-        //상태
-        String status;
-
-        if (loginMemberEntity.getStatus().equals(MemberEntity.Status.APPLIED)) {
-
-            //신청자 엔티티
-            ApplicantEntity applicantEntity = applicantService.findByMemberEntity(loginMemberEntity);
-
-            if (applicantEntity.getIsMatched() == ApplicantEntity.Status.MATCHED) {
-                status = "MATCHED";
-            } else {
-                status = "PENDING";
-            }
-        } else {
-            status = "NOT_APPLIED";
-        }
-
-        //상태 반환
-        return Collections.singletonMap("status", status);
-    }
 
 
     /**
@@ -165,7 +138,7 @@ public class ApplicantBusiness {
         MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
 
         // 탈퇴하지 않은 회원 검증
-        matchingInfoService.validateApplied(loginMemberEntity);
+        matchingInfoService.validateNotWithdraw(loginMemberEntity);
 
         //저장
         applicantService.changePreferLanguages(applicantRequestDto);

@@ -2,7 +2,6 @@ package com.aliens.friendship.domain.member.service;
 
 import com.aliens.db.applicant.entity.ApplicantEntity;
 import com.aliens.db.chatting.entity.ChattingRoomEntity;
-import com.aliens.db.chatting.repository.ChattingRoomRepository;
 import com.aliens.db.matching.entity.MatchingEntity;
 import com.aliens.db.matching.repository.MatchRepository;
 import com.aliens.db.member.entity.MemberEntity;
@@ -12,7 +11,6 @@ import com.aliens.friendship.domain.emailauthentication.exception.EmailAlreadyRe
 import com.aliens.friendship.domain.member.controller.dto.PasswordUpdateRequestDto;
 import com.aliens.friendship.domain.member.exception.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
@@ -24,8 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -37,16 +36,11 @@ public class MemberService {
     private final JavaMailSender javaMailSender;
     private final ApplicantService applicantService;
     private final MatchRepository matchRepository;
-    private final ChattingRoomRepository chattingRoomRepository;
-
-    @Value("${file-server.domain}")
-    private String domainUrl;
 
     @Transactional
-    public boolean changeProfileImage(MemberEntity memberEntity, MultipartFile profileImage) throws Exception {
+    public void changeProfileImage(MemberEntity memberEntity, MultipartFile profileImage) throws Exception {
         memberEntity.updateImageUrl(profileImageService.uploadProfileImage(profileImage));
         memberRepository.save(memberEntity);
-        return true;
     }
 
     @Transactional
@@ -78,13 +72,13 @@ public class MemberService {
     }
 
     @Transactional
-    public void changePassword(MemberEntity memberEntity, String password) throws Exception {
+    public void changePassword(MemberEntity memberEntity, String password) {
         memberEntity.updatePassword(passwordEncoder.encode(password));
         memberRepository.save(memberEntity);
     }
 
     @Transactional
-    public void changeSelfIntroduction(MemberEntity memberEntity, String selfIntroductionChangeRequest) throws Exception {
+    public void changeSelfIntroduction(MemberEntity memberEntity, String selfIntroductionChangeRequest) {
         memberEntity.updateSelfIntroduction(selfIntroductionChangeRequest);
         memberRepository.save(memberEntity);
     }
@@ -95,7 +89,7 @@ public class MemberService {
         memberRepository.save(memberEntity);
     }
 
-    public MemberEntity findByEmailAndName(String email, String name) throws Exception {
+    public MemberEntity findByEmailAndName(String email, String name)  {
         return memberRepository.findByEmailAndName(email,name).orElseThrow(MemberNotFoundException::new);
     }
 
@@ -103,7 +97,7 @@ public class MemberService {
         return memberRepository.findByEmail(email).isPresent();
     }
 
-    public boolean checkDuplicatedAndWithdrawnInAWeekEmail(String email) throws Exception {
+    public boolean checkDuplicatedAndWithdrawnInAWeekEmail(String email) {
         if (memberRepository.findByEmail(email).isPresent()) {
             if (memberRepository.findByEmail(email).get().getStatus() == MemberEntity.Status.WITHDRAWN) {
                 throw new WithdrawnMemberWithinAWeekException();
@@ -125,18 +119,18 @@ public class MemberService {
         return password.toString();
     }
 
-    public void sendTemporaryPassword(MemberEntity memberEntity, String temporaryPassword) throws  Exception{
+    public void sendTemporaryPassword(MemberEntity memberEntity, String temporaryPassword) {
         SimpleMailMessage authenticationMail = createAuthenticationMail(memberEntity.getEmail(), memberEntity.getName(), temporaryPassword);
         javaMailSender.send(authenticationMail);
     }
 
-    public void checkCurrentPassword(String currentPassword, MemberEntity memberEntity) throws Exception {
+    public void checkCurrentPassword(String currentPassword, MemberEntity memberEntity)  {
         if (!passwordEncoder.matches(currentPassword, memberEntity.getPassword())) {
             throw new InvalidMemberPasswordException();
         }
     }
 
-    public void checkSameNewPasswordAndCurrentPassword(PasswordUpdateRequestDto passwordUpdateRequestDto) throws Exception {
+    public void checkSameNewPasswordAndCurrentPassword(PasswordUpdateRequestDto passwordUpdateRequestDto) {
         if (passwordUpdateRequestDto.getNewPassword().equals(passwordUpdateRequestDto.getCurrentPassword())) {
             throw new IdenticalPasswordException();
         }
@@ -150,7 +144,7 @@ public class MemberService {
         return memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
     }
 
-    public boolean checkJoinedEmail(String email) throws Exception {
+    public boolean checkJoinedEmail(String email) {
         if (memberRepository.existsByEmail(email)) {
             throw new EmailAlreadyRegisteredException();
         }
@@ -180,21 +174,41 @@ public class MemberService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String MemberEmail = userDetails.getUsername();
-        MemberEntity memberEntity = findByEmail(MemberEmail);
-        return memberEntity;
+        return findByEmail(MemberEmail);
     }
 
-    public List<MemberEntity> findAllAppliedMember() {
-        return memberRepository.findAllByStatus(MemberEntity.Status.APPLIED);
+    public List<MemberEntity> findAllMatchedMember() {
+        return Stream.concat(
+                        memberRepository.findAllByStatus(MemberEntity.Status.NotAppliedAndMatched).stream(),
+                        memberRepository.findAllByStatus(MemberEntity.Status.AppliedAndMatched).stream())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateMatched(MemberEntity memberEntity) {
+        memberEntity.updateStatus(MemberEntity.Status.NotAppliedAndMatched);
     }
 
     @Transactional
     public void changeApplied(MemberEntity loginMemberEntity) {
-        loginMemberEntity.updateStatus(MemberEntity.Status.APPLIED);
+        if (loginMemberEntity.getStatus() == MemberEntity.Status.NotAppliedAndMatched){
+            loginMemberEntity.updateStatus(MemberEntity.Status.AppliedAndMatched);
+        }
+        else if(loginMemberEntity.getStatus() == MemberEntity.Status.NotAppliedAndNotMatched){
+            loginMemberEntity.updateStatus(MemberEntity.Status.AppliedAndNotMatched);
+        }
     }
 
     private boolean isApplied(MemberEntity memberEntity){
-        return memberEntity.getStatus() == MemberEntity.Status.APPLIED;
+        if (memberEntity.getStatus() == MemberEntity.Status.AppliedAndMatched){
+            return true;
+        }
+        else if (memberEntity.getStatus() == MemberEntity.Status.AppliedAndNotMatched){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     private boolean isMatched(ApplicantEntity applicantEntity){
@@ -207,6 +221,9 @@ public class MemberService {
             matchingEntity.getChattingRoomEntity().updateStatus(ChattingRoomEntity.RoomStatus.CLOSE);
         }
     }
+
+
+
     private String getContentWithNameAndTemporaryPassword(String name,String temporaryPassword){
         String content = "Hello "+name+",\n\n"+
                 "Please use this temporary password to log in, \n"+
@@ -236,4 +253,6 @@ public class MemberService {
                 "4aliens 팀 올림\n";
         return content;
     }
+
+
 }

@@ -58,7 +58,7 @@ public class MemberEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column( nullable = false, length = 45)
     @Builder.Default
-    private Status status = Status.NOT_APPLIED;
+    private Status status = Status.NotAppliedAndNotMatched;
 
     private Instant withdrawalAt;
 
@@ -66,6 +66,7 @@ public class MemberEntity extends BaseEntity {
             cascade = ALL,
             orphanRemoval = true,
             fetch = FetchType.EAGER)
+
     @Builder.Default
     private Set<AuthorityEntity> authorities = new HashSet<>();
 
@@ -125,7 +126,15 @@ public class MemberEntity extends BaseEntity {
     }
 
     public enum Status {
-        APPLIED, NOT_APPLIED, WITHDRAWN;
+        NotAppliedAndMatched,  // 미신청_매칭된 상태
+
+        NotAppliedAndNotMatched,  // 미신청_매칭되지 않은 상태
+
+        AppliedAndNotMatched,  // 신청_매칭되지 않은 상태
+
+        AppliedAndMatched, // 신청_매칭된 상태
+
+        WITHDRAWN;
     }
 
     public enum Mbti {

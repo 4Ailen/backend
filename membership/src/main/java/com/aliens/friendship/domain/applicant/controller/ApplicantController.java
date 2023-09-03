@@ -47,16 +47,6 @@ public class ApplicantController {
         );
     }
 
-    @GetMapping("/status")
-    public ResponseEntity<SingleResult<Map<String, String>>> getStatus() throws Exception {
-        return ResponseEntity.ok(
-                SingleResult.of(
-                        "성공적으로 매칭상태가 조회되었습니다.",
-                        applicantBusiness.getMatchingStatus()
-                )
-        );
-    }
-
 
     @GetMapping("/completion-date")
     public ResponseEntity<SingleResult<Map<String, String>>> getMatchingRemainingPeriod() throws Exception {

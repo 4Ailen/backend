@@ -1,12 +1,18 @@
 package com.aliens.friendship.domain.match.business;
 
 import com.aliens.db.applicant.entity.ApplicantEntity;
+import com.aliens.db.chatting.entity.ChattingRoomEntity;
+import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.friendship.domain.applicant.service.ApplicantService;
+import com.aliens.friendship.domain.chat.service.ChatService;
 import com.aliens.friendship.domain.match.converter.MatchConverter;
 import com.aliens.friendship.domain.match.service.model.Participant;
 import com.aliens.friendship.domain.match.service.model.ServiceModelMatching;
+import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.common.annotation.Business;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,6 +20,8 @@ import java.util.stream.Collectors;
 @Business
 @RequiredArgsConstructor
 public class MatchBusiness {
+    private final MemberService memberService;
+    private final ChatService chatService;
     private final MatchConverter matchConverter;
     private final MatchSaveBusiness matchSaveBusiness;
     private final ApplicantService applicantService;
@@ -156,6 +164,35 @@ public class MatchBusiness {
         }
 
         return false;
+    }
+
+
+
+    /**
+     *  매주 화요일과 목요일 23시 매칭 진행
+     */
+    @Transactional
+    @Scheduled(cron = "0 0 23 ? * TUE,THU") // 매주 화요일과 목요일 23시 매칭 진행
+    public void tuesdayMatchingStart() throws Exception {
+
+        List<ChattingRoomEntity> chattingRoomEntities = chatService.findAllByStatus(ChattingRoomEntity.RoomStatus.OPEN);
+        for(ChattingRoomEntity chattingRoomEntity : chattingRoomEntities){
+            chattingRoomEntity.updateStatus(ChattingRoomEntity.RoomStatus.CLOSE);
+        }
+
+        List<MemberEntity> memberEntities = memberService.findAllMatchedMember();
+        // 매칭된 상태를 일괄 매칭안됨으로 변경
+        for(MemberEntity memberEntity : memberEntities){
+            if (memberEntity.getStatus() == MemberEntity.Status.AppliedAndMatched)
+            {
+                memberEntity.updateStatus(MemberEntity.Status.AppliedAndNotMatched);
+            }
+            else if (memberEntity.getStatus() == MemberEntity.Status.NotAppliedAndMatched){
+                memberEntity.updateStatus(MemberEntity.Status.NotAppliedAndNotMatched);
+            }
+        }
+
+        matchingAllApplicant();
     }
 }
 
