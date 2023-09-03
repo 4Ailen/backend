@@ -60,12 +60,12 @@ public class CommunityArticleCommentService {
         return result;
     }
 
-    public void createCommunityArticleComment(
+    public CommunityArticleCommentEntity createCommunityArticleComment(
             Long articleId,
             CreateArticleCommentRequest request,
             UserDetails principal
     ) {
-        communityArticleCommentRepository.save(
+        return communityArticleCommentRepository.save(
                 CommunityArticleCommentEntity.of(
                         request.getContent(),
                         PARENT,
@@ -76,12 +76,12 @@ public class CommunityArticleCommentService {
         );
     }
 
-    public void createCommunityArticleCommentReply(
+    public CommunityArticleCommentEntity createCommunityArticleCommentReply(
             Long commentId,
             CreateArticleCommentRequest request,
             UserDetails principal
     ) {
-        communityArticleCommentRepository.save(
+        return communityArticleCommentRepository.save(
                 CommunityArticleCommentEntity.of(
                         request.getContent(),
                         CHILD,

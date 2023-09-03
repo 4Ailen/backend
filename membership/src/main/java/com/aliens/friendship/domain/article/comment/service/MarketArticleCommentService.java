@@ -60,12 +60,12 @@ public class MarketArticleCommentService {
         return result;
     }
 
-    public void createMarketArticleComment(
+    public MarketArticleCommentEntity createMarketArticleComment(
             Long articleId,
             CreateArticleCommentRequest request,
             UserDetails principal
     ) {
-        marketArticleCommentRepository.save(
+        return marketArticleCommentRepository.save(
                 MarketArticleCommentEntity.of(
                         request.getContent(),
                         PARENT,
@@ -76,13 +76,13 @@ public class MarketArticleCommentService {
         );
     }
 
-    public void createMarketArticleCommentReply(
+    public MarketArticleCommentEntity createMarketArticleCommentReply(
             Long articleId,
             Long commentId,
             CreateArticleCommentRequest request,
             UserDetails principal
     ) {
-        marketArticleCommentRepository.save(
+        return marketArticleCommentRepository.save(
                 MarketArticleCommentEntity.of(
                         request.getContent(),
                         CHILD,

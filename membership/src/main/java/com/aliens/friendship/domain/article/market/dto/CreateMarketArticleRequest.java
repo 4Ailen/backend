@@ -5,24 +5,26 @@ import com.aliens.db.marketarticle.ProductStatus;
 import com.aliens.db.marketarticle.entity.MarketArticleEntity;
 import com.aliens.db.member.entity.MemberEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@NoArgsConstructor
 @Getter
 public class CreateMarketArticleRequest {
 
     private String title;
-    private MarketArticleStatus status;
+    private String status;
     private Integer price;
-    private ProductStatus productStatus;
+    private String productStatus;
     private String content;
     private List<String> imageUrls;
 
     private CreateMarketArticleRequest(
             String title,
-            MarketArticleStatus status,
+            String status,
             Integer price,
-            ProductStatus productStatus,
+            String productStatus,
             String content,
             List<String> imageUrls
     ) {
@@ -36,9 +38,9 @@ public class CreateMarketArticleRequest {
 
     public static CreateMarketArticleRequest of(
             String title,
-            MarketArticleStatus status,
+            String status,
             Integer price,
-            ProductStatus productStatus,
+            String productStatus,
             String content,
             List<String> imageUrls
     ) {
@@ -57,9 +59,9 @@ public class CreateMarketArticleRequest {
     ) {
         return MarketArticleEntity.of(
                 title,
-                status,
+                MarketArticleStatus.of(status),
                 price,
-                productStatus,
+                ProductStatus.of(productStatus),
                 content,
                 member
         );

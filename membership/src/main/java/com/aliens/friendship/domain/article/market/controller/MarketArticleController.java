@@ -1,11 +1,10 @@
 package com.aliens.friendship.domain.article.market.controller;
 
-import com.aliens.friendship.domain.article.market.dto.CreateMarketArticleRequest;
-import com.aliens.friendship.domain.article.market.dto.CreateMarketResponse;
-import com.aliens.friendship.domain.article.market.dto.MarketArticleDto;
-import com.aliens.friendship.domain.article.market.dto.UpdateMarketArticleRequest;
+import com.aliens.db.marketbookmark.entity.MarketBookmarkEntity;
+import com.aliens.friendship.domain.article.market.dto.*;
 import com.aliens.friendship.domain.article.market.service.MarketArticleService;
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ListResult;
 import com.aliens.friendship.global.response.SingleResult;
@@ -17,12 +16,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/market-articles")
 @RestController
 public class MarketArticleController {
 
     private final MarketArticleService marketArticleService;
+    private final FcmService fcmService;
 
     /**
      * 장터 게시판 검색
@@ -122,35 +124,23 @@ public class MarketArticleController {
     }
 
     @PostMapping("/{article-id}/bookmarks")
-    public ResponseEntity<CommonResult> createBookmark(
+    public ResponseEntity<SingleResult<UpdateBookmarkResponse>> createBookmark(
             @PathVariable("article-id") Long articleId,
             @AuthenticationPrincipal UserPrincipal principal
-    ) {
-        marketArticleService.createBookmark(
-                articleId,
-                principal
-        );
+    ) throws Exception {
+        Optional<MarketBookmarkEntity> marketBookmark = marketArticleService.updateArticleLike(articleId, principal);
+        UpdateBookmarkResponse updateBookmarkResponse;
+        if(marketBookmark.isPresent()){
+            fcmService.sendArticleLikeNoticeToWriter(marketBookmark.get());
+            updateBookmarkResponse = new UpdateBookmarkResponse(marketArticleService.getMarketArticleBookmarkCount(articleId), true);
+        } else{
+            updateBookmarkResponse = new UpdateBookmarkResponse(marketArticleService.getMarketArticleBookmarkCount(articleId), false);
+        }
 
         return ResponseEntity.ok(
-                CommonResult.of(
-                        "성공적으로 북마크가 등록되었습니다."
-                )
-        );
-    }
-
-    @DeleteMapping("/{article-id}/bookmarks")
-    public ResponseEntity<CommonResult> deleteBookmark(
-            @PathVariable("article-id") Long articleId,
-            @AuthenticationPrincipal UserPrincipal principal
-    ) {
-        marketArticleService.deleteBookmark(
-                articleId,
-                principal
-        );
-
-        return ResponseEntity.ok(
-                CommonResult.of(
-                        "성공적으로 북마크가 해제되었습니다."
+                SingleResult.of(
+                        "성공적으로 북마크가 처리되었습니다.",
+                        updateBookmarkResponse
                 )
         );
     }

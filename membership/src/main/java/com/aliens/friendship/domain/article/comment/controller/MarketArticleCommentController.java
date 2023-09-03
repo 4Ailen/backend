@@ -1,10 +1,12 @@
 package com.aliens.friendship.domain.article.comment.controller;
 
+import com.aliens.db.marketarticlecomment.entity.MarketArticleCommentEntity;
 import com.aliens.friendship.domain.article.comment.dto.ArticleCommentsDto;
 import com.aliens.friendship.domain.article.comment.dto.CreateArticleCommentRequest;
 import com.aliens.friendship.domain.article.comment.dto.UpdateArticleCommentRequest;
 import com.aliens.friendship.domain.article.comment.service.MarketArticleCommentService;
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ListResult;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 public class MarketArticleCommentController {
 
     private final MarketArticleCommentService marketArticleCommentService;
+    private final FcmService fcmService;
 
     @GetMapping("/api/v2/market-articles/{article-id}/market-article-comments")
     public ResponseEntity<ListResult<ArticleCommentsDto>> getAllMarketArticleComment(
@@ -38,12 +41,13 @@ public class MarketArticleCommentController {
             @PathVariable("article-id") Long marketArticleId,
             @RequestBody CreateArticleCommentRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        marketArticleCommentService.createMarketArticleComment(
+    ) throws Exception {
+        MarketArticleCommentEntity marketArticleComment = marketArticleCommentService.createMarketArticleComment(
                 marketArticleId,
                 request,
                 userPrincipal
         );
+        fcmService.sendArticleCommentNoticeToWriter(marketArticleComment);
 
         return ResponseEntity.ok(
                 CommonResult.of(
@@ -58,13 +62,14 @@ public class MarketArticleCommentController {
             @PathVariable("article-comment-id") Long marketArticleCommentId,
             @RequestBody CreateArticleCommentRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        marketArticleCommentService.createMarketArticleCommentReply(
+    ) throws Exception {
+        MarketArticleCommentEntity marketArticleComment = marketArticleCommentService.createMarketArticleCommentReply(
                 marketArticleId,
                 marketArticleCommentId,
                 request,
                 userPrincipal
         );
+        fcmService.sendArticleCommentReplyNotice(marketArticleComment);
 
         return ResponseEntity.ok(
                 CommonResult.of(

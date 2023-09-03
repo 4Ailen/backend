@@ -1,12 +1,15 @@
 package com.aliens.friendship.domain.article.community.controller;
 
 import com.aliens.db.communityarticle.ArticleCategory;
+import com.aliens.db.communityarticlelike.entity.CommunityArticleLikeEntity;
 import com.aliens.friendship.domain.article.community.dto.CreateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.community.dto.CreateCommunityArticleResponse;
 import com.aliens.friendship.domain.article.community.dto.UpdateCommunityArticleRequest;
+import com.aliens.friendship.domain.article.community.dto.UpdateLikeResponse;
 import com.aliens.friendship.domain.article.community.service.CommunityArticleService;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
 import com.aliens.friendship.domain.auth.model.UserPrincipal;
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.ListResult;
 import com.aliens.friendship.global.response.SingleResult;
@@ -18,11 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @RestController
 public class CommunityArticleController {
 
     private final CommunityArticleService communityArticleService;
+    private final FcmService fcmService;
 
     /**
      * 커뮤니티 게시글 검색
@@ -120,35 +126,23 @@ public class CommunityArticleController {
     }
 
     @PostMapping("/api/v2/community-articles/{article-id}/likes")
-    public ResponseEntity<CommonResult> createCommunityArticleLike(
+    public ResponseEntity<SingleResult<UpdateLikeResponse>> createCommunityArticleLike(
             @PathVariable("article-id") Long articleId,
             @AuthenticationPrincipal UserPrincipal principal
-    ) {
-        communityArticleService.createArticleLike(
-                articleId,
-                principal
-        );
+    ) throws Exception {
+        Optional<CommunityArticleLikeEntity> communityArticleLike = communityArticleService.updateArticleLike(articleId, principal);
+        UpdateLikeResponse updateLikedResponse;
+        if(communityArticleLike.isPresent()){
+            fcmService.sendArticleLikeNoticeToWriter(communityArticleLike.get());
+            updateLikedResponse = new UpdateLikeResponse(communityArticleService.getCommunityArticleLikesCount(articleId), true);
+        } else{
+            updateLikedResponse = new UpdateLikeResponse(communityArticleService.getCommunityArticleLikesCount(articleId), false);
+        }
 
         return ResponseEntity.ok(
-                CommonResult.of(
-                        "성공적으로 좋아요가 등록되었습니다."
-                )
-        );
-    }
-
-    @DeleteMapping("/api/v2/community-articles/{article-id}/likes")
-    public ResponseEntity<CommonResult> deleteCommunityArticleLike(
-            @PathVariable("article-id") Long articleId,
-            @AuthenticationPrincipal UserPrincipal principal
-    ) {
-        communityArticleService.deleteArticleLike(
-                articleId,
-                principal
-        );
-
-        return ResponseEntity.ok(
-                CommonResult.of(
-                        "성공적으로 좋아요가 해제되었습니다."
+                SingleResult.of(
+                        "성공적으로 좋아요가 처리되었습니다.",
+                        updateLikedResponse
                 )
         );
     }

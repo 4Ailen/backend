@@ -40,3 +40,4 @@ membership/src/main/resources/application-mysql.properties
 
 ### application.yml dev
 membership/src/main/resources/application-dev.yml
+/membership/src/main/resources/firebase/
