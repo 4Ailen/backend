@@ -28,6 +28,6 @@ public class MatchingEntity extends BaseEntity {
     @JoinColumn(name = "chattingroom_Id", nullable = false)
     private ChattingRoomEntity chattingRoomEntity;
 
-    private Instant matchingDate;
+    private Instant matchingDate; //매칭 날짜와 생성 날짜는 다르다.
 
 }
