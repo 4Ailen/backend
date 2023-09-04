@@ -1,12 +1,9 @@
 package com.aliens.friendship.domain.applicant.controller;
 
-import com.aliens.db.applicant.repository.ApplicantRepository;
-import com.aliens.db.matching.repository.MatchRepository;
 import com.aliens.friendship.domain.applicant.business.ApplicantBusiness;
 import com.aliens.friendship.domain.applicant.controller.dto.ApplicantRequestDto;
 import com.aliens.friendship.domain.applicant.controller.dto.ApplicantResponseDto;
 import com.aliens.friendship.domain.applicant.controller.dto.PartnersResponseDto;
-import com.aliens.friendship.domain.match.business.MatchBusiness;
 import com.aliens.friendship.global.response.CommonResult;
 import com.aliens.friendship.global.response.SingleResult;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +19,7 @@ import java.util.Map;
 @Slf4j
 public class ApplicantController {
 
-    private final MatchBusiness matchBusiness;
     private final ApplicantBusiness applicantBusiness;
-    private final MatchRepository matchRepository;
-    private final ApplicantRepository applicantRepository;
 
     @PostMapping()
     public ResponseEntity<CommonResult> applyMatching(@RequestBody ApplicantRequestDto applicantRequestDto) throws Exception {
@@ -78,6 +72,15 @@ public class ApplicantController {
         );
     }
 
+    @GetMapping("/status")
+    public ResponseEntity<SingleResult<Map<String, String>>> getStatus() throws Exception {
+        return ResponseEntity.ok(
+                SingleResult.of(
+                        "성공적으로 매칭상태가 조회되었습니다.",
+                        applicantBusiness.getMatchingStatus()
+                )
+        );
+    }
 
 }
 

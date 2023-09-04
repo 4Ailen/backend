@@ -15,7 +15,7 @@ import static com.aliens.db.communityarticle.ArticleCategory.MARKET;
 public class ArticleDto {
 
     private Long articleId;
-    private ArticleCategory category;
+    private String category;
     private String title;
     private String content;
     private Integer likeCount;
@@ -36,7 +36,7 @@ public class ArticleDto {
             MemberDto member
     ) {
         this.articleId = articleId;
-        this.category = category;
+        this.category = category.getValue();
         this.title = title;
         this.content = content;
         this.likeCount = likeCount;

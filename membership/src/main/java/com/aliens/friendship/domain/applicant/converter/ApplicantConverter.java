@@ -8,7 +8,6 @@ import com.aliens.friendship.domain.applicant.controller.dto.ApplicantResponseDt
 import com.aliens.friendship.domain.applicant.controller.dto.PartnersResponseDto;
 import com.aliens.friendship.global.common.annotation.Converter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -18,9 +17,6 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 @Converter
 public class ApplicantConverter {
-
-    @Value("${file-server.domain}")
-    private String domainUrl;
 
     public ApplicantResponseDto toApplicantResponseDto(ApplicantEntity applicantEntity) throws Exception {
         ApplicantResponseDto.Member applicantDto = ApplicantResponseDto.Member.builder()
