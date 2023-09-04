@@ -135,6 +135,7 @@ public class MemberEntity extends BaseEntity {
         AppliedAndMatched, // 신청_매칭된 상태
 
         WITHDRAWN;
+
     }
 
     public enum Mbti {

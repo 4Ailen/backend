@@ -144,4 +144,18 @@ public class ApplicantBusiness {
         applicantService.changePreferLanguages(applicantRequestDto);
     }
 
+
+    /**
+     * 매칭 상태 조회
+     */
+    public Map<String, String> getMatchingStatus() throws Exception {
+        // 로그인 회원 엔티티
+        MemberEntity loginMemberEntity  = memberService.getCurrentMemberEntity();
+
+        //상태
+        String status = loginMemberEntity.getStatus().toString();
+
+        //상태 반환
+        return Collections.singletonMap("status", status);
+    }
 }

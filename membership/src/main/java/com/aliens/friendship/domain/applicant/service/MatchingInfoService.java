@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MatchingInfoService {
 
-    private final ApplicantRepository applicantRepository;
     private final MatchRepository matchRepository;
 
 
