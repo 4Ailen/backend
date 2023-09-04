@@ -1,52 +1,20 @@
 package com.aliens.friendship.domain.article.market.dto;
 
-import com.aliens.db.marketarticle.MarketArticleStatus;
-import com.aliens.db.marketarticle.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Getter
+@Getter @Setter
 public class UpdateMarketArticleRequest {
 
     private String title;
-    private MarketArticleStatus status;
+    private String status;
     private Integer price;
-    private ProductStatus productStatus;
+    private String productStatus;
     private String content;
-    private List<String> imageUrls;
-
-    private UpdateMarketArticleRequest(
-            String title,
-            MarketArticleStatus status,
-            Integer price,
-            ProductStatus productStatus,
-            String content,
-            List<String> imageUrls
-    ) {
-        this.title = title;
-        this.status = status;
-        this.price = price;
-        this.productStatus = productStatus;
-        this.content = content;
-        this.imageUrls = imageUrls;
-    }
-
-    public static UpdateMarketArticleRequest of(
-            String title,
-            MarketArticleStatus status,
-            Integer price,
-            ProductStatus productStatus,
-            String content,
-            List<String> imageUrls
-    ) {
-        return new UpdateMarketArticleRequest(
-                title,
-                status,
-                price,
-                productStatus,
-                content,
-                imageUrls
-        );
-    }
+    @JsonIgnore
+    private List<MultipartFile> imageUrls;
 }
