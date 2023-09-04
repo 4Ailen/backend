@@ -13,15 +13,17 @@ import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.article.community.dto.CreateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.community.dto.UpdateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
-import com.aliens.friendship.domain.fcm.service.FcmService;
+import com.aliens.friendship.domain.article.service.ArticleImageService;
 import com.aliens.friendship.global.error.InvalidResourceOwnerException;
 import com.aliens.friendship.global.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,9 @@ public class CommunityArticleService {
     private final CommunityArticleLikeRepository communityArticleLikeRepository;
     private final CommunityArticleCommentRepository communityArticleCommentRepository;
     private final MemberRepository memberRepository;
-    private final FcmService fcmService;
+    private final ArticleImageService articleImageService;
+    @Value("${file-server.domain}")
+    private String domainUrl;
 
     /**
      * 커뮤니티 게시판 검색
@@ -97,14 +101,14 @@ public class CommunityArticleService {
     public Long saveCommunityArticle(
             CreateCommunityArticleRequest request,
             UserDetails principal
-    ) {
+    ) throws Exception {
         CommunityArticleEntity communityArticle = communityArticleRepository.save(
                 request.toEntity(getMemberEntity(principal.getUsername()))
         );
 
-        for (String imageUrl : request.getImageUrls()) {
+        for (MultipartFile imageUrl : request.getImageUrls()) {
             CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
-                    imageUrl,
+                    articleImageService.uploadProfileImage(imageUrl),
                     communityArticle
             );
             communityArticleImageRepository.save(communityArticleImage);
@@ -117,7 +121,7 @@ public class CommunityArticleService {
             Long articleId,
             UpdateCommunityArticleRequest request,
             UserDetails principal
-    ) {
+    ) throws Exception {
         CommunityArticleEntity savedCommunityArticle = getCommunityArticleEntity(articleId);
 
         verifyResourceOwner(savedCommunityArticle, getMemberEntity(principal.getUsername()));
@@ -129,9 +133,9 @@ public class CommunityArticleService {
 
         communityArticleImageRepository.deleteAllByCommunityArticle(savedCommunityArticle);
 
-        for (String imageUrl : request.getImageUrls()) {
+        for (MultipartFile imageUrl : request.getImageUrls()) {
             CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
-                    imageUrl,
+                    articleImageService.uploadProfileImage(imageUrl),
                     savedCommunityArticle
             );
             communityArticleImageRepository.save(communityArticleImage);
@@ -205,7 +209,7 @@ public class CommunityArticleService {
         for (CommunityArticleEntity communityArticle : communityArticles) {
             List<String> images = communityArticleImageRepository.findAllByCommunityArticle(communityArticle)
                     .stream()
-                    .map(CommunityArticleImageEntity::getImageUrl)
+                    .map(imageEntity -> domainUrl + imageEntity.getImageUrl())
                     .collect(Collectors.toList());
             results.add(
                     ArticleDto.from(
@@ -250,7 +254,7 @@ public class CommunityArticleService {
     public List<String> getCommunityArticleImages(CommunityArticleEntity communityArticle) {
         return communityArticleImageRepository.findAllByCommunityArticle(communityArticle)
                 .stream()
-                .map(CommunityArticleImageEntity::getImageUrl)
+                .map(imageEntity -> domainUrl + imageEntity.getImageUrl())
                 .collect(Collectors.toList());
     }
 
