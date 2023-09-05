@@ -65,9 +65,9 @@ public class MarketArticleController {
      */
     @PostMapping
     public ResponseEntity<SingleResult<CreateMarketResponse>> createMarketArticle(
-            @RequestBody CreateMarketArticleRequest request,
+            CreateMarketArticleRequest request,
             @AuthenticationPrincipal UserPrincipal principal
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(
                 SingleResult.of(
                         "성공적으로 생성되었습니다.",
@@ -87,9 +87,9 @@ public class MarketArticleController {
     @PatchMapping("/{article-id}")
     public ResponseEntity<CommonResult> updateMarketArticle(
             @PathVariable("article-id") Long articleId,
-            @RequestBody UpdateMarketArticleRequest request,
+            UpdateMarketArticleRequest request,
             @AuthenticationPrincipal UserPrincipal principal
-    ) {
+    ) throws Exception {
         marketArticleService.updateMarketArticle(
                 articleId,
                 request,

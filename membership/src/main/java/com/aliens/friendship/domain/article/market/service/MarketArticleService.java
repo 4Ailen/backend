@@ -1,5 +1,7 @@
 package com.aliens.friendship.domain.article.market.service;
 
+import com.aliens.db.marketarticle.MarketArticleStatus;
+import com.aliens.db.marketarticle.ProductStatus;
 import com.aliens.db.marketarticle.entity.MarketArticleEntity;
 import com.aliens.db.marketarticle.repository.MarketArticleRepository;
 import com.aliens.db.marketarticlecomment.repository.MarketArticleCommentRepository;
@@ -13,15 +15,17 @@ import com.aliens.friendship.domain.article.dto.ArticleDto;
 import com.aliens.friendship.domain.article.market.dto.CreateMarketArticleRequest;
 import com.aliens.friendship.domain.article.market.dto.MarketArticleDto;
 import com.aliens.friendship.domain.article.market.dto.UpdateMarketArticleRequest;
-import com.aliens.friendship.domain.member.service.MemberService;
+import com.aliens.friendship.domain.article.service.ArticleImageService;
 import com.aliens.friendship.global.error.InvalidResourceOwnerException;
 import com.aliens.friendship.global.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +46,9 @@ public class MarketArticleService {
     private final MarketBookmarkRepository marketBookmarkRepository;
     private final MemberRepository memberRepository;
     private final MarketArticleCommentRepository marketArticleCommentRepository;
-    private final MemberService memberService;
+    private final ArticleImageService articleImageService;
+    @Value("${file-server.domain}")
+    private String domainUrl;
 
     /**
      * 장터 게시글 검색
@@ -85,7 +91,7 @@ public class MarketArticleService {
         MarketArticleEntity savedMarketArticle = getMarketArticleEntity(articleId);
         List<String> images = productImageRepository.findAllByMarketArticle(savedMarketArticle)
                 .stream()
-                .map(ProductImageEntity::getImageUrl)
+                .map(imageEntity -> domainUrl + imageEntity.getImageUrl())
                 .collect(Collectors.toList());
 
         return MarketArticleDto.from(
@@ -102,15 +108,15 @@ public class MarketArticleService {
     public Long saveMarketArticle(
             CreateMarketArticleRequest request,
             UserDetails userPrincipal
-    ) {
+    ) throws Exception {
 
         MarketArticleEntity savedMarketArticle = marketArticleRepository.save(request.toEntity(
                 getMemberEntity(userPrincipal.getUsername())
         ));
 
-        for (String imageUrl : request.getImageUrls()) {
+        for (MultipartFile imageUrl : request.getImageUrls()) {
             ProductImageEntity productImage = ProductImageEntity.of(
-                    imageUrl,
+                    articleImageService.uploadProfileImage(imageUrl),
                     savedMarketArticle
             );
             productImageRepository.save(productImage);
@@ -126,7 +132,7 @@ public class MarketArticleService {
             Long articleId,
             UpdateMarketArticleRequest request,
             UserDetails userPrincipal
-    ) {
+    ) throws Exception {
 
         MarketArticleEntity savedMarketArticle = getMarketArticleEntity(articleId);
 
@@ -134,17 +140,17 @@ public class MarketArticleService {
 
         savedMarketArticle.update(
                 request.getTitle(),
-                request.getStatus(),
+                MarketArticleStatus.of(request.getStatus()),
                 request.getPrice(),
-                request.getProductStatus(),
+                ProductStatus.of(request.getProductStatus()),
                 request.getContent()
         );
 
         productImageRepository.deleteAllByMarketArticle(savedMarketArticle);
 
-        for (String imageUrl : request.getImageUrls()) {
+        for (MultipartFile imageUrl : request.getImageUrls()) {
             ProductImageEntity productImage = ProductImageEntity.of(
-                    imageUrl,
+                    articleImageService.uploadProfileImage(imageUrl),
                     savedMarketArticle
             );
             productImageRepository.save(productImage);
@@ -231,7 +237,7 @@ public class MarketArticleService {
         for (MarketArticleEntity marketArticle : marketArticles) {
             List<String> images = productImageRepository.findAllByMarketArticle(marketArticle)
                     .stream()
-                    .map(ProductImageEntity::getImageUrl)
+                    .map(imageEntity -> domainUrl + imageEntity.getImageUrl())
                     .collect(Collectors.toList());
             results.add(ArticleDto.from(
                     marketArticle,
@@ -267,7 +273,7 @@ public class MarketArticleService {
     public List<String> getMarketArticleImages(MarketArticleEntity marketArticle) {
         return productImageRepository.findAllByMarketArticle(marketArticle)
                 .stream()
-                .map(ProductImageEntity::getImageUrl)
+                .map(imageEntity -> domainUrl + imageEntity.getImageUrl())
                 .collect(Collectors.toList());
     }
 
