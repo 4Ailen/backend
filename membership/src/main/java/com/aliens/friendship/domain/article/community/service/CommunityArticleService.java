@@ -195,11 +195,10 @@ public class CommunityArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ArticleDto> getAllLikes(
-            UserDetails principal
-    ) {
+    public List<ArticleDto> getAllLikes(MemberEntity loginMemberEntity) throws Exception {
+
         List<CommunityArticleEntity> communityArticles = communityArticleLikeRepository.findAllByMemberEntity(
-                        getMemberEntity(principal.getUsername())
+                        loginMemberEntity
                 )
                 .stream()
                 .map(CommunityArticleLikeEntity::getCommunityArticle)

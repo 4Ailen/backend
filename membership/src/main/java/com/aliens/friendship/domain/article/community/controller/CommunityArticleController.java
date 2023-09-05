@@ -147,15 +147,14 @@ public class CommunityArticleController {
         );
     }
 
-    @GetMapping("/api/v2/community-articles/likes")
-    public ResponseEntity<ListResult<ArticleDto>> getAllLikes(
-            @AuthenticationPrincipal UserPrincipal principal
-    ) {
-        return ResponseEntity.ok(
-                ListResult.of(
-                        "성공적으로 조회되었습니다.",
-                        communityArticleService.getAllLikes(principal)
-                )
-        );
-    }
+//    @GetMapping("/api/v2/community-articles/likes")
+//    public ResponseEntity<ListResult<ArticleDto>> getAllLikes(
+//    ) {
+//        return ResponseEntity.ok(
+//                ListResult.of(
+//                        "성공적으로 조회되었습니다.",
+//                        communityArticleService.getAllLikes()
+//                )
+//        );
+//    }
 }

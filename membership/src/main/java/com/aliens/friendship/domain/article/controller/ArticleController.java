@@ -1,8 +1,10 @@
 package com.aliens.friendship.domain.article.controller;
 
 import com.aliens.db.communityarticle.ArticleCategory;
+import com.aliens.friendship.domain.article.community.service.CommunityArticleService;
 import com.aliens.friendship.domain.article.dto.ArticleCategoryDto;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
+import com.aliens.friendship.domain.article.market.service.MarketArticleService;
 import com.aliens.friendship.domain.article.service.ArticleService;
 import com.aliens.friendship.global.response.ListResult;
 import com.aliens.friendship.global.response.SingleResult;
@@ -103,5 +105,23 @@ public class ArticleController {
                 )
         );
     }
+
+    /**
+     * 내가 좋아요, 찜한 게시글 목록 조회
+     */
+    @ResponseBody
+    @GetMapping("/api/v2/articles/member/like")
+    public ResponseEntity<ListResult<ArticleDto>> searchArticlesByMelike(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) throws Exception {
+
+        return ResponseEntity.ok(
+                ListResult.of(
+                        "성공적으로 조회되었습니다.",
+                        articleService.searchArticlesByMyLike(pageable).getContent()
+                )
+        );
+    }
+
 
 }
