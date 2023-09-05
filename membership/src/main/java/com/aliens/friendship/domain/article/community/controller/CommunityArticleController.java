@@ -71,9 +71,9 @@ public class CommunityArticleController {
      */
     @PostMapping("/api/v2/community-articles")
     public ResponseEntity<SingleResult<CreateCommunityArticleResponse>> saveCommunityArticle(
-            @RequestBody CreateCommunityArticleRequest request,
+            CreateCommunityArticleRequest request,
             @AuthenticationPrincipal UserPrincipal principal
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(
                 SingleResult.of(
                         "성공적으로 생성되었습니다.",
@@ -93,9 +93,9 @@ public class CommunityArticleController {
     @PatchMapping("/api/v2/community-articles/{article-id}")
     public ResponseEntity<CommonResult> updateCommunityArticle(
             @PathVariable("article-id") Long articleId,
-            @RequestBody UpdateCommunityArticleRequest request,
+            UpdateCommunityArticleRequest request,
             @AuthenticationPrincipal UserPrincipal principal
-    ) {
+    ) throws Exception {
         communityArticleService.updateCommunityArticle(
                 articleId,
                 request,
