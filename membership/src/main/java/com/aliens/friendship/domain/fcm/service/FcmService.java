@@ -56,9 +56,11 @@ public class FcmService {
             // 알림 대상 토큰
             List<String> writerFcmTokens = getFcmTokens(communityArticle.getMember().getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList());
 
-            // 알림
-            MulticastMessage message = fcmMessageConverter.toArticleLikeNotice(personalNotice, writerFcmTokens);
-            firebaseMessagingWrapper.sendMulticast(message);
+            if(!writerFcmTokens.isEmpty()){
+                // 알림
+                MulticastMessage message = fcmMessageConverter.toArticleLikeNotice(personalNotice, writerFcmTokens);
+                firebaseMessagingWrapper.sendMulticast(message);
+            }
         }
     }
 
@@ -75,9 +77,11 @@ public class FcmService {
             // 알림 대상 토큰
             List<String> writerFcmTokens = getFcmTokens(marketArticle.getMember().getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList());
 
-            // 알림
-            MulticastMessage message = fcmMessageConverter.toArticleLikeNotice(personalNotice, writerFcmTokens);
-            firebaseMessagingWrapper.sendMulticast(message);
+            if(!writerFcmTokens.isEmpty()){
+                // 알림
+                MulticastMessage message = fcmMessageConverter.toArticleLikeNotice(personalNotice, writerFcmTokens);
+                firebaseMessagingWrapper.sendMulticast(message);
+            }
         }
     }
 
@@ -94,9 +98,11 @@ public class FcmService {
             // 알림 대상 토큰
             List<String> writerFcmTokens = getFcmTokens(communityArticle.getMember().getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList());
 
-            // 알림
-            MulticastMessage message = fcmMessageConverter.toArticleCommentNotice(personalNotice, writerFcmTokens);
-            firebaseMessagingWrapper.sendMulticast(message);
+            if(!writerFcmTokens.isEmpty()){
+                // 알림
+                MulticastMessage message = fcmMessageConverter.toArticleCommentNotice(personalNotice, writerFcmTokens);
+                firebaseMessagingWrapper.sendMulticast(message);
+            }
         }
     }
 
@@ -113,9 +119,11 @@ public class FcmService {
             // 알림 대상 토큰
             List<String> writerFcmTokens = getFcmTokens(marketArticle.getMember().getId()).stream().map(FcmTokenEntity::getValue).collect(Collectors.toList());
 
-            // 알림
-            MulticastMessage message = fcmMessageConverter.toArticleCommentNotice(personalNotice, writerFcmTokens);
-            firebaseMessagingWrapper.sendMulticast(message);
+            if(!writerFcmTokens.isEmpty()){
+                // 알림
+                MulticastMessage message = fcmMessageConverter.toArticleCommentNotice(personalNotice, writerFcmTokens);
+                firebaseMessagingWrapper.sendMulticast(message);
+            }
         }
     }
 
@@ -155,9 +163,11 @@ public class FcmService {
             }
         }
 
-        // 알림
-        MulticastMessage message = fcmMessageConverter.toArticleCommentReplyNotice(personalNotice, fcmTokens);
-        firebaseMessagingWrapper.sendMulticast(message);
+        if(!fcmTokens.isEmpty()){
+            // 알림
+            MulticastMessage message = fcmMessageConverter.toArticleCommentReplyNotice(personalNotice, fcmTokens);
+            firebaseMessagingWrapper.sendMulticast(message);
+        }
     }
 
     /**
@@ -196,9 +206,11 @@ public class FcmService {
             }
         }
 
-        // 알림
-        MulticastMessage message = fcmMessageConverter.toArticleCommentReplyNotice(personalNotice, fcmTokens);
-        firebaseMessagingWrapper.sendMulticast(message);
+        if(!fcmTokens.isEmpty()){
+            // 알림
+            MulticastMessage message = fcmMessageConverter.toArticleCommentReplyNotice(personalNotice, fcmTokens);
+            firebaseMessagingWrapper.sendMulticast(message);
+        }
     }
 
     public List<FcmTokenEntity> getFcmTokens(Long memberId) {
