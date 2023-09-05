@@ -235,4 +235,25 @@ public class ArticleService {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 내가 좋아요, 찜한 게시글 목록 조회
+     */
+    public Page<ArticleDto> searchArticlesByMyLike(
+            Pageable pageable
+    ) throws Exception {
+        MemberEntity loginMemberEntity = memberService.getCurrentMemberEntity();
+        List<ArticleDto> marketArticles = marketArticleService.getAllBookmarks(loginMemberEntity);
+        List<ArticleDto> communityArticles = communityArticleService.getAllLikes(loginMemberEntity);
+
+        List<ArticleDto> results = new ArrayList<>();
+        results.addAll(communityArticles);
+        results.addAll(marketArticles);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), results.size());
+
+        return new PageImpl<>(results.subList(start, end), pageable, results.size());
+    }
+
 }

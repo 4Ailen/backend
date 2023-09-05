@@ -9,9 +9,11 @@ import com.aliens.db.member.entity.MemberEntity;
 import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.db.productimage.entity.ProductImageEntity;
 import com.aliens.db.productimage.repsitory.ProductImageRepository;
+import com.aliens.friendship.domain.article.dto.ArticleDto;
 import com.aliens.friendship.domain.article.market.dto.CreateMarketArticleRequest;
 import com.aliens.friendship.domain.article.market.dto.MarketArticleDto;
 import com.aliens.friendship.domain.article.market.dto.UpdateMarketArticleRequest;
+import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.error.InvalidResourceOwnerException;
 import com.aliens.friendship.global.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class MarketArticleService {
     private final MarketBookmarkRepository marketBookmarkRepository;
     private final MemberRepository memberRepository;
     private final MarketArticleCommentRepository marketArticleCommentRepository;
+    private final MemberService memberService;
 
     /**
      * 장터 게시글 검색
@@ -215,23 +218,22 @@ public class MarketArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<MarketArticleDto> getAllBookmarks(
-            UserDetails principal
-    ) {
+    public List<ArticleDto> getAllBookmarks( MemberEntity loginMemberEntity
+    )  {
         List<MarketArticleEntity> marketArticles = marketBookmarkRepository.findAllByMemberEntity(
-                        getMemberEntity(principal.getUsername())
+                        loginMemberEntity
                 )
                 .stream()
                 .map(MarketBookmarkEntity::getMarketArticle)
                 .collect(Collectors.toList());
 
-        List<MarketArticleDto> results = new ArrayList<>();
+        List<ArticleDto> results = new ArrayList<>();
         for (MarketArticleEntity marketArticle : marketArticles) {
             List<String> images = productImageRepository.findAllByMarketArticle(marketArticle)
                     .stream()
                     .map(ProductImageEntity::getImageUrl)
                     .collect(Collectors.toList());
-            results.add(MarketArticleDto.from(
+            results.add(ArticleDto.from(
                     marketArticle,
                     getMarketArticleCommentsCount(marketArticle),
                     getMarketArticleBookmarkCount(marketArticle),

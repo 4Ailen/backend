@@ -145,17 +145,14 @@ public class MarketArticleController {
         );
     }
 
-    @GetMapping("/bookmarks")
-    public ResponseEntity<ListResult<MarketArticleDto>> getAllBookmarks(
-            @AuthenticationPrincipal UserPrincipal principal
-    ) {
-        return ResponseEntity.ok(
-                ListResult.of(
-                        "성공적으로 조회되었습니다.",
-                        marketArticleService.getAllBookmarks(
-                                principal
-                        )
-                )
-        );
-    }
+//    @GetMapping("/bookmarks")
+//    public ResponseEntity<ListResult<MarketArticleDto>> getAllBookmarks(
+//    ) throws Exception {
+//        return ResponseEntity.ok(
+//                ListResult.of(
+//                        "성공적으로 조회되었습니다.",
+//                        marketArticleService.getAllBookmarks()
+//                )
+//        );
+//    }
 }

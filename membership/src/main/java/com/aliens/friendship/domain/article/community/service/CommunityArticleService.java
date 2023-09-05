@@ -14,6 +14,7 @@ import com.aliens.friendship.domain.article.community.dto.CreateCommunityArticle
 import com.aliens.friendship.domain.article.community.dto.UpdateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
 import com.aliens.friendship.domain.fcm.service.FcmService;
+import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.error.InvalidResourceOwnerException;
 import com.aliens.friendship.global.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -191,11 +192,10 @@ public class CommunityArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ArticleDto> getAllLikes(
-            UserDetails principal
-    ) {
+    public List<ArticleDto> getAllLikes(MemberEntity loginMemberEntity) throws Exception {
+
         List<CommunityArticleEntity> communityArticles = communityArticleLikeRepository.findAllByMemberEntity(
-                        getMemberEntity(principal.getUsername())
+                        loginMemberEntity
                 )
                 .stream()
                 .map(CommunityArticleLikeEntity::getCommunityArticle)
