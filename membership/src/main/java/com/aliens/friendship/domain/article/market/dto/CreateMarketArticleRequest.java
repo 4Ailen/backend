@@ -21,7 +21,6 @@ public class CreateMarketArticleRequest {
     private Integer price;
     private String productStatus;
     private String content;
-    @JsonIgnore
     private List<MultipartFile> imageUrls;
 
     public MarketArticleEntity toEntity(

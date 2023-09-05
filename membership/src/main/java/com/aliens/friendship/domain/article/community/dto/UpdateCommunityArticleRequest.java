@@ -13,7 +13,5 @@ public class UpdateCommunityArticleRequest {
 
     private String title;
     private String content;
-    @ProfileImageValidate
-    @JsonIgnore
     private List<MultipartFile> imageUrls;
 }

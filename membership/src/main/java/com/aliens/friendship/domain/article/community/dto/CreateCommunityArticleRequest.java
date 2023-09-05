@@ -16,10 +16,8 @@ public class CreateCommunityArticleRequest {
 
     private String title;
     private String content;
-    String category;
-
-    @ProfileImageValidate
-    @JsonIgnore
+    private String category;
+    
     private List<MultipartFile> imageUrls;
 
     public CommunityArticleEntity toEntity(MemberEntity member) {
