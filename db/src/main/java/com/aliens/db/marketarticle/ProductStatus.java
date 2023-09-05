@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 public enum ProductStatus {
-    NEW("새 것"),
-    MIDDLE_NEW("거의 새 것"),
-    LITTLE_FLAW("약간의 하자"),
-    USING("사용감 있음");
+    BRAND_NEW("새 것"),
+    ALMOST_NEW("거의 새 것"),
+    SLIGHT_DEFECT("약간의 하자"),
+    USED("사용감 있음");
 
     private final String value;
 
@@ -16,23 +16,17 @@ public enum ProductStatus {
         this.value = value;
     }
 
-    public static MarketArticleStatus from(String value) {
-        for (MarketArticleStatus status : MarketArticleStatus.values()) {
-            if (status.getValue().equals(value)) {
-                return status;
-            }
-        }
-        return null;
-    }
-
     public String getValue() {
         return value;
     }
 
-    public static ProductStatus of(String category) {
-        for (ProductStatus ba : ProductStatus.values()) {
-            if (ba.value.equals(category)) {
-                return ba;
+    public static ProductStatus of(String value) {
+        for (ProductStatus status : ProductStatus.values()) {
+            if (status.value.equals(value)) {
+                return status;
+            }
+            if (status.name().equalsIgnoreCase(value)) {
+                return status;
             }
         }
 
