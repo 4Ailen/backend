@@ -15,29 +15,23 @@ public enum ArticleCategory {
     FOOD("음식게시판"),
     FASHION("패션게시판");
 
-    public static ArticleCategory from(String value) {
-        for (ArticleCategory status : ArticleCategory.values()) {
-            if (status.getValue().equals(value)) {
-                return status;
-            }
-        }
-        return null;
-    }
-
     public String getValue() {
         return value;
     }
 
     private final String value;
 
-    public static ArticleCategory of(String category) {
-        if (category == null) {
+    public static ArticleCategory of(String value) {
+        if (value == null) {
             return ALL;
         }
 
-        for (ArticleCategory ba : ArticleCategory.values()) {
-            if (ba.value.equals(category)) {
-                return ba;
+        for (ArticleCategory category : ArticleCategory.values()) {
+            if (category.value.equals(value)) {
+                return category;
+            }
+            if (category.name().equalsIgnoreCase(value)) {
+                return category;
             }
         }
 

@@ -11,23 +11,17 @@ public enum MarketArticleStatus {
 
     private final String value;
 
-    public static MarketArticleStatus from(String value) {
-        for (MarketArticleStatus status : MarketArticleStatus.values()) {
-            if (status.getValue().equals(value)) {
-                return status;
-            }
-        }
-        return null;
-    }
-
     public String getValue() {
         return value;
     }
 
-    public static MarketArticleStatus of(String category) {
-        for (MarketArticleStatus ba : MarketArticleStatus.values()) {
-            if (ba.value.equals(category)) {
-                return ba;
+    public static MarketArticleStatus of(String value) {
+        for (MarketArticleStatus status : MarketArticleStatus.values()) {
+            if (status.value.equals(value)) {
+                return status;
+            }
+            if (status.name().equalsIgnoreCase(value)) {
+                return status;
             }
         }
 
