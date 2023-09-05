@@ -4,7 +4,6 @@ import com.aliens.db.marketarticle.MarketArticleStatus;
 import com.aliens.db.marketarticle.ProductStatus;
 import com.aliens.db.marketarticle.entity.MarketArticleEntity;
 import com.aliens.db.member.entity.MemberEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

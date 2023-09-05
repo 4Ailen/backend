@@ -7,7 +7,6 @@ import com.aliens.friendship.domain.member.controller.dto.MemberDto;
 import lombok.Getter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,9 +14,9 @@ public class MarketArticleDto {
 
     private Long articleId;
     private String title;
-    private MarketArticleStatus status;
+    private String marketArticleStatus;
     private Integer price;
-    private ProductStatus productStatus;
+    private String productStatus;
     private String content;
     private Integer marketArticleBookmarkCount;
     private Integer commentsCount;
@@ -40,9 +39,9 @@ public class MarketArticleDto {
     ) {
         this.articleId = articleId;
         this.title = title;
-        this.status = status;
+        this.marketArticleStatus = status.getValue();
         this.price = price;
-        this.productStatus = productStatus;
+        this.productStatus = productStatus.getValue();
         this.content = content;
         this.marketArticleBookmarkCount = marketArticleBookmarkCount;
         this.commentsCount = commentsCount;
