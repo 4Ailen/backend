@@ -1,7 +1,9 @@
 package com.aliens.friendship.domain.member.controller.dto;
 
 import com.aliens.db.member.entity.MemberEntity;
+import lombok.Getter;
 
+@Getter
 public class MemberDto {
 
     private Long memberId;
