@@ -1,10 +1,8 @@
 package com.aliens.friendship.domain.article.controller;
 
 import com.aliens.db.communityarticle.ArticleCategory;
-import com.aliens.friendship.domain.article.community.service.CommunityArticleService;
 import com.aliens.friendship.domain.article.dto.ArticleCategoryDto;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
-import com.aliens.friendship.domain.article.market.service.MarketArticleService;
 import com.aliens.friendship.domain.article.service.ArticleService;
 import com.aliens.friendship.global.response.ListResult;
 import com.aliens.friendship.global.response.SingleResult;

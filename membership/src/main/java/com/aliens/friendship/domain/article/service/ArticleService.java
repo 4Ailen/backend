@@ -58,7 +58,7 @@ public class ArticleService {
         List<ArticleDto> results = new ArrayList<>();
         results.addAll(communityArticles);
         results.addAll(marketArticles);
-
+        results.sort((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), results.size());
 
@@ -140,6 +140,7 @@ public class ArticleService {
         List<ArticleDto> results = new ArrayList<>();
         results.addAll(communityArticles);
         results.addAll(marketArticles);
+        results.sort((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), results.size());
@@ -195,6 +196,7 @@ public class ArticleService {
         List<ArticleDto> results = new ArrayList<>();
         results.addAll(communityArticles);
         results.addAll(marketArticles);
+        results.sort((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), results.size());
@@ -249,6 +251,7 @@ public class ArticleService {
         List<ArticleDto> results = new ArrayList<>();
         results.addAll(communityArticles);
         results.addAll(marketArticles);
+        results.sort((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), results.size());
