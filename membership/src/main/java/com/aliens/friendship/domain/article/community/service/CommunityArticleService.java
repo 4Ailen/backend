@@ -106,12 +106,15 @@ public class CommunityArticleService {
                 request.toEntity(getMemberEntity(principal.getUsername()))
         );
 
-        for (MultipartFile imageUrl : request.getImageUrls()) {
-            CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
-                    articleImageService.uploadProfileImage(imageUrl),
-                    communityArticle
-            );
-            communityArticleImageRepository.save(communityArticleImage);
+        List<MultipartFile> imageUrls = request.getImageUrls();
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            for (MultipartFile imageUrl : imageUrls) {
+                CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
+                        articleImageService.uploadProfileImage(imageUrl),
+                        communityArticle
+                );
+                communityArticleImageRepository.save(communityArticleImage);
+            }
         }
 
         return communityArticle.getId();
@@ -133,12 +136,15 @@ public class CommunityArticleService {
 
         communityArticleImageRepository.deleteAllByCommunityArticle(savedCommunityArticle);
 
-        for (MultipartFile imageUrl : request.getImageUrls()) {
-            CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
-                    articleImageService.uploadProfileImage(imageUrl),
-                    savedCommunityArticle
-            );
-            communityArticleImageRepository.save(communityArticleImage);
+        List<MultipartFile> imageUrls = request.getImageUrls();
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            for (MultipartFile imageUrl : imageUrls) {
+                CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
+                        articleImageService.uploadProfileImage(imageUrl),
+                        savedCommunityArticle
+                );
+                communityArticleImageRepository.save(communityArticleImage);
+            }
         }
     }
 
