@@ -10,7 +10,7 @@ import java.util.List;
 public class UpdateMarketArticleRequest {
 
     private String title;
-    private String status;
+    private String marketArticleStatus;
     private Integer price;
     private String productStatus;
     private String content;

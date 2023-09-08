@@ -87,7 +87,7 @@ public class MarketArticleDto {
         return new MarketArticleDto(
                 marketArticle.getId(),
                 marketArticle.getTitle(),
-                marketArticle.getStatus(),
+                marketArticle.getMarketArticleStatus(),
                 marketArticle.getPrice(),
                 marketArticle.getProductStatus(),
                 marketArticle.getContent(),
