@@ -140,7 +140,7 @@ public class MarketArticleService {
 
         savedMarketArticle.update(
                 request.getTitle(),
-                MarketArticleStatus.of(request.getStatus()),
+                MarketArticleStatus.of(request.getMarketArticleStatus()),
                 request.getPrice(),
                 ProductStatus.of(request.getProductStatus()),
                 request.getContent()

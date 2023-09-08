@@ -16,7 +16,7 @@ import java.util.List;
 public class CreateMarketArticleRequest {
 
     private String title;
-    private String status;
+    private String marketArticleStatus;
     private Integer price;
     private String productStatus;
     private String content;
@@ -27,7 +27,7 @@ public class CreateMarketArticleRequest {
     ) {
         return MarketArticleEntity.of(
                 title,
-                MarketArticleStatus.of(status),
+                MarketArticleStatus.of(marketArticleStatus),
                 price,
                 ProductStatus.of(productStatus),
                 content,

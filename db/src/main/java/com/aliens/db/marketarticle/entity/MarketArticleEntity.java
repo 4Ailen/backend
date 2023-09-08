@@ -21,7 +21,7 @@ public class MarketArticleEntity
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
-    private MarketArticleStatus status;
+    private MarketArticleStatus marketArticleStatus;
 
     @Column(nullable = false)
     private Integer price;
@@ -38,14 +38,14 @@ public class MarketArticleEntity
 
     private MarketArticleEntity(
             String title,
-            MarketArticleStatus status,
+            MarketArticleStatus marketArticleStatus,
             Integer price,
             ProductStatus productStatus,
             String content,
             MemberEntity member
     ) {
         this.title = title;
-        this.status = status;
+        this.marketArticleStatus = marketArticleStatus;
         this.price = price;
         this.productStatus = productStatus;
         this.content = content;
@@ -54,7 +54,7 @@ public class MarketArticleEntity
 
     public static MarketArticleEntity of(
             String title,
-            MarketArticleStatus status,
+            MarketArticleStatus marketArticleStatus,
             Integer price,
             ProductStatus productStatus,
             String content,
@@ -62,7 +62,7 @@ public class MarketArticleEntity
     ) {
         return new MarketArticleEntity(
                 title,
-                status,
+                marketArticleStatus,
                 price,
                 productStatus,
                 content,
@@ -72,13 +72,13 @@ public class MarketArticleEntity
 
     public void update(
             String title,
-            MarketArticleStatus status,
+            MarketArticleStatus marketArticleStatus,
             Integer price,
             ProductStatus productStatus,
             String content
     ) {
         this.title = title;
-        this.status = status;
+        this.marketArticleStatus = marketArticleStatus;
         this.price = price;
         this.productStatus = productStatus;
         this.content = content;
