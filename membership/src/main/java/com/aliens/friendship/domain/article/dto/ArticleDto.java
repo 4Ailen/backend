@@ -83,4 +83,20 @@ public class ArticleDto {
                 MemberDto.from(marketArticle.getMember())
         );
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ArticleDto that = (ArticleDto) o;
+
+        return articleId != null ? articleId.equals(that.articleId) : that.articleId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return articleId != null ? articleId.hashCode() : 0;
+    }
+
 }

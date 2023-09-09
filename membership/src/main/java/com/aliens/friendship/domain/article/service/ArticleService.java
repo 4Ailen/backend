@@ -18,9 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -193,9 +191,11 @@ public class ArticleService {
         List<ArticleDto> communityArticles = searchCommunityArticleByMyComments(loginMemberEntity);
         List<ArticleDto> marketArticles = searchMarketArticleByMyComments(loginMemberEntity);
 
-        List<ArticleDto> results = new ArrayList<>();
-        results.addAll(communityArticles);
-        results.addAll(marketArticles);
+        Set<ArticleDto> uniqueResults = new HashSet<>();
+        uniqueResults.addAll(communityArticles);
+        uniqueResults.addAll(marketArticles);
+
+        List<ArticleDto> results = new ArrayList<>(uniqueResults);
         results.sort((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
         int start = (int) pageable.getOffset();
