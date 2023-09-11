@@ -1,5 +1,6 @@
 package com.aliens.friendship.domain.admin;
 
+import com.aliens.friendship.domain.fcm.service.FcmService;
 import com.aliens.friendship.domain.match.business.MatchBusiness;
 import com.aliens.friendship.domain.member.business.MemberBusiness;
 import com.aliens.friendship.domain.member.controller.dto.MemberInfoByAdminResponseDto;
@@ -21,6 +22,7 @@ public class AdminMemberController {
     private final MemberBusiness memberBusiness;
     private final ReportBusiness reportBusiness;
     private final MatchBusiness matchBusiness;
+    private final FcmService fcmService;
 
     @DeleteMapping("/{memberId}")
     public ResponseEntity<CommonResult> deleteMemberInfoByAdmin(@PathVariable Long memberId) {
@@ -57,6 +59,7 @@ public class AdminMemberController {
     @PostMapping("match")
     public void match() throws Exception {
         matchBusiness.matchingAllApplicant();
+        fcmService.sendNoticeToAll("매칭 완료 알림", "매칭이 완료되었습니다!");
     }
 
 }

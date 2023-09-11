@@ -213,11 +213,24 @@ public class FcmService {
         }
     }
 
+    public void sendNoticeToAll(String title, String content) throws Exception {
+        List<String> registeredTokens = getAllTokens();
+        MulticastMessage message = fcmMessageConverter.toNotice(title, content, registeredTokens);
+        firebaseMessagingWrapper.sendMulticast(message);
+    }
+
     public List<FcmTokenEntity> getFcmTokens(Long memberId) {
         return fcmTokenRepository.findAllByMemberId(memberId);
     }
 
     private boolean isRecipientCurrentUser(MemberEntity recipientMember) throws Exception {
         return memberService.getCurrentMemberEntity().equals(recipientMember);
+    }
+
+    private List<String> getAllTokens() {
+        return fcmTokenRepository.findAll()
+                .stream()
+                .map(FcmTokenEntity::getValue)
+                .collect(Collectors.toList());
     }
 }

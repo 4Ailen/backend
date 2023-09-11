@@ -10,7 +10,6 @@ import com.aliens.friendship.domain.match.service.model.Participant;
 import com.aliens.friendship.domain.match.service.model.ServiceModelMatching;
 import com.aliens.friendship.domain.member.service.MemberService;
 import com.aliens.friendship.global.common.annotation.Business;
-import com.aliens.friendship.global.rabbitMQ.MatchCompletionProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ public class MatchBusiness {
     private final MatchConverter matchConverter;
     private final MatchSaveBusiness matchSaveBusiness;
     private final ApplicantService applicantService;
-    private final MatchCompletionProducer matchCompletionProducer;
     private static final int MAX_TRIES = 200;
     private Map<String, Queue<Participant>> languageQueuesWithCandidates = new HashMap<>();
     private int maxMatches = 3;
@@ -195,7 +193,6 @@ public class MatchBusiness {
         }
 
         matchingAllApplicant();
-        matchCompletionProducer.sendMatchCompletionMessage("매칭이 완료되었습니다!");
     }
 }
 
