@@ -58,4 +58,13 @@ public class FcmMessageConverter {
                 .addAllTokens(fcmTokens)
                 .build();
     }
+
+    public MulticastMessage toNotice(String title, String content, List<String> registeredTokens) {
+        return MulticastMessage.builder()
+                .putData("type", "notice")
+                .putData("title", title)
+                .putData("body", content)
+                .addAllTokens(registeredTokens)
+                .build();
+    }
 }
