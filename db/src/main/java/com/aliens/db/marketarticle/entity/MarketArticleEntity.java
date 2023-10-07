@@ -3,12 +3,16 @@ package com.aliens.db.marketarticle.entity;
 import com.aliens.db.BaseEntity;
 import com.aliens.db.marketarticle.MarketArticleStatus;
 import com.aliens.db.marketarticle.ProductStatus;
+import com.aliens.db.marketarticlecomment.entity.MarketArticleCommentEntity;
+import com.aliens.db.marketbookmark.entity.MarketBookmarkEntity;
 import com.aliens.db.member.entity.MemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,6 +39,12 @@ public class MarketArticleEntity
 
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
+
+    @OneToMany(mappedBy = "marketArticle", orphanRemoval = true)
+    private List<MarketArticleCommentEntity> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "marketArticle", orphanRemoval = true)
+    private List<MarketBookmarkEntity> likes = new ArrayList<>();
 
     private MarketArticleEntity(
             String title,
