@@ -57,4 +57,14 @@ public class MarketArticleRepositoryImpl implements MarketArticleCustomRepositor
         return new PageImpl<>(result, pageable, result.size());
     }
 
+    @Override
+    public Optional<Instant> findLatestArticleTimeByMemberId(Long memberId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
+        return Optional.ofNullable(queryFactory
+                .select(marketArticleEntity.createdAt.max())
+                .from(marketArticleEntity)
+                .where(marketArticleEntity.member.id.eq(memberId))
+                .fetchOne());
+    }
 }

@@ -18,4 +18,5 @@ public interface MarketArticleRepository extends
 
     Page<MarketArticleEntity> findAllByTitleContainingOrContentContaining(String title, String content, Pageable pageable);
 
+    Optional<Instant> findLatestArticleTimeByMemberId(Long memberId);
 }

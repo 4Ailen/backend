@@ -13,4 +13,5 @@ public interface MarketArticleCustomRepository {
 
     Page<MarketArticleEntity> findAllByTitleContainingOrContentContainingByFetchJoin(String title, String content, Pageable pageable);
 
+    Optional<Instant> findLatestArticleTimeByMemberId(Long memberId);
 }

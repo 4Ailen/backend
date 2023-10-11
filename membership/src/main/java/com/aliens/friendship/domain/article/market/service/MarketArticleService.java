@@ -12,6 +12,7 @@ import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.db.productimage.entity.ProductImageEntity;
 import com.aliens.db.productimage.repsitory.ProductImageRepository;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
+import com.aliens.friendship.domain.article.exception.ArticleCreationNotAllowedException;
 import com.aliens.friendship.domain.article.market.dto.CreateMarketArticleRequest;
 import com.aliens.friendship.domain.article.market.dto.MarketArticleDto;
 import com.aliens.friendship.domain.article.market.dto.UpdateMarketArticleRequest;
@@ -27,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -139,20 +142,30 @@ public class MarketArticleService {
             CreateMarketArticleRequest request,
             UserDetails userPrincipal
     ) throws Exception {
+        MemberEntity member = getMemberEntity(userPrincipal.getUsername());
+        Optional<Instant> latestArticleTime = marketArticleRepository.findLatestArticleTimeByMemberId(member.getId());
 
-        MarketArticleEntity savedMarketArticle = marketArticleRepository.save(request.toEntity(
-                getMemberEntity(userPrincipal.getUsername())
-        ));
+        boolean canCreateArticle = latestArticleTime.map(
+                time -> Duration.between(time, Instant.now()).toMinutes() >= 5
+        ).orElse(true);
 
-        for (MultipartFile imageUrl : request.getImageUrls()) {
-            ProductImageEntity productImage = ProductImageEntity.of(
-                    articleImageService.uploadProfileImage(imageUrl),
-                    savedMarketArticle
-            );
-            productImageRepository.save(productImage);
+        if (canCreateArticle) {
+            MarketArticleEntity savedMarketArticle = marketArticleRepository.save(request.toEntity(
+                    getMemberEntity(userPrincipal.getUsername())
+            ));
+
+            for (MultipartFile imageUrl : request.getImageUrls()) {
+                ProductImageEntity productImage = ProductImageEntity.of(
+                        articleImageService.uploadProfileImage(imageUrl),
+                        savedMarketArticle
+                );
+                productImageRepository.save(productImage);
+            }
+
+            return savedMarketArticle.getId();
+        } else {
+            throw new ArticleCreationNotAllowedException();
         }
-
-        return savedMarketArticle.getId();
     }
 
     /**
@@ -212,10 +225,10 @@ public class MarketArticleService {
         MarketArticleEntity marketArticle = getMarketArticleEntity(articleId);
         MemberEntity member = getMemberEntity(principal.getUsername());
         Optional<MarketBookmarkEntity> marketBookmark = marketBookmarkRepository.findByMarketArticleAndMemberEntity(marketArticle, member);
-        if(marketBookmark.isPresent()){
+        if (marketBookmark.isPresent()) {
             deleteBookmark(articleId, principal);
             return Optional.empty();
-        } else{
+        } else {
             return Optional.of(createBookmark(articleId, principal));
         }
     }
@@ -254,8 +267,8 @@ public class MarketArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ArticleDto> getAllBookmarks( MemberEntity loginMemberEntity
-    )  {
+    public List<ArticleDto> getAllBookmarks(MemberEntity loginMemberEntity
+    ) {
         List<MarketArticleEntity> marketArticles = marketBookmarkRepository.findAllByMemberEntity(
                         loginMemberEntity
                 )
