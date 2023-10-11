@@ -83,6 +83,36 @@ public class MarketArticleService {
                 ));
     }
 
+    @Transactional(readOnly = true)
+    public Page<MarketArticleDto> searchMarketArticlesWithFetchJoin(
+            Pageable pageable,
+            String searchKeyword
+    ) {
+        if (searchKeyword == null || searchKeyword.isBlank()) {
+            return marketArticleRepository.findAllWithFetchJoin(pageable)
+                    .map(article ->
+                            MarketArticleDto.from(
+                                    article,
+                                    article.getLikes().size(),
+                                    article.getComments().size(),
+                                    getMarketArticleImages(article)
+                            )
+                    );
+        }
+
+        return marketArticleRepository.findAllByTitleContainingOrContentContainingByFetchJoin(
+                        searchKeyword,
+                        searchKeyword,
+                        pageable
+                )
+                .map(article -> MarketArticleDto.from(
+                        article,
+                        article.getLikes().size(),
+                        article.getComments().size(),
+                        getMarketArticleImages(article)
+                ));
+    }
+
     /**
      * 장터 게시글 상세 조회
      */
