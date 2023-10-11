@@ -13,6 +13,7 @@ import com.aliens.db.member.repository.MemberRepository;
 import com.aliens.friendship.domain.article.community.dto.CreateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.community.dto.UpdateCommunityArticleRequest;
 import com.aliens.friendship.domain.article.dto.ArticleDto;
+import com.aliens.friendship.domain.article.exception.ArticleCreationNotAllowedException;
 import com.aliens.friendship.domain.article.service.ArticleImageService;
 import com.aliens.friendship.global.error.InvalidResourceOwnerException;
 import com.aliens.friendship.global.error.ResourceNotFoundException;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -102,22 +105,33 @@ public class CommunityArticleService {
             CreateCommunityArticleRequest request,
             UserDetails principal
     ) throws Exception {
-        CommunityArticleEntity communityArticle = communityArticleRepository.save(
-                request.toEntity(getMemberEntity(principal.getUsername()))
-        );
+        MemberEntity member = getMemberEntity(principal.getUsername());
+        Optional<Instant> latestArticleTime = communityArticleRepository.findLatestArticleTimeByMemberId(member.getId());
 
-        List<MultipartFile> imageUrls = request.getImageUrls();
-        if (imageUrls != null && !imageUrls.isEmpty()) {
-            for (MultipartFile imageUrl : imageUrls) {
-                CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
-                        articleImageService.uploadProfileImage(imageUrl),
-                        communityArticle
-                );
-                communityArticleImageRepository.save(communityArticleImage);
+        boolean canCreateArticle = latestArticleTime.map(
+                time -> Duration.between(time, Instant.now()).toMinutes() >= 5
+        ).orElse(true);
+
+        if (canCreateArticle) {
+            CommunityArticleEntity communityArticle = communityArticleRepository.save(
+                    request.toEntity(getMemberEntity(principal.getUsername()))
+            );
+
+            List<MultipartFile> imageUrls = request.getImageUrls();
+            if (imageUrls != null && !imageUrls.isEmpty()) {
+                for (MultipartFile imageUrl : imageUrls) {
+                    CommunityArticleImageEntity communityArticleImage = CommunityArticleImageEntity.of(
+                            articleImageService.uploadProfileImage(imageUrl),
+                            communityArticle
+                    );
+                    communityArticleImageRepository.save(communityArticleImage);
+                }
             }
-        }
 
-        return communityArticle.getId();
+            return communityArticle.getId();
+        } else {
+            throw new ArticleCreationNotAllowedException();
+        }
     }
 
     public void updateCommunityArticle(
