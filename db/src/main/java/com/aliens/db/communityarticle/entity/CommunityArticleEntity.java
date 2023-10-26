@@ -6,8 +6,10 @@ import com.aliens.db.communityarticlecomment.entity.CommunityArticleCommentEntit
 import com.aliens.db.communityarticlelike.entity.CommunityArticleLikeEntity;
 import com.aliens.db.member.entity.MemberEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@SuperBuilder
 public class CommunityArticleEntity
         extends BaseEntity {
 

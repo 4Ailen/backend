@@ -18,7 +18,6 @@ import static javax.persistence.CascadeType.ALL;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity @Getter @ToString @SuperBuilder
-@Table(name = "member")
 public class MemberEntity extends BaseEntity {
 
     @Column(nullable = false, length = 45)
