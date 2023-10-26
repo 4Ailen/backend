@@ -1,6 +1,7 @@
 package com.aliens.friendship.domain.article.service;
 
 import com.aliens.db.communityarticle.ArticleCategory;
+import com.aliens.db.communityarticle.ArticleSearch;
 import com.aliens.db.communityarticle.repository.CommunityArticleRepository;
 import com.aliens.db.communityarticlecomment.repository.CommunityArticleCommentRepository;
 import com.aliens.db.marketarticle.repository.MarketArticleRepository;
@@ -259,4 +260,11 @@ public class ArticleService {
         return new PageImpl<>(results.subList(start, end), pageable, results.size());
     }
 
+    public Long aa(){
+        return communityArticleRepository.searchWithAll();
+    }
+
+    public Page<com.aliens.db.communityarticle.ArticleDto> searchMyArticlesWithFetchJoin(Pageable pageable, String searchKeyword) {
+        return communityArticleRepository.searchWithFetchJoin(pageable,searchKeyword);
+    }
 }
