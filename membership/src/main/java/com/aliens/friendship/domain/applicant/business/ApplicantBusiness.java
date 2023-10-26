@@ -59,6 +59,9 @@ public class ApplicantBusiness {
         // 탈퇴하지 않은 회원 검증
         matchingInfoService.validateNotWithdraw(loginMemberEntity);
 
+        // 중복 신청 검증
+        applicantService.validateDuplicatedApplication(loginMemberEntity);
+
         //Dto -> Entity
         ApplicantEntity applicantEntity = applicantConverter.toApplicantEntity(loginMemberEntity,applicantRequestDto);
 
