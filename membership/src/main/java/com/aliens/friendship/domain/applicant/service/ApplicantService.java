@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,27 +41,6 @@ public class ApplicantService {
                 .orElseThrow(MatchRequestNotSubmitted::new);
         return applicantEntity;
     }
-
-    /**
-     v1 기준 매칭날짜(금요일) 반환
-     */
-//    public Instant getDateWillMatched(ApplicantEntity applicantEntity) {
-//        Instant applicationDateInstant = applicantEntity.getCreatedAt();
-//        ZoneId zoneId = ZoneId.systemDefault();
-//        LocalDate applicationDate = applicationDateInstant.atZone(zoneId).toLocalDate();
-//        DayOfWeek dayOfWeek = applicationDate.getDayOfWeek();
-//
-//        // applicationDate가 금요일 이전인 경우, 그 주의 금요일 00시를 반환
-//        if (dayOfWeek.compareTo(DayOfWeek.FRIDAY) < 0) {
-//            return getThisFriday(applicationDate);
-//        }
-//        // 금요일 이후인 경우, 다음 주의 금요일 00시를 반환
-//        else {
-//            LocalDate nextFriday = applicationDate.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
-//            return getNextFriday(nextFriday);
-//        }
-//    }
-
 
     /**
      v2 기준 매칭날짜(화요일, 금요일) 반환
@@ -118,14 +98,14 @@ public class ApplicantService {
        }
     }
 
-    public static Instant getThisFriday(LocalDate date) {
+    public Instant getThisFriday(LocalDate date) {
         return date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)) // 이번 주 금요일 반환
                 .atTime(LocalTime.MIN)
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
     }
 
-    public static Instant getNextFriday(LocalDate date) {
+    public Instant getNextFriday(LocalDate date) {
         return date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)) // 다음 주 금요일 반환
                 .atTime(LocalTime.MIN)
                 .atZone(ZoneId.systemDefault())
@@ -144,7 +124,16 @@ public class ApplicantService {
         return memberEntity;
     }
 
-    private MemberEntity findByEmail(String email) throws Exception {
+    private MemberEntity findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+    }
+
+    public void validateDuplicatedApplication(MemberEntity loginMemberEntity) {
+        Optional<ApplicantEntity> applicantEntity = applicantRepository.findFirstByMemberEntityOrderByCreatedAtDesc(loginMemberEntity);
+        if (applicantEntity.isPresent()) {
+            if (applicantEntity.get().getIsMatched() == ApplicantEntity.Status.NOT_MATCHED){
+                throw new MatchingCompletedException();
+            }
+        }
     }
 }
