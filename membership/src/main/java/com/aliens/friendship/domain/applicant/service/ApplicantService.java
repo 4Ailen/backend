@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -146,5 +147,14 @@ public class ApplicantService {
 
     private MemberEntity findByEmail(String email) throws Exception {
         return memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+    }
+
+    public void validateDuplicatedApplication(MemberEntity loginMemberEntity) {
+        Optional<ApplicantEntity> applicantEntity = applicantRepository.findFirstByMemberEntityOrderByCreatedAtDesc(loginMemberEntity);
+        if (applicantEntity.isPresent()) {
+            if (applicantEntity.get().getIsMatched() == ApplicantEntity.Status.NOT_MATCHED) {
+                throw new MatchingCompletedException();
+            }
+        }
     }
 }
