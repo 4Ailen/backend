@@ -8,6 +8,7 @@ import com.aliens.friendship.domain.applicant.controller.dto.ApplicantResponseDt
 import com.aliens.friendship.domain.applicant.controller.dto.PartnersResponseDto;
 import com.aliens.friendship.global.common.annotation.Converter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -17,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 @Converter
 public class ApplicantConverter {
+    @Value("${file-server.domain}")
+    private String domainUrl;
 
     public ApplicantResponseDto toApplicantResponseDto(ApplicantEntity applicantEntity) throws Exception {
         ApplicantResponseDto.Member applicantDto = ApplicantResponseDto.Member.builder()
@@ -25,7 +28,7 @@ public class ApplicantConverter {
                 .mbti(applicantEntity.getMemberEntity().getMbti())
                 .age(applicantEntity.getMemberEntity().getAge())
                 .nationality(applicantEntity.getMemberEntity().getNationality())
-                .profileImage(applicantEntity.getMemberEntity().getProfileImageUrl())
+                .profileImage(domainUrl + applicantEntity.getMemberEntity().getProfileImageUrl())
                 .countryImage(applicantEntity.getMemberEntity().getNationality())
                 .selfIntroduction(applicantEntity.getMemberEntity().getSelfIntroduction())
                 .build();
@@ -68,7 +71,7 @@ public class ApplicantConverter {
                 .mbti(matching.getMatchedMember().getMbti())
                 .memberId(matching.getMatchedMember().getId())
                 .selfIntroduction(matching.getMatchedMember().getSelfIntroduction())
-                .profileImage(matching.getMatchedMember().getProfileImageUrl())
+                .profileImage(domainUrl + matching.getMatchedMember().getProfileImageUrl())
                 .firstPreferLanguage(applicantEntity.getFirstPreferLanguage().toString())
                 .secondPreferLanguage(applicantEntity.getSecondPreferLanguage().toString())
                 .build();
