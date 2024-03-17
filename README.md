@@ -1,5 +1,6 @@
 # ⛵ Friend Ship
-나중에 로고 추가하면 됩니다~!
+[협업 기록](https://hulking-edge-c2d.notion.site/4Alien-s-Team-94abf384bcd84982bdeaebebff6fabf7?pvs=4)
+
 <!-- 로고 -->
 <!-- <p align="center">
   <br>
@@ -55,7 +56,6 @@
 | 프론트엔드 | Flutter(Dart) |     |  |
 | 백엔드 | Spring(Java) |  |  |
 | 데이터베이스 | Redis | MYSQL |  |
-| 배포 | Doker | Server(AWS) | Kubernetes |
 
 # 🙏 결과 및 기대효과
 > 결과물
