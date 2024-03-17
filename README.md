@@ -1,5 +1,5 @@
 # ⛵ Friend Ship
-나중에 로고 추가하면 됩니다~!
+[협업 기록](https://hulking-edge-c2d.notion.site/4Alien-s-Team-94abf384bcd84982bdeaebebff6fabf7?pvs=4)
 <!-- 로고 -->
 <!-- <p align="center">
   <br>
